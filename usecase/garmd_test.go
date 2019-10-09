@@ -26,10 +26,10 @@ import (
 
 	"github.com/kpango/glg"
 
-	"github.com/AthenZ/garm/config"
-	"github.com/AthenZ/garm/handler"
-	"github.com/AthenZ/garm/router"
-	"github.com/AthenZ/garm/service"
+	"github.com/yahoojapan/garm/config"
+	"github.com/yahoojapan/garm/handler"
+	"github.com/yahoojapan/garm/router"
+	"github.com/yahoojapan/garm/service"
 )
 
 func TestNew(t *testing.T) {
@@ -54,10 +54,10 @@ func TestNew(t *testing.T) {
 					Token: config.Token{},
 				},
 			},
-			wantErr: fmt.Errorf("token service instantiate failed: invalid token refresh duration : time: invalid duration \"\""),
+			wantErr: fmt.Errorf("token service instantiate failed: invalid token refresh duration : time: invalid duration "),
 		},
 		func() test {
-			keyEnvName := "dummyKey"
+			keyKey := "dummyKey"
 			key := "../service/testdata/dummyServer.key"
 
 			return test{
@@ -65,38 +65,38 @@ func TestNew(t *testing.T) {
 				args: args{
 					cfg: config.Config{
 						Token: config.Token{
-							AthenzDomain:    keyEnvName,
-							ServiceName:     keyEnvName,
-							PrivateKey:      "_" + keyEnvName + "_",
-							ValidateToken:   false,
-							RefreshDuration: "1m",
-							KeyVersion:      "1",
-							Expiration:      "1m",
+							AthenzDomain:      keyKey,
+							ServiceName:       keyKey,
+							PrivateKeyEnvName: "_" + keyKey + "_",
+							ValidateToken:     false,
+							RefreshDuration:   "1m",
+							KeyVersion:        "1",
+							Expiration:        "1m",
 						},
 					},
 				},
 				beforeFunc: func() {
-					os.Setenv(keyEnvName, key)
+					os.Setenv(keyKey, key)
 				},
 				afterFunc: func() {
-					os.Unsetenv(keyEnvName)
+					os.Unsetenv(keyKey)
 				},
-				wantErr: fmt.Errorf("athenz service instantiate failed: athenz timeout parse failed: time: invalid duration \"\""),
+				wantErr: fmt.Errorf("athenz service instantiate failed: athenz timeout parse failed: time: invalid duration "),
 			}
 		}(),
 		func() test {
-			keyEnvName := "dummyKey"
+			keyKey := "dummyKey"
 			key := "../service/testdata/dummyServer.key"
 			cfg := config.Config{
 				Token: config.Token{
-					AthenzDomain:    keyEnvName,
-					ServiceName:     keyEnvName,
-					NTokenPath:      "",
-					PrivateKey:      "_" + keyEnvName + "_",
-					ValidateToken:   false,
-					RefreshDuration: "1m",
-					KeyVersion:      "1",
-					Expiration:      "1m",
+					AthenzDomain:      keyKey,
+					ServiceName:       keyKey,
+					NTokenPath:        "",
+					PrivateKeyEnvName: "_" + keyKey + "_",
+					ValidateToken:     false,
+					RefreshDuration:   "1m",
+					KeyVersion:        "1",
+					Expiration:        "1m",
 				},
 				Athenz: config.Athenz{
 					Timeout: "1m",
@@ -107,7 +107,7 @@ func TestNew(t *testing.T) {
 				},
 			}
 
-			os.Setenv(keyEnvName, key)
+			os.Setenv(keyKey, key)
 
 			return test{
 				name: "Check new garm daemon return correct",
@@ -115,10 +115,10 @@ func TestNew(t *testing.T) {
 					cfg: cfg,
 				},
 				beforeFunc: func() {
-					os.Setenv(keyEnvName, key)
+					os.Setenv(keyKey, key)
 				},
 				afterFunc: func() {
-					os.Unsetenv(keyEnvName)
+					os.Unsetenv(keyKey)
 				},
 				want: func() GarmDaemon {
 					token, err := service.NewTokenService(cfg.Token)
@@ -195,17 +195,17 @@ func Test_garm_Start(t *testing.T) {
 	}
 	tests := []test{
 		func() test {
-			keyEnvName := "dummy_key"
+			keyKey := "dummy_key"
 			key := "../service/testdata/dummyServer.key"
-			certEnvName := "dummy_cert"
+			certKey := "dummy_cert"
 			cert := "../service/testdata/dummyServer.crt"
 
 			cfg := config.Config{
 				Token: config.Token{
-					AthenzDomain:    keyEnvName,
-					ServiceName:     keyEnvName,
-					NTokenPath:      "",
-					PrivateKey:      "_" + keyEnvName + "_",
+					AthenzDomain: keyKey,
+					ServiceName:  keyKey,
+					NTokenPath:   "",
+					//		PrivateKeyEnvName: "_" + keyKey + "_",
 					ValidateToken:   false,
 					RefreshDuration: "1m",
 					KeyVersion:      "1",
@@ -216,18 +216,17 @@ func Test_garm_Start(t *testing.T) {
 					URL:     "/",
 				},
 				Server: config.Server{
-					HealthzPath:      "/",
-					ShutdownDuration: "5s",
+					HealthzPath: "/",
 					TLS: config.TLS{
 						Enabled: true,
-						Cert:    "_" + certEnvName + "_",
-						Key:     "_" + keyEnvName + "_",
+						CertKey: certKey,
+						KeyKey:  keyKey,
 					},
 				},
 			}
 			ctx, cancelFunc := context.WithCancel(context.Background())
 
-			os.Setenv(keyEnvName, key)
+			os.Setenv(keyKey, key)
 
 			return test{
 				name: "Check success start garm daemon",
@@ -252,8 +251,8 @@ func Test_garm_Start(t *testing.T) {
 					}
 				}(),
 				beforeFunc: func() {
-					os.Setenv(certEnvName, cert)
-					os.Setenv(keyEnvName, key)
+					os.Setenv(certKey, cert)
+					os.Setenv(keyKey, key)
 				},
 				checkFunc: func(got chan []error, want []error) error {
 					cancelFunc()
@@ -267,8 +266,8 @@ func Test_garm_Start(t *testing.T) {
 
 				},
 				afterFunc: func() {
-					os.Unsetenv(keyEnvName)
-					os.Setenv(certEnvName, cert)
+					os.Unsetenv(keyKey)
+					os.Setenv(certKey, cert)
 					cancelFunc()
 				},
 				want: []error{context.Canceled},
