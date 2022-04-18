@@ -27,7 +27,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/yahoojapan/garm/config"
+	"github.com/AthenZ/garm/config"
 )
 
 func TestNewServer(t *testing.T) {

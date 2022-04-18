@@ -1,4 +1,4 @@
-module github.com/yahoojapan/garm
+module github.com/AthenZ/garm
 
 go 1.14
 

@@ -30,9 +30,9 @@ import (
 	"testing"
 	"time"
 
+	"github.com/AthenZ/garm/config"
+	"github.com/AthenZ/garm/handler"
 	"github.com/kpango/glg"
-	"github.com/yahoojapan/garm/config"
-	"github.com/yahoojapan/garm/handler"
 )
 
 // glgMutex prevent race condition on glg

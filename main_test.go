@@ -4,8 +4,8 @@ import (
 	"os"
 	"testing"
 
+	"github.com/AthenZ/garm/config"
 	"github.com/pkg/errors"
-	"github.com/yahoojapan/garm/config"
 )
 
 func TestParseParams(t *testing.T) {

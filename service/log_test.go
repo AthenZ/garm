@@ -26,10 +26,10 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/AthenZ/garm/config"
+	"github.com/AthenZ/garm/log"
 	"github.com/kpango/glg"
 	webhook "github.com/yahoo/k8s-athenz-webhook"
-	"github.com/yahoojapan/garm/config"
-	"github.com/yahoojapan/garm/log"
 )
 
 func TestNewLogger(t *testing.T) {

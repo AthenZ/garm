@@ -26,10 +26,10 @@ import (
 
 	"github.com/kpango/glg"
 
-	"github.com/yahoojapan/garm/config"
-	"github.com/yahoojapan/garm/handler"
-	"github.com/yahoojapan/garm/router"
-	"github.com/yahoojapan/garm/service"
+	"github.com/AthenZ/garm/config"
+	"github.com/AthenZ/garm/handler"
+	"github.com/AthenZ/garm/router"
+	"github.com/AthenZ/garm/service"
 )
 
 func TestNew(t *testing.T) {

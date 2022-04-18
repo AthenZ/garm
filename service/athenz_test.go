@@ -28,8 +28,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/AthenZ/garm/config"
 	webhook "github.com/yahoo/k8s-athenz-webhook"
-	"github.com/yahoojapan/garm/config"
 
 	authn "k8s.io/api/authentication/v1beta1"
 	authz "k8s.io/api/authorization/v1beta1"

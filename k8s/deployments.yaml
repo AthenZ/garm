@@ -61,7 +61,7 @@ spec:
             configMapKeyRef:
               key: athenz-private-key
               name: garm-extapi
-        image: yahoojapan/garm:latest
+        image: docker.io/yahoojapan/garm:latest
         imagePullPolicy: Always
         readinessProbe:
           httpGet:

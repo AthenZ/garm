@@ -25,10 +25,10 @@ import (
 	"strings"
 	"time"
 
+	"github.com/AthenZ/garm/config"
+	"github.com/AthenZ/garm/handler"
 	"github.com/kpango/glg"
 	"github.com/pkg/errors"
-	"github.com/yahoojapan/garm/config"
-	"github.com/yahoojapan/garm/handler"
 )
 
 // New returns ServeMux with routes using given handler.
