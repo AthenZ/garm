@@ -2,7 +2,7 @@
 
 [![License: Apache](https://img.shields.io/badge/License-Apache%202.0-blue.svg?style=flat-square)](https://opensource.org/licenses/Apache-2.0)
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/AthenZ/garm?style=flat-square&label=Github%20version)](https://github.com/AthenZ/garm/releases/latest)
-[![Docker Image Version (tag latest)](https://img.shields.io/docker/v/yahoojapan/garm/latest?style=flat-square&label=Docker%20version)](https://hub.docker.com/r/yahoojapan/garm/tags)
+[![Docker Image Version (tag latest)](https://img.shields.io/docker/v/athenz/garm/latest?style=flat-square&label=Docker%20version)](https://hub.docker.com/r/athenz/garm/tags)
 [![Go Report Card](https://goreportcard.com/badge/github.com/AthenZ/garm)](https://goreportcard.com/report/github.com/AthenZ/garm)
 [![GoDoc](http://godoc.org/github.com/AthenZ/garm?status.svg)](http://godoc.org/github.com/AthenZ/garm)
 [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-v2.0%20adopted-ff69b4.svg)](code_of_conduct.md)
@@ -11,18 +11,13 @@
 
 <!-- TOC insertAnchor:false -->
 
-- [Garm](#garm)
-    - [What is Garm](#what-is-garm)
-    - [Use Case](#use-case)
-        - [Authorization](#authorization)
-        - [Docker](#docker)
-        - [Usage](#usage)
-    - [CI/CD](#cicd)
-    - [Future Work](#future-work)
-    - [License](#license)
-    - [Contributor License Agreement](#contributor-license-agreement)
-    - [About releases](#about-releases)
-    - [Authors](#authors)
+- [What is Garm](#what-is-garm)
+- [Use Case](#use-case)
+    - [Authorization](#authorization)
+    - [Docker](#docker)
+    - [Usage](#usage)
+- [Contributor License Agreement](#contributor-license-agreement)
+- [About releases](#about-releases)
 
 <!-- /TOC -->
 
@@ -34,7 +29,7 @@ Garm implements the Kubernetes authorization webhook interface to provide access
 
 By default, Garm replies the native Kubernetes authentication for authorization. However, it also supports the Kubernetes authentication webhook. Using the authentication hook requires Athenz to be able to sign tokens for users.
 
-Requires go 1.14 or later.
+Requires go 1.18 or later.
 
 ## Use Case
 
@@ -76,4 +71,4 @@ Note that only for contributions to the garm repository on the [GitHub](https://
 
 - Releases
     - [![GitHub release (latest by date)](https://img.shields.io/github/v/release/AthenZ/garm?style=flat-square&label=Github%20version)](https://github.com/AthenZ/garm/releases/latest)
-    - [![Docker Image Version (tag latest)](https://img.shields.io/docker/v/yahoojapan/garm/latest?style=flat-square&label=Docker%20version)](https://hub.docker.com/r/yahoojapan/garm/tags)
+    - [![Docker Image Version (tag latest)](https://img.shields.io/docker/v/athenz/garm/latest?style=flat-square&label=Docker%20version)](https://hub.docker.com/r/athenz/garm/tags)

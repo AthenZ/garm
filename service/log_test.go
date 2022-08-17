@@ -300,7 +300,7 @@ func Test_newLogTraceFlag(t *testing.T) {
 				traces: []string{"athenz", "invalid"},
 			},
 			want:          webhook.LogTraceAthenz,
-			expectedError: "[ERR]:\tunsupported trace event, invalid, ignored\n",
+			expectedError: "unsupported trace event, invalid, ignored\n",
 		},
 	}
 	for _, tt := range tests {
