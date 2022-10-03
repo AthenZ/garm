@@ -26,10 +26,10 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/AthenZ/garm/config"
+	"github.com/AthenZ/garm/log"
 	"github.com/kpango/glg"
 	webhook "github.com/yahoo/k8s-athenz-webhook"
-	"github.com/yahoojapan/garm/config"
-	"github.com/yahoojapan/garm/log"
 )
 
 func TestNewLogger(t *testing.T) {
@@ -300,7 +300,7 @@ func Test_newLogTraceFlag(t *testing.T) {
 				traces: []string{"athenz", "invalid"},
 			},
 			want:          webhook.LogTraceAthenz,
-			expectedError: "[ERR]:\tunsupported trace event, invalid, ignored\n",
+			expectedError: "unsupported trace event, invalid, ignored\n",
 		},
 	}
 	for _, tt := range tests {

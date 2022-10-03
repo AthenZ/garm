@@ -19,7 +19,7 @@ package service
 import (
 	"strings"
 
-	"github.com/yahoojapan/garm/config"
+	"github.com/AthenZ/garm/config"
 )
 
 // Resolver is used to map K8s webhook requests to Athenz requests. (Athenz cannot use ":", hence, needs mapping.)

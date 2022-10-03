@@ -27,7 +27,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/yahoojapan/garm/config"
+	"github.com/AthenZ/garm/config"
 )
 
 func TestNewServer(t *testing.T) {
@@ -489,16 +489,10 @@ func Test_server_hcShutdown(t *testing.T) {
 	}
 	tests := []test{
 		func() test {
-			handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				w.WriteHeader(200)
-			})
-			hcsrv := httptest.NewServer(handler)
 
 			return test{
-				name: "hcShutdown works",
-				fields: fields{
-					hcsrv: hcsrv.Config,
-				},
+				name:   "hcShutdown works",
+				fields: fields{},
 				args: args{
 					ctx: context.Background(),
 				},
@@ -506,7 +500,6 @@ func Test_server_hcShutdown(t *testing.T) {
 					return got
 				},
 				afterFunc: func() error {
-					hcsrv.Close()
 					return nil
 				},
 			}
@@ -529,10 +522,14 @@ func Test_server_hcShutdown(t *testing.T) {
 				}()
 			}
 
+			handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.WriteHeader(200)
+			})
+			hcsrv := httptest.NewServer(handler)
 			s := &server{
 				srv:        tt.fields.srv,
 				srvRunning: tt.fields.srvRunning,
-				hcsrv:      tt.fields.hcsrv,
+				hcsrv:      hcsrv.Config,
 				hcrunning:  tt.fields.hcrunning,
 				cfg:        tt.fields.cfg,
 				pwt:        tt.fields.pwt,
@@ -543,6 +540,7 @@ func Test_server_hcShutdown(t *testing.T) {
 			if err := tt.checkFunc(s, e, tt.want); err != nil {
 				t.Errorf("server.listenAndServe() Error = %v", err)
 			}
+			s.hcsrv.Close()
 		})
 	}
 }
@@ -572,16 +570,9 @@ func Test_server_apiShutdown(t *testing.T) {
 	}
 	tests := []test{
 		func() test {
-			handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				w.WriteHeader(200)
-			})
-			apisrv := httptest.NewServer(handler)
-
 			return test{
-				name: "apiShutdown works",
-				fields: fields{
-					srv: apisrv.Config,
-				},
+				name:   "apiShutdown works",
+				fields: fields{},
 				args: args{
 					ctx: context.Background(),
 				},
@@ -589,7 +580,6 @@ func Test_server_apiShutdown(t *testing.T) {
 					return got
 				},
 				afterFunc: func() error {
-					apisrv.Close()
 					return nil
 				},
 			}
@@ -612,8 +602,12 @@ func Test_server_apiShutdown(t *testing.T) {
 				}()
 			}
 
+			handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.WriteHeader(200)
+			})
+			apisrv := httptest.NewServer(handler)
 			s := &server{
-				srv:        tt.fields.srv,
+				srv:        apisrv.Config,
 				srvRunning: tt.fields.srvRunning,
 				hcsrv:      tt.fields.hcsrv,
 				hcrunning:  tt.fields.hcrunning,
@@ -626,6 +620,7 @@ func Test_server_apiShutdown(t *testing.T) {
 			if err := tt.checkFunc(s, e, tt.want); err != nil {
 				t.Errorf("server.listenAndServe() Error = %v", err)
 			}
+			s.srv.Close()
 		})
 	}
 }
@@ -797,14 +792,11 @@ func Test_server_listenAndServeAPI(t *testing.T) {
 					return nil
 				},
 				checkFunc: func(s *server, want error) error {
-					// listenAndServeAPI function is blocking, so we need to set timer to shutdown the process
-					go func() {
-						time.Sleep(time.Second * 1)
-						err := s.srv.Shutdown(context.Background())
-						if err != nil {
-							t.Error(err)
-						}
-					}()
+					time.Sleep(time.Second * 1)
+					err := s.srv.Shutdown(context.Background())
+					if err != nil {
+						t.Error(err)
+					}
 
 					got := s.listenAndServeAPI()
 

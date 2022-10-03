@@ -21,7 +21,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/yahoojapan/garm/config"
+	"github.com/AthenZ/garm/config"
 )
 
 func TestNewResolver(t *testing.T) {
@@ -1060,7 +1060,7 @@ func Test_resolve_PrincipalFromUser(t *testing.T) {
 			fields: fields{
 				cfg: config.Platform{
 					ServiceAccountPrefixes: []string{"prefix-319:"},
-					EmptyNamespace: "empty",
+					EmptyNamespace:         "empty",
 				},
 				athenzSAPrefix: "athenz._namespace_.",
 			},
@@ -1089,7 +1089,7 @@ func Test_resolve_PrincipalFromUser(t *testing.T) {
 			fields: fields{
 				cfg: config.Platform{
 					ServiceAccountPrefixes: []string{"prefix-331"},
-					EmptyNamespace: "empty",
+					EmptyNamespace:         "empty",
 				},
 				athenzSAPrefix: "athenz._namespace_.",
 			},

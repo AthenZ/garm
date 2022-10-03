@@ -23,9 +23,9 @@ import (
 	"sync"
 	"time"
 
+	"github.com/AthenZ/garm/config"
 	"github.com/kpango/glg"
 	"github.com/pkg/errors"
-	"github.com/yahoojapan/garm/config"
 )
 
 // Server represents a Garm server behaviour.

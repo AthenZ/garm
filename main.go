@@ -25,10 +25,10 @@ import (
 	"runtime"
 	"syscall"
 
+	"github.com/AthenZ/garm/config"
+	"github.com/AthenZ/garm/usecase"
 	"github.com/kpango/glg"
 	"github.com/pkg/errors"
-	"github.com/yahoojapan/garm/config"
-	"github.com/yahoojapan/garm/usecase"
 )
 
 // Version is set by the build command via LDFLAGS

@@ -28,8 +28,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/AthenZ/garm/config"
 	webhook "github.com/yahoo/k8s-athenz-webhook"
-	"github.com/yahoojapan/garm/config"
 
 	authn "k8s.io/api/authentication/v1beta1"
 	authz "k8s.io/api/authorization/v1beta1"
@@ -199,7 +199,7 @@ func TestNewAthenz(t *testing.T) {
 			name:      "Check NewAthenz fail with nil cfg",
 			args:      args{},
 			want:      nil,
-			wantError: fmt.Errorf("athenz timeout parse failed: time: invalid duration "),
+			wantError: fmt.Errorf("athenz timeout parse failed: time: invalid duration \"\""),
 		},
 		{
 			name: "Check NewAthenz fail with invalid timeout duration",
@@ -209,7 +209,7 @@ func TestNewAthenz(t *testing.T) {
 				},
 			},
 			want:      nil,
-			wantError: fmt.Errorf("athenz timeout parse failed: time: invalid duration %s", "xxxtimeout"),
+			wantError: fmt.Errorf("athenz timeout parse failed: time: invalid duration \"%s\"", "xxxtimeout"),
 		},
 		{
 			name: "Check NewAthenz fail with unknown timeout unit",
@@ -219,7 +219,7 @@ func TestNewAthenz(t *testing.T) {
 				},
 			},
 			want:      nil,
-			wantError: fmt.Errorf("athenz timeout parse failed: time: unknown unit %s in duration %s", "ss", "10ss"),
+			wantError: fmt.Errorf("athenz timeout parse failed: time: unknown unit \"%s\" in duration \"%s\"", "ss", "10ss"),
 		},
 		{
 			name: "Check NewAthenz fail with timeout having no units",
@@ -229,7 +229,7 @@ func TestNewAthenz(t *testing.T) {
 				},
 			},
 			want:      nil,
-			wantError: fmt.Errorf("athenz timeout parse failed: time: missing unit in duration %s", "99"),
+			wantError: fmt.Errorf("athenz timeout parse failed: time: missing unit in duration \"%s\"", "99"),
 		},
 	}
 	errToStr := func(err error) string {

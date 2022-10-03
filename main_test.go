@@ -4,8 +4,8 @@ import (
 	"os"
 	"testing"
 
+	"github.com/AthenZ/garm/config"
 	"github.com/pkg/errors"
-	"github.com/yahoojapan/garm/config"
 )
 
 func TestParseParams(t *testing.T) {
@@ -113,7 +113,7 @@ func Test_run(t *testing.T) {
 				},
 				checkFunc: func(cfg config.Config) error {
 					got := run(cfg)
-					want := "failed to instantiate daemon: athenz service instantiate failed: athenz timeout parse failed: time: invalid duration dummy"
+					want := "failed to instantiate daemon: athenz service instantiate failed: athenz timeout parse failed: time: invalid duration \"dummy\""
 					if len(got) != 1 {
 						return errors.New("len(got) != 1")
 					}
@@ -136,7 +136,7 @@ func Test_run(t *testing.T) {
 				},
 				checkFunc: func(cfg config.Config) error {
 					got := run(cfg)
-					want := "failed to instantiate daemon: token service instantiate failed: invalid token refresh duration dummy: time: invalid duration dummy"
+					want := "failed to instantiate daemon: token service instantiate failed: invalid token refresh duration dummy: time: invalid duration \"dummy\""
 					if len(got) != 1 {
 						return errors.New("len(got) != 1")
 					}

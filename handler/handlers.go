@@ -19,8 +19,8 @@ package handler
 import (
 	"net/http"
 
+	"github.com/AthenZ/garm/service"
 	"github.com/pkg/errors"
-	"github.com/yahoojapan/garm/service"
 )
 
 // Handler is an interface to handle authentication and authorization requests.

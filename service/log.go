@@ -21,10 +21,10 @@ import (
 	"os"
 	"strings"
 
+	"github.com/AthenZ/garm/config"
+	"github.com/AthenZ/garm/log"
 	"github.com/kpango/glg"
-	"github.com/yahoo/k8s-athenz-webhook"
-	"github.com/yahoojapan/garm/config"
-	"github.com/yahoojapan/garm/log"
+	webhook "github.com/yahoo/k8s-athenz-webhook"
 )
 
 // Logger is an intermediate interface to create an actual logger.

@@ -26,10 +26,10 @@ import (
 
 	"github.com/kpango/glg"
 
-	"github.com/yahoojapan/garm/config"
-	"github.com/yahoojapan/garm/handler"
-	"github.com/yahoojapan/garm/router"
-	"github.com/yahoojapan/garm/service"
+	"github.com/AthenZ/garm/config"
+	"github.com/AthenZ/garm/handler"
+	"github.com/AthenZ/garm/router"
+	"github.com/AthenZ/garm/service"
 )
 
 func TestNew(t *testing.T) {
@@ -54,7 +54,7 @@ func TestNew(t *testing.T) {
 					Token: config.Token{},
 				},
 			},
-			wantErr: fmt.Errorf("token service instantiate failed: invalid token refresh duration : time: invalid duration "),
+			wantErr: fmt.Errorf("token service instantiate failed: invalid token refresh duration : time: invalid duration \"\""),
 		},
 		func() test {
 			keyEnvName := "dummyKey"
@@ -81,7 +81,7 @@ func TestNew(t *testing.T) {
 				afterFunc: func() {
 					os.Unsetenv(keyEnvName)
 				},
-				wantErr: fmt.Errorf("athenz service instantiate failed: athenz timeout parse failed: time: invalid duration "),
+				wantErr: fmt.Errorf("athenz service instantiate failed: athenz timeout parse failed: time: invalid duration \"\""),
 			}
 		}(),
 		func() test {
@@ -216,7 +216,8 @@ func Test_garm_Start(t *testing.T) {
 					URL:     "/",
 				},
 				Server: config.Server{
-					HealthzPath: "/",
+					HealthzPath:      "/",
+					ShutdownDuration: "5s",
 					TLS: config.TLS{
 						Enabled: true,
 						Cert:    "_" + certEnvName + "_",

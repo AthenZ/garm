@@ -19,7 +19,7 @@ package router
 import (
 	"net/http"
 
-	"github.com/yahoojapan/garm/handler"
+	"github.com/AthenZ/garm/handler"
 )
 
 // Route represents the routing information from incoming request.

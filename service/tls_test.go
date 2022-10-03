@@ -26,7 +26,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/yahoojapan/garm/config"
+	"github.com/AthenZ/garm/config"
 )
 
 func trim(str string) string {
@@ -141,7 +141,7 @@ func TestNewTLSConfig(t *testing.T) {
 					}
 
 					if !match {
-						return fmt.Errorf("CurvePreferences not Find :\twant %s", string(want.MinVersion))
+						return fmt.Errorf("CurvePreferences not Find :\twant %d", want.MinVersion)
 					}
 				}
 				return nil

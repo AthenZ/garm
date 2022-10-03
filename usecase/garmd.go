@@ -19,11 +19,11 @@ package usecase
 import (
 	"context"
 
+	"github.com/AthenZ/garm/config"
+	"github.com/AthenZ/garm/handler"
+	"github.com/AthenZ/garm/router"
+	"github.com/AthenZ/garm/service"
 	"github.com/pkg/errors"
-	"github.com/yahoojapan/garm/config"
-	"github.com/yahoojapan/garm/handler"
-	"github.com/yahoojapan/garm/router"
-	"github.com/yahoojapan/garm/service"
 )
 
 // GarmDaemon represents Garm daemon behavior.
