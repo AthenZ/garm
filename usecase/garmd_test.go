@@ -212,8 +212,8 @@ func Test_garm_Start(t *testing.T) {
 					HealthzPath: "/",
 					TLS: config.TLS{
 						Enabled: true,
-						Cert:    certKey,
-						Key:     keyKey,
+						Cert:    "_" + certKey + "_",
+						Key:     "_" + keyKey + "_",
 					},
 				},
 			}
