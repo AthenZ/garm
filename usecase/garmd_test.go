@@ -26,10 +26,10 @@ import (
 
 	"github.com/kpango/glg"
 
-	"github.com/yahoojapan/garm/config"
-	"github.com/yahoojapan/garm/handler"
-	"github.com/yahoojapan/garm/router"
-	"github.com/yahoojapan/garm/service"
+	"github.com/AthenZ/garm/config"
+	"github.com/AthenZ/garm/handler"
+	"github.com/AthenZ/garm/router"
+	"github.com/AthenZ/garm/service"
 )
 
 func TestNew(t *testing.T) {
@@ -54,7 +54,7 @@ func TestNew(t *testing.T) {
 					Token: config.Token{},
 				},
 			},
-			wantErr: fmt.Errorf("token service instantiate failed: invalid token refresh duration : time: invalid duration "),
+			wantErr: fmt.Errorf("token service instantiate failed: invalid token refresh duration : time: invalid duration \"\""),
 		},
 		func() test {
 			keyKey := "dummyKey"
@@ -65,13 +65,13 @@ func TestNew(t *testing.T) {
 				args: args{
 					cfg: config.Config{
 						Token: config.Token{
-							AthenzDomain:      keyKey,
-							ServiceName:       keyKey,
-							PrivateKeyEnvName: "_" + keyKey + "_",
-							ValidateToken:     false,
-							RefreshDuration:   "1m",
-							KeyVersion:        "1",
-							Expiration:        "1m",
+							AthenzDomain:    keyKey,
+							ServiceName:     keyKey,
+							PrivateKey:      "_" + keyKey + "_",
+							ValidateToken:   false,
+							RefreshDuration: "1m",
+							KeyVersion:      "1",
+							Expiration:      "1m",
 						},
 					},
 				},
@@ -81,21 +81,21 @@ func TestNew(t *testing.T) {
 				afterFunc: func() {
 					os.Unsetenv(keyKey)
 				},
-				wantErr: fmt.Errorf("athenz service instantiate failed: athenz timeout parse failed: time: invalid duration "),
+				wantErr: fmt.Errorf("athenz service instantiate failed: athenz timeout parse failed: time: invalid duration \"\""),
 			}
 		}(),
 		func() test {
 			key := "../service/testdata/dummyServer.key"
 			cfg := config.Config{
 				Token: config.Token{
-					AthenzDomain:      "dummyDomain",
-					ServiceName:       "dummyService",
-					NTokenPath:        "",
-					PrivateKeyEnvName: key,
-					ValidateToken:     false,
-					RefreshDuration:   "1m",
-					KeyVersion:        "1",
-					Expiration:        "1m",
+					AthenzDomain:    "dummyDomain",
+					ServiceName:     "dummyService",
+					NTokenPath:      "",
+					PrivateKey:      key,
+					ValidateToken:   false,
+					RefreshDuration: "1m",
+					KeyVersion:      "1",
+					Expiration:      "1m",
 				},
 				Athenz: config.Athenz{
 					Timeout: "1m",
@@ -195,14 +195,14 @@ func Test_garm_Start(t *testing.T) {
 
 			cfg := config.Config{
 				Token: config.Token{
-					AthenzDomain:      "dummyDomain",
-					ServiceName:       "dummyService",
-					NTokenPath:        "",
-					PrivateKeyEnvName: key,
-					ValidateToken:     false,
-					RefreshDuration:   "1m",
-					KeyVersion:        "1",
-					Expiration:        "1m",
+					AthenzDomain:    "dummyDomain",
+					ServiceName:     "dummyService",
+					NTokenPath:      "",
+					PrivateKey:      key,
+					ValidateToken:   false,
+					RefreshDuration: "1m",
+					KeyVersion:      "1",
+					Expiration:      "1m",
 				},
 				Athenz: config.Athenz{
 					Timeout: "1m",
@@ -212,8 +212,8 @@ func Test_garm_Start(t *testing.T) {
 					HealthzPath: "/",
 					TLS: config.TLS{
 						Enabled: true,
-						CertKey: certKey,
-						KeyKey:  keyKey,
+						Cert:    certKey,
+						Key:     keyKey,
 					},
 				},
 			}
