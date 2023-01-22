@@ -13,6 +13,7 @@
   - [during mapping](#during-mapping)
 
 <!-- /TOC -->
+<!--markdownlint-disable MD013-->
 
 ## Parse k8s resources
 
