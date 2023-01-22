@@ -21,22 +21,22 @@
 
 **Related configuration**
 1. For garm, `config.yaml`
-  ```yaml
-  server.tls.ca
-  server.tls.cert
-  server.tls.key
+    ```yaml
+    server.tls.ca
+    server.tls.cert
+    server.tls.key
 
-  athenz.root_ca
-  ```
+    athenz.root_ca
+    ```
 1. For kube-apiserver, `authz.yaml`
-  ```yaml
-  # https://github.com/kubernetes/apiserver/blob/master/plugin/pkg/authorizer/webhook/webhook.go#L69
-  clusters.cluster.certificate-authority
+    ```yaml
+    # https://github.com/kubernetes/apiserver/blob/master/plugin/pkg/authorizer/webhook/webhook.go#L69
+    clusters.cluster.certificate-authority
 
-  # https://github.com/kubernetes/apiserver/blob/master/plugin/pkg/authorizer/webhook/webhook.go#L76-L77
-  users.user.client-certificate
-  users.user.client-key
-  ```
+    # https://github.com/kubernetes/apiserver/blob/master/plugin/pkg/authorizer/webhook/webhook.go#L76-L77
+    users.user.client-certificate
+    users.user.client-key
+    ```
 
 **Note**
 - Garm uses the same server certificate for /authn and /authz.
