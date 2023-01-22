@@ -127,7 +127,7 @@ func (r *resolve) MapK8sResourceAthenzResource(k8sRes string) string {
 // do the following for each athenzDomains
 // split it with ".";
 // for each token, if it match /^_.*_$/ but not "_namespace_", replace the token with config.GetActualValue(token);
-// and then return the processed value
+// and then return the processed value.
 func (r *resolve) createAthenzDomains(athenzDomains []string) []string {
 	if len(athenzDomains) == 0 {
 		return athenzDomains
@@ -157,7 +157,8 @@ func (r *resolve) BuildDomainsFromNamespace(namespace string) []string {
 	return r.buildAthenzDomain(r.athenzDomains, namespace)
 }
 
-//  BuildServiceAccountPrefixFromNamespace returns domains by processing AthenzServiceAccountPrefix.
+//	BuildServiceAccountPrefixFromNamespace returns domains by processing AthenzServiceAccountPrefix.
+//
 // if namespace != "", replace `/ = .`, then `.. => -`, then replace "_namespace_" in AthenzServiceAccountPrefix with namespace;
 // else replace "._namespace_" in AthenzServiceAccountPrefix with namespace;
 // trim ".", then "-", then ":"
@@ -223,17 +224,17 @@ func (r *resolve) MapResourceName(name string) string {
 	return name
 }
 
-// GetEmptyNamespace returns cfg.EmptyNamespace
+// GetEmptyNamespace returns cfg.EmptyNamespace.
 func (r *resolve) GetEmptyNamespace() string {
 	return r.cfg.EmptyNamespace
 }
 
-// GetNonResourceGroup returns cfg.NonResourceAPIGroup
+// GetNonResourceGroup returns cfg.NonResourceAPIGroup.
 func (r *resolve) GetNonResourceGroup() string {
 	return r.cfg.NonResourceAPIGroup
 }
 
-// GetNonResourceNamespace returns cfg.NonResourceNamespace
+// GetNonResourceNamespace returns cfg.NonResourceNamespace.
 func (r *resolve) GetNonResourceNamespace() string {
 	return r.cfg.NonResourceNamespace
 }
@@ -339,7 +340,7 @@ func (r *resolve) IsAllowed(verb, namespace, apiGroup, resource, name string) bo
 	return true
 }
 
-// IsAdminAccess returns true, if any admin access in config match
+// IsAdminAccess returns true, if any admin access in config match.
 func (r *resolve) IsAdminAccess(verb, namespace, apiGroup, resource, name string) bool {
 	var ok bool
 	for _, admin := range r.cfg.AdminAccessList {

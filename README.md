@@ -9,17 +9,18 @@
 
 ![logo](./images/logo.png)
 
-<!-- TOC insertAnchor:false -->
+<!-- TOC -->
 
 - [What is Garm](#what-is-garm)
 - [Use Case](#use-case)
-    - [Authorization](#authorization)
-    - [Docker](#docker)
-    - [Usage](#usage)
+  - [Authorization](#authorization)
+  - [Docker](#docker)
+  - [Usage](#usage)
 - [Contributor License Agreement](#contributor-license-agreement)
 - [About releases](#about-releases)
 
 <!-- /TOC -->
+<!--markdownlint-disable MD013-->
 
 ## What is Garm
 
@@ -51,8 +52,9 @@ Garm convert the K8s request to Athenz request based on the mapping rules in `co
 P.S. It is just a sample deployment solution above. Garm can work on any environment as long as it can access both the API server and the Athenz server.
 
 ### Docker
-```shell
-$ docker pull docker.io/athenz/garm
+
+```bash
+docker pull docker.io/athenz/garm
 ```
 
 ### Usage
@@ -70,5 +72,5 @@ Note that only for contributions to the garm repository on the [GitHub](https://
 ## About releases
 
 - Releases
-    - [![GitHub release (latest by date)](https://img.shields.io/github/v/release/AthenZ/garm?style=flat-square&label=Github%20version)](https://github.com/AthenZ/garm/releases/latest)
-    - [![Docker Image Version (tag latest)](https://img.shields.io/docker/v/athenz/garm/latest?style=flat-square&label=Docker%20version)](https://hub.docker.com/r/athenz/garm/tags)
+  - [![GitHub release (latest by date)](https://img.shields.io/github/v/release/AthenZ/garm?style=flat-square&label=Github%20version)](https://github.com/AthenZ/garm/releases/latest)
+  - [![Docker Image Version (tag latest)](https://img.shields.io/docker/v/athenz/garm/latest?style=flat-square&label=Docker%20version)](https://hub.docker.com/r/athenz/garm/tags)
