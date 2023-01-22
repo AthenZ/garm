@@ -32,10 +32,10 @@ import (
 	"github.com/kpango/glg"
 )
 
-// glgMutex prevent race condition on glg
+// glgMutex prevent race condition on glg.
 var glgMutex = &sync.Mutex{}
 
-// dummyHandler is a mock implement for handler.Handler
+// dummyHandler is a mock implement for handler.Handler.
 type dummyHandler struct {
 	responseValue string
 }
@@ -115,7 +115,7 @@ func TestNewServeMux(t *testing.T) {
 					want = "Authenticate response"
 					handler.responseValue = want
 					recorder = httptest.NewRecorder()
-					request, err = http.NewRequest(http.MethodPost, "/authn", nil)
+					request, err = http.NewRequestWithContext(context.Background(), http.MethodPost, "/authn", nil)
 					if err != nil {
 						return
 					}
@@ -134,7 +134,7 @@ func TestNewServeMux(t *testing.T) {
 					want = "Authorize response"
 					handler.responseValue = want
 					recorder = httptest.NewRecorder()
-					request, err = http.NewRequest(http.MethodPost, "/authz", nil)
+					request, err = http.NewRequestWithContext(context.Background(), http.MethodPost, "/authz", nil)
 					if err != nil {
 						return
 					}
@@ -226,7 +226,7 @@ func Test_routing(t *testing.T) {
 					h: handlerFunc,
 				},
 				checkFunc: func(server http.Handler) error {
-					request, err := http.NewRequest(http.MethodGet, "/", nil)
+					request, err := http.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
 					if err != nil {
 						return err
 					}
@@ -270,7 +270,7 @@ func Test_routing(t *testing.T) {
 					glgMutex.Lock()
 					glg.Get().SetMode(glg.NONE)
 
-					request, err := http.NewRequest(http.MethodGet, "/", nil)
+					request, err := http.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
 					if err != nil {
 						return err
 					}
@@ -308,7 +308,7 @@ func Test_routing(t *testing.T) {
 					h: handlerFunc,
 				},
 				checkFunc: func(server http.Handler) error {
-					request, err := http.NewRequest(http.MethodGet, "/", nil)
+					request, err := http.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
 					if err != nil {
 						return err
 					}
@@ -348,7 +348,7 @@ func Test_routing(t *testing.T) {
 					h: handlerFunc,
 				},
 				checkFunc: func(server http.Handler) error {
-					request, err := http.NewRequest(http.MethodOptions, "/", nil)
+					request, err := http.NewRequestWithContext(context.Background(), http.MethodOptions, "/", nil)
 					if err != nil {
 						return err
 					}
@@ -390,7 +390,7 @@ func Test_routing(t *testing.T) {
 				},
 				checkFunc: func(server http.Handler) error {
 					for _, method := range []string{http.MethodGet, http.MethodPost} {
-						request, err := http.NewRequest(method, "/", nil)
+						request, err := http.NewRequestWithContext(context.Background(), method, "/", nil)
 						if err != nil {
 							return err
 						}
@@ -439,7 +439,7 @@ func Test_routing(t *testing.T) {
 					errorBuffer := new(bytes.Buffer)
 					glg.Get().SetMode(glg.WRITER).SetWriter(errorBuffer)
 
-					request, err := http.NewRequest(http.MethodGet, "/", nil)
+					request, err := http.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
 					if err != nil {
 						return err
 					}
@@ -483,7 +483,7 @@ func Test_routing(t *testing.T) {
 					errorBuffer := new(bytes.Buffer)
 					glg.Get().SetMode(glg.WRITER).SetWriter(errorBuffer)
 
-					request, err := http.NewRequest(http.MethodGet, "/", nil)
+					request, err := http.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
 					if err != nil {
 						return err
 					}
@@ -537,7 +537,7 @@ func Test_routing(t *testing.T) {
 					rpr, rpw := io.Pipe()
 					rpw.Close()
 					rpr.Close()
-					request, err := http.NewRequest(http.MethodGet, "/", rpr)
+					request, err := http.NewRequestWithContext(context.Background(), http.MethodGet, "/", rpr)
 					if err != nil {
 						return err
 					}
@@ -582,7 +582,7 @@ func Test_routing(t *testing.T) {
 					h: handlerFunc,
 				},
 				checkFunc: func(server http.Handler) error {
-					request, err := http.NewRequest(http.MethodGet, "/", nil)
+					request, err := http.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
 					if err != nil {
 						return err
 					}
@@ -777,7 +777,7 @@ func Test_recoverWrap(t *testing.T) {
 					h: handlerFunc,
 				},
 				checkFunc: func(server http.Handler) error {
-					request, err := http.NewRequest(http.MethodGet, "/", nil)
+					request, err := http.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
 					if err != nil {
 						return err
 					}
@@ -822,7 +822,7 @@ func Test_recoverWrap(t *testing.T) {
 					errorBuffer := new(bytes.Buffer)
 					glg.Get().SetMode(glg.WRITER).SetWriter(errorBuffer)
 
-					request, err := http.NewRequest(http.MethodGet, "/", nil)
+					request, err := http.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
 					if err != nil {
 						return err
 					}

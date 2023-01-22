@@ -9,7 +9,7 @@
 
 ![logo](./images/logo.png)
 
-<!-- TOC insertAnchor:false -->
+<!-- TOC -->
 
 - [What is Garm](#what-is-garm)
 - [Use Case](#use-case)
@@ -19,6 +19,7 @@
 - [About releases](#about-releases)
 
 <!-- /TOC -->
+<!--markdownlint-disable MD013-->
 
 ## What is Garm
 

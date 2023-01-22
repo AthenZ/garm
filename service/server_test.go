@@ -178,10 +178,15 @@ func Test_server_ListenAndServe(t *testing.T) {
 					http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
 
 					checkSrvRunning := func(addr string) error {
-						res, err := http.DefaultClient.Get(addr)
+						req, err := http.NewRequestWithContext(context.Background(), "GET", addr, nil)
 						if err != nil {
 							return err
 						}
+						res, err := http.DefaultClient.Do(req)
+						if err != nil {
+							return err
+						}
+						defer res.Body.Close()
 						if res.StatusCode != 200 {
 							return fmt.Errorf("Response status code invalid, %v", res.StatusCode)
 						}
@@ -282,10 +287,15 @@ func Test_server_ListenAndServe(t *testing.T) {
 					http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
 
 					checkSrvRunning := func(addr string) error {
-						res, err := http.DefaultClient.Get(addr)
+						req, err := http.NewRequestWithContext(context.Background(), "GET", addr, nil)
 						if err != nil {
 							return err
 						}
+						res, err := http.DefaultClient.Do(req)
+						if err != nil {
+							return err
+						}
+						defer res.Body.Close()
 						if res.StatusCode != 200 {
 							return fmt.Errorf("Response status code invalid, %v", res.StatusCode)
 						}
@@ -386,10 +396,15 @@ func Test_server_ListenAndServe(t *testing.T) {
 					http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
 
 					checkSrvRunning := func(addr string) error {
-						res, err := http.DefaultClient.Get(addr)
+						req, err := http.NewRequestWithContext(context.Background(), "GET", addr, nil)
 						if err != nil {
 							return err
 						}
+						res, err := http.DefaultClient.Do(req)
+						if err != nil {
+							return err
+						}
+						defer res.Body.Close()
 						if res.StatusCode != 200 {
 							return fmt.Errorf("Response status code invalid, %v", res.StatusCode)
 						}
@@ -466,7 +481,6 @@ func Test_server_hcShutdown(t *testing.T) {
 	type fields struct {
 		srv        *http.Server
 		srvRunning bool
-		hcsrv      *http.Server
 		hcrunning  bool
 		cfg        config.Server
 		pwt        time.Duration
@@ -545,7 +559,6 @@ func Test_server_hcShutdown(t *testing.T) {
 
 func Test_server_apiShutdown(t *testing.T) {
 	type fields struct {
-		srv        *http.Server
 		srvRunning bool
 		hcsrv      *http.Server
 		hcrunning  bool
@@ -701,6 +714,7 @@ func Test_server_handleHealthCheckRequest(t *testing.T) {
 				},
 				checkFunc: func() error {
 					result := rw.Result()
+					defer result.Body.Close()
 					if header := result.StatusCode; header != http.StatusOK {
 						return fmt.Errorf("Header is not correct, got: %v", header)
 					}
