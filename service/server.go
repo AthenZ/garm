@@ -55,18 +55,18 @@ type server struct {
 }
 
 const (
-	// ContentType represents a HTTP header name "Content-Type"
+	// ContentType represents a HTTP header name "Content-Type".
 	ContentType = "Content-Type"
 
-	// TextPlain represents a HTTP content type "text/plain"
+	// TextPlain represents a HTTP content type "text/plain".
 	TextPlain = "text/plain"
 
-	// CharsetUTF8 represents a UTF-8 charset for HTTP response "charset=UTF-8"
+	// CharsetUTF8 represents a UTF-8 charset for HTTP response "charset=UTF-8".
 	CharsetUTF8 = "charset=UTF-8"
 )
 
 var (
-	// ErrContextClosed represents the error that the context is closed
+	// ErrContextClosed represents the error that the context is closed.
 	ErrContextClosed = errors.New("context Closed")
 )
 

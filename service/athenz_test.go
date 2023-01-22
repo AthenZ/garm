@@ -35,19 +35,19 @@ import (
 	authz "k8s.io/api/authorization/v1beta1"
 )
 
-// dummyLogger is a mock implementation for webhook.Logger
+// dummyLogger is a mock implementation for webhook.Logger.
 type dummyLogger string
 
-// Println is mock method for webhook.Logger interface
+// Println is mock method for webhook.Logger interface.
 func (dummyLogger) Println(args ...interface{}) {}
 
-// Printf is mock method for webhook.Logger interface
+// Printf is mock method for webhook.Logger interface.
 func (dummyLogger) Printf(format string, args ...interface{}) {}
 
-// dummyLogger is a mock implementation for webhook.ResourceMapper and webhook.UserMapper
+// dummyLogger is a mock implementation for webhook.ResourceMapper and webhook.UserMapper.
 type dummyMapper string
 
-// MapResource is mock method for webhook.ResourceMapper interface
+// MapResource is mock method for webhook.ResourceMapper interface.
 func (dummyMapper) MapResource(ctx context.Context, spec authz.SubjectAccessReviewSpec) (principal string, checks []webhook.AthenzAccessCheck, err error) {
 	principal = "principal"
 	checks = []webhook.AthenzAccessCheck{
@@ -64,7 +64,7 @@ func (dummyMapper) MapResource(ctx context.Context, spec authz.SubjectAccessRevi
 	return
 }
 
-// MapUser is mock method for webhook.UserMapper interface
+// MapUser is mock method for webhook.UserMapper interface.
 func (dummyMapper) MapUser(ctx context.Context, domain, service string) (authn.UserInfo, error) {
 	return authn.UserInfo{
 		Username: "username",

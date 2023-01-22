@@ -9,17 +9,18 @@
 
 ![logo](./images/logo.png)
 
-<!-- TOC insertAnchor:false -->
+<!-- TOC -->
 
 - [What is Garm](#what-is-garm)
 - [Use Case](#use-case)
-    - [Authorization](#authorization)
-    - [Docker](#docker)
-    - [Usage](#usage)
+  - [Authorization](#authorization)
+  - [Docker](#docker)
+  - [Usage](#usage)
 - [Contributor License Agreement](#contributor-license-agreement)
 - [About releases](#about-releases)
 
 <!-- /TOC -->
+<!--markdownlint-disable MD013-->
 
 ## What is Garm
 

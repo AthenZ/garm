@@ -48,7 +48,7 @@ type token struct {
 }
 
 var (
-	// ErrTokenNotFound represents the error that the token is not found
+	// ErrTokenNotFound represents the error that the token is not found.
 	ErrTokenNotFound = errors.New("Error:\ttoken not found")
 )
 

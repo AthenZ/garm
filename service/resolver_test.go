@@ -506,8 +506,9 @@ func Test_resolve_createAthenzDomains(t *testing.T) {
 			}
 
 			r := &resolve{
-				cfg:           tt.fields.cfg,
-				athenzDomains: tt.fields.athenzDomains,
+				cfg:            tt.fields.cfg,
+				athenzDomains:  tt.fields.athenzDomains,
+				athenzSAPrefix: tt.fields.athenzSAPrefix,
 			}
 			if got := r.createAthenzDomains(tt.args.athenzDomains); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("resolve.createAthenzDomains() = %v, want %v", got, tt.want)

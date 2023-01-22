@@ -34,7 +34,7 @@ type Athenz interface {
 	AthenzAuthenticator(http.ResponseWriter, *http.Request) error
 }
 
-// Wrapper for Athenz HTTP request handlers
+// Wrapper for Athenz HTTP request handlers.
 type athenz struct {
 	// authConfig is the shared configuration for the HTTP handlers.
 	authConfig config.Athenz
