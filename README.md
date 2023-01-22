@@ -51,8 +51,9 @@ Garm convert the K8s request to Athenz request based on the mapping rules in `co
 P.S. It is just a sample deployment solution above. Garm can work on any environment as long as it can access both the API server and the Athenz server.
 
 ### Docker
-```shell
-$ docker pull docker.io/athenz/garm
+
+```bash
+docker pull docker.io/athenz/garm
 ```
 
 ### Usage

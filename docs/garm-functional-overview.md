@@ -99,6 +99,7 @@ P.S. It may be easier to read the code directly. [createAthenzDomains()](../serv
     - white_list **ONLY** contains `RequestInfo{ Verb: "get", Namespace: "kube-system", APIGroup: "*", Resource: "secrets", Name: "alertmanager"}`.
 
 ## Select Athenz domain
+
 - `in admin_access_list` => use admin domain
   - `config.yaml`, `map_rule.tld.platform.admin_access_list`
 - Matching logic
@@ -107,6 +108,7 @@ P.S. It may be easier to read the code directly. [createAthenzDomains()](../serv
 ## Create Athenz assertion
 
 ### during mapping
+
 ![optional api group and resource name](./assets/optional-api-group-and-resource-name.png)
 
 - Athenz service domain
