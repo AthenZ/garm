@@ -21,7 +21,7 @@ import (
 	"fmt"
 
 	webhook "github.com/yahoo/k8s-athenz-webhook"
-	authn "k8s.io/api/authentication/v1beta1"
+	authn "k8s.io/api/authentication/v1"
 )
 
 // UserMapper allows for mapping from Athenz principals to k8s objects.

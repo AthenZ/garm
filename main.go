@@ -25,8 +25,8 @@ import (
 	"runtime"
 	"syscall"
 
-	"github.com/AthenZ/garm/config"
-	"github.com/AthenZ/garm/usecase"
+	"github.com/AthenZ/garm/v2/config"
+	"github.com/AthenZ/garm/v2/usecase"
 	"github.com/kpango/glg"
 	"github.com/pkg/errors"
 )

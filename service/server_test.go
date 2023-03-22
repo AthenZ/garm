@@ -27,7 +27,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/AthenZ/garm/config"
+	"github.com/AthenZ/garm/v2/config"
 )
 
 func TestNewServer(t *testing.T) {

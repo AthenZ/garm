@@ -21,7 +21,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/AthenZ/garm/config"
+	"github.com/AthenZ/garm/v2/config"
 )
 
 func TestNewResolver(t *testing.T) {
