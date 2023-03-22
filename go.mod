@@ -4,13 +4,13 @@ go 1.18
 
 replace (
 	github.com/AthenZ/athenz => github.com/AthenZ/athenz v1.11.23
-	golang.org/x/net => golang.org/x/net v0.7.0 // indirect
+	golang.org/x/net => golang.org/x/net v0.7.0
 	k8s.io/client-go => k8s.io/client-go v0.26.0
 )
 
 require (
 	github.com/AthenZ/athenz v1.11.23
-	github.com/kpango/glg v1.6.15
+	github.com/kpango/glg v1.6.14
 	github.com/pkg/errors v0.9.1
 	github.com/yahoo/k8s-athenz-webhook v0.1.5-0.20230310225932-073f1a05c41a
 	gopkg.in/yaml.v2 v2.4.0
