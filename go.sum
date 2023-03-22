@@ -195,8 +195,8 @@ github.com/jstemmer/go-junit-report v0.9.1/go.mod h1:Brl9GWCQeLvo8nXZwPNNblvFj/X
 github.com/kisielk/errcheck v1.5.0/go.mod h1:pFxgyoBC7bSaBwPgfKdkLd5X25qrDl4LWUI2bnpBCr8=
 github.com/kisielk/gotool v1.0.0/go.mod h1:XhKaO+MFFWcvkIS/tQcRk01m1F5IRFswLeQ+oQHNcck=
 github.com/konsorten/go-windows-terminal-sequences v1.0.1/go.mod h1:T0+1ngSBFLxvqU3pZ+m/2kptfBszLMUkC4ZK/EgS/cQ=
-github.com/kpango/fastime v1.1.9 h1:xVQHcqyPt5M69DyFH7g1EPRns1YQNap9d5eLhl/Jy84=
-github.com/kpango/fastime v1.1.9/go.mod h1:vyD7FnUn08zxY4b/QFBZVG+9EWMYsNl+QF0uE46urD4=
+github.com/kpango/fastime v1.1.6 h1:lAw1Tiwnlbsx1xZs6W9eM7/8niwabknewbmLkh/yTVo=
+github.com/kpango/fastime v1.1.6/go.mod h1:tTNDbIo5qL6D7g5vh2YbkyUbOVP2kD/we3rSjN22PMY=
 github.com/kpango/glg v1.6.14 h1:Ss3ZvTQ23blUCDYizSAijiFTZsgGeYr/lanUGgQ10rY=
 github.com/kpango/glg v1.6.14/go.mod h1:2djk7Zr4zKIYPHlORH8tJVlhCEh+XXW8W4K3qJyNXMI=
 github.com/kr/pretty v0.1.0/go.mod h1:dAy3ld7l9f0ibDNOQOHHMYYIIbhfbHSm3C4ZsoJORNo=
