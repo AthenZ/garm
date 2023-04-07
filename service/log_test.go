@@ -26,8 +26,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/AthenZ/garm/config"
-	"github.com/AthenZ/garm/log"
+	"github.com/AthenZ/garm/v2/config"
+	"github.com/AthenZ/garm/v2/log"
 	"github.com/kpango/glg"
 	webhook "github.com/yahoo/k8s-athenz-webhook"
 )

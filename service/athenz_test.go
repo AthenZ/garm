@@ -28,11 +28,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/AthenZ/garm/config"
+	"github.com/AthenZ/garm/v2/config"
 	webhook "github.com/yahoo/k8s-athenz-webhook"
 
-	authn "k8s.io/api/authentication/v1beta1"
-	authz "k8s.io/api/authorization/v1beta1"
+	authn "k8s.io/api/authentication/v1"
+	authz "k8s.io/api/authorization/v1"
 )
 
 // dummyLogger is a mock implementation for webhook.Logger

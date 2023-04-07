@@ -21,7 +21,7 @@ import (
 	"reflect"
 	"testing"
 
-	authn "k8s.io/api/authentication/v1beta1"
+	authn "k8s.io/api/authentication/v1"
 )
 
 func TestNewUserMapper(t *testing.T) {

@@ -21,7 +21,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/AthenZ/garm/config"
+	"github.com/AthenZ/garm/v2/config"
 	"github.com/pkg/errors"
 	webhook "github.com/yahoo/k8s-athenz-webhook"
 )

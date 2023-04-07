@@ -28,7 +28,7 @@ import (
 	"time"
 
 	"github.com/AthenZ/athenz/libs/go/zmssvctoken"
-	"github.com/AthenZ/garm/config"
+	"github.com/AthenZ/garm/v2/config"
 )
 
 func TestNewTokenService(t *testing.T) {

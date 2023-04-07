@@ -19,7 +19,7 @@ package service
 import (
 	"strings"
 
-	"github.com/AthenZ/garm/config"
+	"github.com/AthenZ/garm/v2/config"
 )
 
 // Resolver is used to map K8s webhook requests to Athenz requests. (Athenz cannot use ":", hence, needs mapping.)
@@ -30,6 +30,8 @@ type Resolver interface {
 	MapK8sResourceAthenzResource(string) string
 	// BuildDomainsFromNamespace creates Athenz domains with namespace.
 	BuildDomainsFromNamespace(string) []string
+	// BuildServiceAccountPrefixFromNamespace creates Athenz domains for service account with namespace.
+	BuildServiceAccountPrefixFromNamespace(string) []string
 	// PrincipalFromUser creates principal name from user.
 	PrincipalFromUser(user string, groups []string) string
 	// GetAdminDomain creates Athenz admin domain with namespace.

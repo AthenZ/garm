@@ -22,9 +22,9 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/AthenZ/garm/config"
+	"github.com/AthenZ/garm/v2/config"
 	webhook "github.com/yahoo/k8s-athenz-webhook"
-	authz "k8s.io/api/authorization/v1beta1"
+	authz "k8s.io/api/authorization/v1"
 )
 
 func TestNewResourceMapper(t *testing.T) {

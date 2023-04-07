@@ -21,7 +21,7 @@ import (
 	"crypto/x509"
 	"io/ioutil"
 
-	"github.com/AthenZ/garm/config"
+	"github.com/AthenZ/garm/v2/config"
 	"github.com/kpango/glg"
 	"github.com/pkg/errors"
 )

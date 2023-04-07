@@ -21,7 +21,7 @@ import (
 	"fmt"
 
 	webhook "github.com/yahoo/k8s-athenz-webhook"
-	authz "k8s.io/api/authorization/v1beta1"
+	authz "k8s.io/api/authorization/v1"
 )
 
 // ResourceMapper allows for mapping from an authorization request to Athenz principals.

@@ -25,8 +25,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/AthenZ/garm/config"
-	"github.com/AthenZ/garm/handler"
+	"github.com/AthenZ/garm/v2/config"
+	"github.com/AthenZ/garm/v2/handler"
 	"github.com/kpango/glg"
 	"github.com/pkg/errors"
 )
