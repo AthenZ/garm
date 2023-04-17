@@ -29,7 +29,12 @@ import (
 
 const (
 	// currentVersion represents the configuration version.
-	currentVersion = "v2.0.0"
+	currentVersion string = "v2.0.0"
+	// Choose the delimiter that RequestInfo's verb, namespace, API Group, Resource and Name CANNOT use.
+	// i.e) If end user can set its resource name with hyphens, we cannot use hyphen as delimiter.
+	// This will wrongfully grant access to privileged actions like DELETE or POST
+	// for resources with hyphens in their names when minimum access rights such as GET is given.
+	delimiter string = ","
 )
 
 // Config represents an application configuration content (config.yaml).
@@ -256,11 +261,11 @@ type RequestInfo struct {
 	once *sync.Once
 }
 
-// Serialize returns RequestInfo in string format.
-// 1. replacedAPIGroup = replace `. => _` in r.APIGroup
-// 2. output format: `${r.Verb}-${r.Namespace}-${replacedAPIGroup}-${r.Resource}-${r.Name}`
+// Returns RequestInfo in string, separated by the delimiter.
+// API Group's periods will be replaced with underscores.
 func (r *RequestInfo) Serialize() string {
-	return strings.Join([]string{r.Verb, r.Namespace, strings.Replace(r.APIGroup, ".", "_", -1), r.Resource, r.Name}, "-")
+	apiGroupWithoutPeriods := strings.Replace(r.APIGroup, ".", "_", -1)
+	return strings.Join([]string{r.Verb, r.Namespace, apiGroupWithoutPeriods, r.Resource, r.Name}, delimiter)
 }
 
 // Match checks if the given RequestInfo matches with the regular expression in this RequestInfo.
