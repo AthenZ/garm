@@ -268,6 +268,28 @@ func (r *RequestInfo) Serialize() string {
 	return strings.Join([]string{r.Verb, r.Namespace, apiGroupWithoutPeriods, r.Resource, r.Name}, delimiter)
 }
 
+func buildRobustRegex(glob string) string {
+	var sb strings.Builder
+	sb.WriteString("^")
+	for _, c := range glob {
+		switch c {
+		case '*':
+			sb.WriteString(".*")
+		case '?':
+			// TODO: Check required. I do not think ? should become dot here. Should be escaped?
+			sb.WriteString(".")
+		// escape regex special characters
+		case '^', '$', '|', '[', ']', '+', '\\', '(', ')', '{', '}':
+			sb.WriteString("\\")
+			fallthrough
+		default:
+			sb.WriteRune(c)
+		}
+	}
+	sb.WriteString("$")
+	return strings.Replace(sb.String(), "..*", ".*", -1)
+}
+
 // Match checks if the given RequestInfo matches with the regular expression in this RequestInfo.
 // 1. r.Serialize()
 // 2. replace `* => .*`
@@ -278,7 +300,7 @@ func (r *RequestInfo) Match(req RequestInfo) bool {
 		r.once = new(sync.Once)
 	}
 	r.once.Do(func() {
-		r.reg = regexp.MustCompile(strings.Replace(strings.Replace(r.Serialize(), "*", ".*", -1), "..*", ".*", -1))
+		r.reg = regexp.MustCompile(buildRobustRegex(r.Serialize()))
 	})
 
 	return r.reg.Copy().MatchString(req.Serialize())

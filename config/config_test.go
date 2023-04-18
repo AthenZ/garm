@@ -571,3 +571,60 @@ func TestCheckPrefixAndSuffix(t *testing.T) {
 		})
 	}
 }
+
+func Test_patternFromGlob(t *testing.T) {
+	type args struct {
+		glob string
+	}
+	tests := []struct {
+		name string
+		args args
+		want string
+	}{
+		{
+			name: "Test patternFromGlob with *",
+			args: args{
+				glob: "*",
+			},
+			want: "^.*$",
+		},
+		{
+			name: "Test patternFromGlob with *.*",
+			args: args{
+				glob: "*.*",
+			},
+			want: "^.*.*$",
+		},
+		// Test question mark
+		{
+			name: "Test patternFromGlob with ?",
+			args: args{
+				glob: "?",
+			},
+			want: "^.$",
+		},
+		// Test every regex here: '^', '$', '|', '[', ']', '+', '\\', '(', ')', '{', '}'
+		{
+			name: "Test patternFromGlob with ^$|[]+\\(){}",
+			args: args{
+				glob: "^$|[]+\\(){}",
+			},
+			want: "^\\^\\$\\|\\[\\]\\+\\\\\\(\\)\\{\\}$",
+		},
+		// Test plain text
+		{
+			name: "Test patternFromGlob with plain text",
+			args: args{
+				glob: "plain text",
+			},
+			want: "^plain text$",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := buildRobustRegex(tt.args.glob); got != tt.want {
+				t.Errorf("buildRobustRegex() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
