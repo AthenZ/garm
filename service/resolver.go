@@ -18,6 +18,7 @@ package service
 
 import (
 	"strings"
+	"fmt"
 
 	"github.com/AthenZ/garm/v2/config"
 )
@@ -311,28 +312,24 @@ func (r *resolve) TrimResource(res string) string {
 // returns false, only if inside blacklist
 // i.e. return (in whitelist || not in blacklist)
 func (r *resolve) IsAllowed(verb, namespace, apiGroup, resource, name string) bool {
+	ri := config.RequestInfo{
+		Verb:      verb,
+		Namespace: namespace,
+		APIGroup:  apiGroup,
+		Resource:  resource,
+		Name:      name,
+	}
+
 	for _, white := range r.cfg.WhiteList {
-		if white.Match(config.RequestInfo{
-			Verb:      verb,
-			Namespace: namespace,
-			APIGroup:  apiGroup,
-			Resource:  resource,
-			Name:      name,
-		}) {
-			// TODO: Write a log here
+		if white.Match(ri) {
+			fmt.Printf("👍 Passed with \"%s\" matches \"%s\"", white.Serialize(), ri.Serialize())
 			return true
 		}
 	}
 
 	for _, black := range r.cfg.BlackList {
-		if black.Match(config.RequestInfo{
-			Verb:      verb,
-			Namespace: namespace,
-			APIGroup:  apiGroup,
-			Resource:  resource,
-			Name:      name,
-		}) {
-			// TODO: Write a log here
+		if black.Match(ri) {
+			fmt.Printf("❌ Explicitly denied with \"%s\" matches %s", black.Serialize(), ri.Serialize())
 			return false
 		}
 	}
@@ -342,16 +339,14 @@ func (r *resolve) IsAllowed(verb, namespace, apiGroup, resource, name string) bo
 
 // IsAdminAccess returns true, if any admin access in config match
 func (r *resolve) IsAdminAccess(verb, namespace, apiGroup, resource, name string) bool {
-	var ok bool
 	for _, admin := range r.cfg.AdminAccessList {
-		ok = admin.Match(config.RequestInfo{
+		if admin.Match(config.RequestInfo{
 			Verb:      verb,
 			Namespace: namespace,
 			APIGroup:  apiGroup,
 			Resource:  resource,
 			Name:      name,
-		})
-		if ok {
+		}) {
 			return true
 		}
 	}
