@@ -311,29 +311,28 @@ func (r *resolve) TrimResource(res string) string {
 // returns false, only if inside blacklist
 // i.e. return (in whitelist || not in blacklist)
 func (r *resolve) IsAllowed(verb, namespace, apiGroup, resource, name string) bool {
-	var ok bool
 	for _, white := range r.cfg.WhiteList {
-		ok = white.Match(config.RequestInfo{
+		if white.Match(config.RequestInfo{
 			Verb:      verb,
 			Namespace: namespace,
 			APIGroup:  apiGroup,
 			Resource:  resource,
 			Name:      name,
-		})
-		if ok {
+		}) {
+			// TODO: Write a log here
 			return true
 		}
 	}
 
 	for _, black := range r.cfg.BlackList {
-		ok = black.Match(config.RequestInfo{
+		if black.Match(config.RequestInfo{
 			Verb:      verb,
 			Namespace: namespace,
 			APIGroup:  apiGroup,
 			Resource:  resource,
 			Name:      name,
-		})
-		if ok {
+		}) {
+			// TODO: Write a log here
 			return false
 		}
 	}
