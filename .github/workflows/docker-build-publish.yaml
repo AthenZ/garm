@@ -226,4 +226,4 @@ jobs:
         name: Test Docker image
         id: test_docker
         run: |
-          docker run --rm ${{ fromJSON(steps.meta.outputs.json).tags[0] }} --version
+          docker run --rm ${{ fromJSON(steps.meta.outputs.json).tags[0] }} -version
