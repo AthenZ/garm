@@ -269,27 +269,6 @@ func (r *RequestInfo) Serialize() string {
 	return strings.Join([]string{r.Verb, r.Namespace, r.APIGroup, r.Resource, r.Name}, delimiter)
 }
 
-func buildRobustRegex(glob string) string {
-	var sb strings.Builder
-	sb.WriteString("^")
-	for _, c := range glob {
-		switch c {
-		case '*':
-			sb.WriteString(".*")
-		case '?':
-			sb.WriteString(".")
-		// escape regex special characters
-		case '^', '$', '|', '[', ']', '+', '\\', '(', ')', '{', '}':
-			sb.WriteString("\\")
-			fallthrough
-		default:
-			sb.WriteRune(c)
-		}
-	}
-	sb.WriteString("$")
-	return strings.Replace(sb.String(), "..*", ".*", -1)
-}
-
 // Match checks if the given RequestInfo matches with the regular expression in this RequestInfo.
 // 1. r.Serialize()
 // 2. replace `* => .*`

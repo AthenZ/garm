@@ -1461,7 +1461,7 @@ func Test_resolve_IsAdminAccess(t *testing.T) {
 			want: true,
 		},
 		{
-			name: "Check resolve IsAdminAccess regex match",
+			name: "Check with asterisk for resource",
 			fields: fields{
 				cfg: config.Platform{
 					AdminAccessList: []*config.RequestInfo{
@@ -1509,7 +1509,7 @@ func Test_resolve_IsAdminAccess(t *testing.T) {
 			want: false,
 		},
 		{
-			name: "Check resolve IsAdminAccess regex match success after APIGroup replace",
+			name: "Check period in APIGroup gets escaped successfully",
 			fields: fields{
 				cfg: config.Platform{
 					AdminAccessList: []*config.RequestInfo{
