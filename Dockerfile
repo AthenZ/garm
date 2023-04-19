@@ -2,7 +2,7 @@ FROM golang:1.20-alpine AS base
 
 RUN set -eux \
     && apk --no-cache add ca-certificates \
-    && apk --no-cache add --virtual build-dependencies cmake g++ make unzip curl upx git
+    && apk --no-cache add --virtual build-dependencies cmake g++ make unzip curl git
 
 WORKDIR ${GOPATH}/src/github.com/AthenZ/garm
 
@@ -30,7 +30,7 @@ RUN BUILD_TIME=$(date -u +%Y%m%d-%H%M%S) \
     GOARCH=$(go env GOARCH) \
     GO111MODULE=on \
     go build -ldflags "-s -w -linkmode 'external' -extldflags '-static -fPIC -m64 -pthread -std=c++11 -lstdc++' -X 'main.Version=${APP_VERSION} at ${BUILD_TIME} by ${GO_VERSION}'" -a -tags "cgo netgo" -installsuffix "cgo netgo" -o "${APP_NAME}" \
-    && upx --best -o "/usr/bin/${APP_NAME}" "${APP_NAME}"
+    && mv "${APP_NAME}" "/usr/bin/${APP_NAME}"
 
 RUN apk del build-dependencies --purge \
     && rm -rf "${GOPATH}"
@@ -50,7 +50,7 @@ COPY --from=builder /etc/passwd /etc/passwd
 COPY --from=builder /usr/bin/${APP_NAME} /go/bin/${APP_NAME}
 # Copy user
 COPY --from=builder /etc/passwd /etc/passwd
-USER ${APP_NAME}
+# USER ${APP_NAME}
 
 HEALTHCHECK NONE
 ENTRYPOINT ["/go/bin/garm"]
