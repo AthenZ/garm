@@ -276,7 +276,6 @@ func buildRobustRegex(glob string) string {
 		case '*':
 			sb.WriteString(".*")
 		case '?':
-			// TODO: Check required. I do not think ? should become dot here. Should be escaped?
 			sb.WriteString(".")
 		// escape regex special characters
 		case '^', '$', '|', '[', ']', '+', '\\', '(', ')', '{', '}':
