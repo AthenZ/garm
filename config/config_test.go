@@ -59,7 +59,7 @@ func Test_requestInfo_Serialize(t *testing.T) {
 					Name:      "dummyName",
 				},
 			},
-			want: "dummyVerb,dummyNamespace,dummy_APIGroup,dummyResource,dummyName",
+			want: "dummyVerb,dummyNamespace,dummy.APIGroup,dummyResource,dummyName",
 		},
 	}
 	for _, tt := range tests {

@@ -18,7 +18,7 @@ package service
 
 import (
 	"strings"
-	"fmt"
+	"github.com/kpango/glg"
 
 	"github.com/AthenZ/garm/v2/config"
 )
@@ -322,14 +322,14 @@ func (r *resolve) IsAllowed(verb, namespace, apiGroup, resource, name string) bo
 
 	for _, white := range r.cfg.WhiteList {
 		if white.Match(ri) {
-			fmt.Printf("👍 Passed with \"%s\" matches \"%s\"\n", white.Serialize(), ri.Serialize())
+			glg.Info("👍 Passed with \"%s\" matches \"%s\"\n", white.Serialize(), ri.Serialize())
 			return true
 		}
 	}
 
 	for _, black := range r.cfg.BlackList {
 		if black.Match(ri) {
-			fmt.Printf("❌ Explicitly denied with \"%s\" matches %s\n", black.Serialize(), ri.Serialize())
+			glg.Info("❌ Explicitly denied with \"%s\" matches %s\n", black.Serialize(), ri.Serialize())
 			return false
 		}
 	}

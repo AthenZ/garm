@@ -21,6 +21,8 @@ import (
 	"regexp"
 	"strings"
 	"sync"
+	"github.com/kpango/glg"
+	assertion "github.com/AthenZ/athenz-authorizer/v5/policy"
 
 	"github.com/pkg/errors"
 	webhook "github.com/yahoo/k8s-athenz-webhook"
@@ -264,8 +266,7 @@ type RequestInfo struct {
 // Returns RequestInfo in string, separated by the delimiter.
 // API Group's periods will be replaced with underscores.
 func (r *RequestInfo) Serialize() string {
-	apiGroupWithoutPeriods := strings.Replace(r.APIGroup, ".", "_", -1)
-	return strings.Join([]string{r.Verb, r.Namespace, apiGroupWithoutPeriods, r.Resource, r.Name}, delimiter)
+	return strings.Join([]string{r.Verb, r.Namespace, r.APIGroup, r.Resource, r.Name}, delimiter)
 }
 
 func buildRobustRegex(glob string) string {
@@ -299,10 +300,16 @@ func (r *RequestInfo) Match(req RequestInfo) bool {
 		r.once = new(sync.Once)
 	}
 	r.once.Do(func() {
-		r.reg = regexp.MustCompile(buildRobustRegex(r.Serialize()))
+		ass, err := assertion.NewAssertion("", ":"+r.Serialize(), "")
+		if err != nil {
+			glg.Error(err)
+			r.reg = regexp.MustCompile("")
+		} else {
+			r.reg = ass.ResourceRegexp
+		}
 	})
 
-	return r.reg.Copy().MatchString(req.Serialize())
+	return r.reg.Copy().MatchString(strings.ToLower(req.Serialize()))
 }
 
 // New returns the decoded configuration YAML file as *Config struct. Returns non-nil error if any.
