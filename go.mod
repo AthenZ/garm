@@ -3,7 +3,7 @@ module github.com/AthenZ/garm/v2
 go 1.20
 
 replace (
-	github.com/AthenZ/athenz => github.com/AthenZ/athenz v1.11.23
+	github.com/AthenZ/athenz => github.com/AthenZ/athenz v1.11.26
 	golang.org/x/net => golang.org/x/net v0.7.0
 	k8s.io/client-go => k8s.io/client-go v0.26.0
 )
