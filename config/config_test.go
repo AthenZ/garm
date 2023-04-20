@@ -196,7 +196,7 @@ func Test_requestInfo_Match(t *testing.T) {
 			want: true,
 		},
 		{
-			name: "Check if hyphen is not used for delimiter",
+			name: "Check malicious resource name not match",
 			fields: fields{
 				req: RequestInfo{
 					Verb:      "get",
