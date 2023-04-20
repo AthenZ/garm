@@ -1461,7 +1461,7 @@ func Test_resolve_IsAdminAccess(t *testing.T) {
 			want: true,
 		},
 		{
-			name: "Check with asterisk for resource",
+			name: "Check resource with asterisk",
 			fields: fields{
 				cfg: config.Platform{
 					AdminAccessList: []*config.RequestInfo{
