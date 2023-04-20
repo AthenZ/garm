@@ -281,7 +281,7 @@ func (r *RequestInfo) Match(req RequestInfo) bool {
 	r.once.Do(func() {
 		ass, err := assertion.NewAssertion("", ":"+r.Serialize(), "")
 		if err != nil {
-			glg.Error(err)
+			glg.Error(errors.Wrap(err, "regex creation error: invalid blacklist/whitelist config"))
 			r.reg = regexp.MustCompile("")
 		} else {
 			r.reg = ass.ResourceRegexp
