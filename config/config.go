@@ -264,8 +264,7 @@ type RequestInfo struct {
 	once *sync.Once
 }
 
-// Returns RequestInfo in string, separated by the delimiter.
-// API Group's periods will be replaced with underscores.
+// Serialize returns RequestInfo in string, separated by the delimiter.
 func (r *RequestInfo) Serialize() string {
 	return strings.Join([]string{r.Verb, r.Namespace, r.APIGroup, r.Resource, r.Name}, delimiter)
 }
