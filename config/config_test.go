@@ -49,7 +49,7 @@ func Test_requestInfo_Serialize(t *testing.T) {
 			want: "dummyVerb,dummyNamespace,dummyAPIGroup,dummyResource,dummyName",
 		},
 		{
-			name: "Check serialize with replace API group",
+			name: "Check serialize with API group containing period",
 			fields: fields{
 				req: RequestInfo{
 					Verb:      "dummyVerb",
