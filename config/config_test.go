@@ -95,11 +95,6 @@ func Test_requestInfo_Match(t *testing.T) {
 					APIGroup:  "dummyAPIGroup",
 					Resource:  "dummyResource",
 					Name:      "dummyName",
-
-					/*reg: func() *regexp.Regexp {
-						reg, _ := regexp.Compile("dummy")
-						return reg
-					}(),*/
 				},
 			},
 			args: args{
@@ -122,11 +117,6 @@ func Test_requestInfo_Match(t *testing.T) {
 					APIGroup:  "dummyAPIGroup",
 					Resource:  "dummyResource",
 					Name:      "dummyName",
-
-					/*reg: func() *regexp.Regexp {
-						reg, _ := regexp.Compile("dummy")
-						return reg
-					}(),*/
 				},
 			},
 			args: args{
@@ -149,11 +139,6 @@ func Test_requestInfo_Match(t *testing.T) {
 					APIGroup:  "dummyAPIGroup",
 					Resource:  "dummyResource",
 					Name:      "*",
-
-					/*reg: func() *regexp.Regexp {
-						reg, _ := regexp.Compile("dummy")
-						return reg
-					}(),*/
 				},
 			},
 			args: args{
@@ -177,11 +162,6 @@ func Test_requestInfo_Match(t *testing.T) {
 					APIGroup:  "dummyAPIGroup",
 					Resource:  "*",
 					Name:      "*",
-
-					/*reg: func() *regexp.Regexp {
-						reg, _ := regexp.Compile("dummy")
-						return reg
-					}(),*/
 				},
 			},
 			args: args{
@@ -204,11 +184,6 @@ func Test_requestInfo_Match(t *testing.T) {
 					APIGroup:  "garm",
 					Resource:  "pods",
 					Name:      "*",
-
-					/*reg: func() *regexp.Regexp {
-						reg, _ := regexp.Compile("dummy")
-						return reg
-					}(),*/
 				},
 			},
 			args: args{
