@@ -46,10 +46,10 @@ func Test_requestInfo_Serialize(t *testing.T) {
 					Name:      "dummyName",
 				},
 			},
-			want: "dummyVerb-dummyNamespace-dummyAPIGroup-dummyResource-dummyName",
+			want: "dummyVerb,dummyNamespace,dummyAPIGroup,dummyResource,dummyName",
 		},
 		{
-			name: "Check serialize with replace API group",
+			name: "Check serialize with API group containing period",
 			fields: fields{
 				req: RequestInfo{
 					Verb:      "dummyVerb",
@@ -59,7 +59,7 @@ func Test_requestInfo_Serialize(t *testing.T) {
 					Name:      "dummyName",
 				},
 			},
-			want: "dummyVerb-dummyNamespace-dummy_APIGroup-dummyResource-dummyName",
+			want: "dummyVerb,dummyNamespace,dummy.APIGroup,dummyResource,dummyName",
 		},
 	}
 	for _, tt := range tests {
@@ -95,11 +95,6 @@ func Test_requestInfo_Match(t *testing.T) {
 					APIGroup:  "dummyAPIGroup",
 					Resource:  "dummyResource",
 					Name:      "dummyName",
-
-					/*reg: func() *regexp.Regexp {
-						reg, _ := regexp.Compile("dummy")
-						return reg
-					}(),*/
 				},
 			},
 			args: args{
@@ -122,11 +117,6 @@ func Test_requestInfo_Match(t *testing.T) {
 					APIGroup:  "dummyAPIGroup",
 					Resource:  "dummyResource",
 					Name:      "dummyName",
-
-					/*reg: func() *regexp.Regexp {
-						reg, _ := regexp.Compile("dummy")
-						return reg
-					}(),*/
 				},
 			},
 			args: args{
@@ -149,11 +139,6 @@ func Test_requestInfo_Match(t *testing.T) {
 					APIGroup:  "dummyAPIGroup",
 					Resource:  "dummyResource",
 					Name:      "*",
-
-					/*reg: func() *regexp.Regexp {
-						reg, _ := regexp.Compile("dummy")
-						return reg
-					}(),*/
 				},
 			},
 			args: args{
@@ -177,11 +162,6 @@ func Test_requestInfo_Match(t *testing.T) {
 					APIGroup:  "dummyAPIGroup",
 					Resource:  "*",
 					Name:      "*",
-
-					/*reg: func() *regexp.Regexp {
-						reg, _ := regexp.Compile("dummy")
-						return reg
-					}(),*/
 				},
 			},
 			args: args{
@@ -194,6 +174,28 @@ func Test_requestInfo_Match(t *testing.T) {
 				},
 			},
 			want: true,
+		},
+		{
+			name: "Check malicious resource name not match",
+			fields: fields{
+				req: RequestInfo{
+					Verb:      "get",
+					Namespace: "kube-system",
+					APIGroup:  "garm",
+					Resource:  "pods",
+					Name:      "*",
+				},
+			},
+			args: args{
+				req: RequestInfo{
+					Verb:      "create",
+					Namespace: "kube-system",
+					APIGroup:  "garm",
+					Resource:  "pods",
+					Name:      "get-kube-system-garm-pods-test",
+				},
+			},
+			want: false,
 		},
 	}
 	for _, tt := range tests {

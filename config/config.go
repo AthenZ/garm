@@ -21,6 +21,8 @@ import (
 	"regexp"
 	"strings"
 	"sync"
+	"github.com/kpango/glg"
+	assertion "github.com/AthenZ/athenz-authorizer/v5/policy"
 
 	"github.com/pkg/errors"
 	webhook "github.com/yahoo/k8s-athenz-webhook"
@@ -29,7 +31,13 @@ import (
 
 const (
 	// currentVersion represents the configuration version.
-	currentVersion = "v2.0.0"
+	currentVersion string = "v2.0.0"
+	// delimiter represents delimiter used to serialize RequestInfo. Must NOT use valid characters allowed in the all the fields of RequestInfo.
+	// Choose the delimiter that RequestInfo's verb, namespace, API Group, Resource and Name CANNOT use.
+	// i.e) If end user can set its resource name with hyphens, we cannot use hyphen as delimiter.
+	// This will wrongfully grant access to privileged actions like DELETE or POST
+	// for resources with hyphens in their names when minimum access rights such as GET is given.
+	delimiter string = ","
 )
 
 // Config represents an application configuration content (config.yaml).
@@ -256,11 +264,9 @@ type RequestInfo struct {
 	once *sync.Once
 }
 
-// Serialize returns RequestInfo in string format.
-// 1. replacedAPIGroup = replace `. => _` in r.APIGroup
-// 2. output format: `${r.Verb}-${r.Namespace}-${replacedAPIGroup}-${r.Resource}-${r.Name}`
+// Serialize returns RequestInfo in string, separated by the delimiter.
 func (r *RequestInfo) Serialize() string {
-	return strings.Join([]string{r.Verb, r.Namespace, strings.Replace(r.APIGroup, ".", "_", -1), r.Resource, r.Name}, "-")
+	return strings.Join([]string{r.Verb, r.Namespace, r.APIGroup, r.Resource, r.Name}, delimiter)
 }
 
 // Match checks if the given RequestInfo matches with the regular expression in this RequestInfo.
@@ -273,10 +279,16 @@ func (r *RequestInfo) Match(req RequestInfo) bool {
 		r.once = new(sync.Once)
 	}
 	r.once.Do(func() {
-		r.reg = regexp.MustCompile(strings.Replace(strings.Replace(r.Serialize(), "*", ".*", -1), "..*", ".*", -1))
+		ass, err := assertion.NewAssertion("", ":"+r.Serialize(), "")
+		if err != nil {
+			glg.Error(errors.Wrap(err, "regex creation error: invalid blacklist/whitelist config"))
+			r.reg = regexp.MustCompile("")
+		} else {
+			r.reg = ass.ResourceRegexp
+		}
 	})
 
-	return r.reg.Copy().MatchString(req.Serialize())
+	return r.reg.Copy().MatchString(strings.ToLower(req.Serialize()))
 }
 
 // New returns the decoded configuration YAML file as *Config struct. Returns non-nil error if any.

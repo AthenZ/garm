@@ -95,7 +95,7 @@ func (m *resourceMapper) MapResource(ctx context.Context, spec authz.SubjectAcce
 	case !m.res.IsAllowed(verb, namespace, group, resource, name): // Not Allowed
 		return "", nil,
 			fmt.Errorf(
-				"----%s's request is not allowed----\nVerb:\t%s\nNamespaceb:\t%s\nAPI Group:\t%s\nResource:\t%s\nResource Name:\t%s\n",
+				"❌ %s's request is explicitly denied by the blacklist! Verb: \"%s\", Namespace: \"%s\", API Group: \"%s\", Resource: \"%s\", Resource Name: \"%s\"",
 				identity, verb, namespace, group, resource, name)
 	case m.res.IsAdminAccess(verb, namespace, group, resource, name):
 		return identity, m.createAdminAccessCheck(

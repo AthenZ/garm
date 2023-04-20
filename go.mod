@@ -1,16 +1,17 @@
 module github.com/AthenZ/garm/v2
 
-go 1.18
+go 1.20
 
 replace (
-	github.com/AthenZ/athenz => github.com/AthenZ/athenz v1.11.23
+	github.com/AthenZ/athenz => github.com/AthenZ/athenz v1.11.26
 	golang.org/x/net => golang.org/x/net v0.7.0
 	k8s.io/client-go => k8s.io/client-go v0.26.0
 )
 
 require (
-	github.com/AthenZ/athenz v1.11.23
-	github.com/kpango/glg v1.6.14
+	github.com/AthenZ/athenz v1.11.26
+	github.com/AthenZ/athenz-authorizer/v5 v5.5.1
+	github.com/kpango/glg v1.6.15
 	github.com/pkg/errors v0.9.1
 	github.com/yahoo/k8s-athenz-webhook v0.1.5-0.20230310225932-073f1a05c41a
 	gopkg.in/yaml.v2 v2.4.0
@@ -27,17 +28,21 @@ require (
 	github.com/google/go-cmp v0.5.9 // indirect
 	github.com/google/gofuzz v1.2.0 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
-	github.com/kpango/fastime v1.1.6 // indirect
+	github.com/klauspost/cpuid/v2 v2.2.4 // indirect
+	github.com/kpango/fastime v1.1.9 // indirect
+	github.com/kpango/gache v1.2.8 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826 // indirect
 	github.com/yahoo/athenz v1.9.31 // indirect
 	github.com/yahoo/k8s-athenz-syncer v0.1.8 // indirect
-	golang.org/x/net v0.7.0 // indirect
+	github.com/zeebo/xxh3 v1.0.2 // indirect
+	golang.org/x/net v0.9.0 // indirect
 	golang.org/x/oauth2 v0.0.0-20220223155221-ee480838109b // indirect
-	golang.org/x/sys v0.5.0 // indirect
-	golang.org/x/term v0.5.0 // indirect
-	golang.org/x/text v0.7.0 // indirect
+	golang.org/x/sync v0.1.0 // indirect
+	golang.org/x/sys v0.7.0 // indirect
+	golang.org/x/term v0.7.0 // indirect
+	golang.org/x/text v0.9.0 // indirect
 	golang.org/x/time v0.0.0-20220210224613-90d013bbcef8 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
 	google.golang.org/protobuf v1.28.1 // indirect
