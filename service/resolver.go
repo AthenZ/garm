@@ -322,7 +322,7 @@ func (r *resolve) IsAllowed(verb, namespace, apiGroup, resource, name string) bo
 
 	for _, white := range r.cfg.WhiteList {
 		if white.Match(ri) {
-			glg.Debug("👍 Passed with \"%s\" matches \"%s\"\n", white.Serialize(), ri.Serialize())
+			glg.Debugf("⏩ Excluded from blacklist with whitelist \"%v\" matches \"%v\"\n", white, ri)
 			return true
 		}
 	}
