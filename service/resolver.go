@@ -329,7 +329,7 @@ func (r *resolve) IsAllowed(verb, namespace, apiGroup, resource, name string) bo
 
 	for _, black := range r.cfg.BlackList {
 		if black.Match(ri) {
-			glg.Debug("❌ Explicitly denied with \"%s\" matches %s\n", black.Serialize(), ri.Serialize())
+			glg.Debugf("❌ Explicitly denied by blacklist with blacklist \"%s\" matches \"%s\"\n", black, ri)
 			return false
 		}
 	}
