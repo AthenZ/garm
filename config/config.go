@@ -32,6 +32,7 @@ import (
 const (
 	// currentVersion represents the configuration version.
 	currentVersion string = "v2.0.0"
+	// delimiter represents delimiter used to serialize RequestInfo. Must NOT use valid characters allowed in the all the fields of RequestInfo.
 	// Choose the delimiter that RequestInfo's verb, namespace, API Group, Resource and Name CANNOT use.
 	// i.e) If end user can set its resource name with hyphens, we cannot use hyphen as delimiter.
 	// This will wrongfully grant access to privileged actions like DELETE or POST
