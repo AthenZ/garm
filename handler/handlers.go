@@ -19,7 +19,7 @@ package handler
 import (
 	"net/http"
 
-	"github.com/AthenZ/garm/v2/service"
+	"github.com/AthenZ/garm/v3/service"
 	"github.com/pkg/errors"
 )
 

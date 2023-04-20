@@ -22,7 +22,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/AthenZ/garm/v2/service"
+	"github.com/AthenZ/garm/v3/service"
 )
 
 func TestNew(t *testing.T) {

@@ -25,7 +25,7 @@ import (
 	"unsafe"
 
 	"github.com/AthenZ/athenz/libs/go/zmssvctoken"
-	"github.com/AthenZ/garm/v2/config"
+	"github.com/AthenZ/garm/v3/config"
 	"github.com/kpango/glg"
 	"github.com/pkg/errors"
 	webhook "github.com/yahoo/k8s-athenz-webhook"

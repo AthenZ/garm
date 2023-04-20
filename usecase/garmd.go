@@ -19,10 +19,10 @@ package usecase
 import (
 	"context"
 
-	"github.com/AthenZ/garm/v2/config"
-	"github.com/AthenZ/garm/v2/handler"
-	"github.com/AthenZ/garm/v2/router"
-	"github.com/AthenZ/garm/v2/service"
+	"github.com/AthenZ/garm/v3/config"
+	"github.com/AthenZ/garm/v3/handler"
+	"github.com/AthenZ/garm/v3/router"
+	"github.com/AthenZ/garm/v3/service"
 	"github.com/pkg/errors"
 )
 

@@ -1,4 +1,4 @@
-module github.com/AthenZ/garm/v2
+module github.com/AthenZ/garm/v3
 
 go 1.20
 

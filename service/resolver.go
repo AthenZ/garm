@@ -18,9 +18,10 @@ package service
 
 import (
 	"strings"
+
 	"github.com/kpango/glg"
 
-	"github.com/AthenZ/garm/v2/config"
+	"github.com/AthenZ/garm/v3/config"
 )
 
 // Resolver is used to map K8s webhook requests to Athenz requests. (Athenz cannot use ":", hence, needs mapping.)
@@ -160,7 +161,8 @@ func (r *resolve) BuildDomainsFromNamespace(namespace string) []string {
 	return r.buildAthenzDomain(r.athenzDomains, namespace)
 }
 
-//  BuildServiceAccountPrefixFromNamespace returns domains by processing AthenzServiceAccountPrefix.
+//	BuildServiceAccountPrefixFromNamespace returns domains by processing AthenzServiceAccountPrefix.
+//
 // if namespace != "", replace `/ = .`, then `.. => -`, then replace "_namespace_" in AthenzServiceAccountPrefix with namespace;
 // else replace "._namespace_" in AthenzServiceAccountPrefix with namespace;
 // trim ".", then "-", then ":"
