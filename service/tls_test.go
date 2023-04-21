@@ -26,7 +26,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/AthenZ/garm/v2/config"
+	"github.com/AthenZ/garm/v3/config"
 )
 
 func trim(str string) string {

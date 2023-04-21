@@ -22,7 +22,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/AthenZ/garm/v2/handler"
+	"github.com/AthenZ/garm/v3/handler"
 )
 
 func TestNewRoutes(t *testing.T) {
