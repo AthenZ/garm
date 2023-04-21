@@ -4,14 +4,13 @@
 
 <!-- MarkdownTOC levels="1,2" -->
 
-- [Garm Functional Overview](#garm-functional-overview)
-	- [Parse k8s resources](#parse-k8s-resources)
-	- [Map resources](#map-resources)
-	- [Subsitute Athenz domain & principal](#subsitute-athenz-domain--principal)
-	- [Filter k8s request](#filter-k8s-request)
-	- [Select Athenz domain](#select-athenz-domain)
-	- [Create Athenz assertion](#create-athenz-assertion)
-					- [P.S. during mapping](#ps-during-mapping)
+- [Parse k8s resources](#parse-k8s-resources)
+- [Map resources](#map-resources)
+- [Subsitute Athenz domain \& principal](#subsitute-athenz-domain--principal)
+- [Filter k8s request](#filter-k8s-request)
+- [Select Athenz domain](#select-athenz-domain)
+- [Create Athenz assertion](#create-athenz-assertion)
+        - [P.S. during mapping](#ps-during-mapping)
 
 <!-- /MarkdownTOC -->
 
@@ -93,9 +92,9 @@ P.S. It may be easier to read the code directly. [createAthenzDomains()](../serv
 - `in black_list AND NOT in white_list` => directly reject
 	- `config.yaml`, `map_rule.tld.platform.black_list` & `map_rule.tld.platform.white_list`
 - Matching logic
-	-  create rule RegExp for matching
-		- ![garm resource matching](./assets/garm-resource-matching.png)
-	- Garm resource attribute is serialized before matching with the rule RegExp.
+	- create black_list/white_list rules that allow wildcard matching
+	- Garm resource attribute is serialized before matching with the black_list/white_list rule.
+	- ![garm resource matching](./assets/garm-resource-matching.png)
 - Example
 	- `RequestInfo{ Verb: "get", Namespace: "kube-system", APIGroup: "*", Resource: "secrets", Name: "alertmanager"}` => check with Athenz
 		- black_list contains `RequestInfo{ Verb: "*", Namespace: "kube-system", APIGroup: "*", Resource: "*", Name: "*"}`.
