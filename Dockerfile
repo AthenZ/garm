@@ -53,7 +53,6 @@ COPY --from=builder /etc/passwd /etc/passwd
 COPY --from=builder /usr/bin/${APP_NAME} /go/bin/${APP_NAME}
 # Copy user
 COPY --from=builder /etc/passwd /etc/passwd
-USER ${APP_NAME}
 
 HEALTHCHECK NONE
 ENTRYPOINT ["/go/bin/garm"]
