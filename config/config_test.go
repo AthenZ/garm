@@ -23,7 +23,7 @@ import (
 	"testing"
 	"time"
 
-	webhook "github.com/yahoo/k8s-athenz-webhook"
+	webhook "github.com/AthenZ/garm/v3/third_party/webhook"
 )
 
 func Test_requestInfo_Serialize(t *testing.T) {
