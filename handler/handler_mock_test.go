@@ -27,11 +27,12 @@ type mockAthenz struct {
 
 // AthenzAuthorizer returns a mock value of service.Athenz.AthenzAuthenticator() function.
 // User should initialize the AthenzAuthorizerFunc function pointer and this function will trigger it.
-// Example: mock := &mockAthenz{
-//		AthenzAuthenticatorFunc: func(http.ResponseWriter, *http.Request) error {
-//			// mock function logic
-//		},
-//	}
+//
+//	Example: mock := &mockAthenz{
+//			AthenzAuthenticatorFunc: func(http.ResponseWriter, *http.Request) error {
+//				// mock function logic
+//			},
+//		}
 func (a *mockAthenz) AthenzAuthorizer(rw http.ResponseWriter, r *http.Request) error {
 	return a.AthenzAuthorizerFunc(rw, r)
 }
@@ -39,11 +40,12 @@ func (a *mockAthenz) AthenzAuthorizer(rw http.ResponseWriter, r *http.Request) e
 // AthenzAuthenticator returns a mock value of service.Athenz.AthenzAuthenticator() function.
 // User should initialize the AthenzAuthenticatorFunc function pointer and this function will trigger it.
 // Example:
-// mock := &mockAthenz{
-//		AthenzAuthenticatorFunc: func(http.ResponseWriter, *http.Request) error {
-//			// mock function logic
-//		},
-//	}
+//
+//	mock := &mockAthenz{
+//			AthenzAuthenticatorFunc: func(http.ResponseWriter, *http.Request) error {
+//				// mock function logic
+//			},
+//		}
 func (a *mockAthenz) AthenzAuthenticator(rw http.ResponseWriter, r *http.Request) error {
 	return a.AthenzAuthenticatorFunc(rw, r)
 }

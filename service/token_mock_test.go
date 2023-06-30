@@ -75,9 +75,10 @@ func (mt *mockTokenBuilder) Token() zmssvctoken.Token {
 // Value returns a mock value of zmssvctoken.TokenBuilder.Value() function.
 // Example:
 // tb := NewMockTokenBuilder()
-// tb.(*mockTokenBuilder).valueFunc = func() (string, error) {
-//	 // mock function logic
-// }
+//
+//	tb.(*mockTokenBuilder).valueFunc = func() (string, error) {
+//		 // mock function logic
+//	}
 func (mt *mockToken) Value() (string, error) {
 	return mt.valueFunc()
 }
