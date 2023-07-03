@@ -141,6 +141,8 @@ func (a *authorizer) getSubjectAccessReview(ctx context.Context, req *http.Reque
 		}
 		glg.Info("Data", convertIntoV1(rV1Beta1)) // TODO: Delete me
 		r = convertIntoV1(rV1Beta1)
+	} else {
+		glg.Info("Did not run!!!") // TODO: Delete me
 	}
 	if r.APIVersion != authzSupportedVersion {
 		return nil, fmt.Errorf("unsupported authorization version, want '%s', got '%s'", authzSupportedVersion, r.APIVersion)
