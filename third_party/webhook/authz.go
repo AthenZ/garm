@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/kpango/glg"
 	authz "k8s.io/api/authorization/v1"
 	authzv1beta1 "k8s.io/api/authorization/v1beta1"
 )
@@ -133,10 +134,12 @@ func (a *authorizer) getSubjectAccessReview(ctx context.Context, req *http.Reque
 		return nil, fmt.Errorf("invalid JSON request '%s', %v", b, err)
 	}
 	if r.APIVersion == authzSupportedBetaVersion {
+		glg.Info("[deprecated] received '%s' will be deleted in the near future", authzSupportedBetaVersion) // TODO: Delete me
 		var rV1Beta1 authzv1beta1.SubjectAccessReview
 		if err := json.Unmarshal(b, &rV1Beta1); err != nil {
 			return nil, fmt.Errorf("invalid JSON request '%s', %v", b, err)
 		}
+		glg.Info("Data", convertIntoV1(rV1Beta1)) // TODO: Delete me
 		r = convertIntoV1(rV1Beta1)
 	}
 	if r.APIVersion != authzSupportedVersion {
