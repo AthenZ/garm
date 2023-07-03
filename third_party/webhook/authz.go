@@ -10,11 +10,13 @@ import (
 	"strings"
 
 	authz "k8s.io/api/authorization/v1"
+	authzv1beta1 "k8s.io/api/authorization/v1beta1"
 )
 
 const (
-	authzSupportedVersion = "authorization.k8s.io/v1"
-	authzSupportedKind    = "SubjectAccessReview"
+	authzSupportedBetaVersion = "authorization.k8s.io/v1beta1"
+	authzSupportedVersion     = "authorization.k8s.io/v1"
+	authzSupportedKind        = "SubjectAccessReview"
 )
 
 // AuthzError is an error implementation that can provide custom
@@ -87,6 +89,33 @@ func (a *authorizer) clientX509(ctx context.Context) (*client, error) {
 	return newClient(a.ZMSEndpoint, a.ZTSEndpoint, a.Timeout, xpX509), nil
 }
 
+func convertIntoV1(sarV1Beta1 authzv1beta1.SubjectAccessReview) authz.SubjectAccessReview {
+	return authz.SubjectAccessReview{
+		TypeMeta:   sarV1Beta1.TypeMeta,
+		ObjectMeta: sarV1Beta1.ObjectMeta,
+		Spec: authz.SubjectAccessReviewSpec{
+			User: sarV1Beta1.Spec.User,
+			UID:  sarV1Beta1.Spec.UID,
+			// Extra: r2.Spec.Extra, // TODO: How to copy the extra from v1beta to v1?
+			Groups:                sarV1Beta1.Spec.Groups,
+			NonResourceAttributes: (*authz.NonResourceAttributes)(sarV1Beta1.Spec.DeepCopy().NonResourceAttributes),
+			ResourceAttributes: &authz.ResourceAttributes{
+				Namespace: sarV1Beta1.Spec.ResourceAttributes.Namespace,
+				Verb:      sarV1Beta1.Spec.ResourceAttributes.Verb,
+				Group:     sarV1Beta1.Spec.ResourceAttributes.Group,
+				Version:   sarV1Beta1.Spec.ResourceAttributes.Version,
+				Resource:  sarV1Beta1.Spec.ResourceAttributes.Resource,
+				Name:      sarV1Beta1.Spec.ResourceAttributes.Name,
+			},
+		},
+		Status: authz.SubjectAccessReviewStatus{
+			Allowed: sarV1Beta1.Status.Allowed,
+			Denied:  sarV1Beta1.Status.Denied,
+			Reason:  sarV1Beta1.Status.Reason,
+		},
+	}
+}
+
 // getSubjectAccessReview extracts the subject access review object from the request and returns it.
 func (a *authorizer) getSubjectAccessReview(ctx context.Context, req *http.Request) (*authz.SubjectAccessReview, error) {
 	b, err := ioutil.ReadAll(req.Body)
@@ -99,20 +128,27 @@ func (a *authorizer) getSubjectAccessReview(ctx context.Context, req *http.Reque
 	if isLogEnabled(ctx, LogTraceServer) {
 		getLogger(ctx).Printf("request body: %s\n", b)
 	}
-	var r authz.SubjectAccessReview
-	if err := json.Unmarshal(b, &r); err != nil {
+	var sar authz.SubjectAccessReview
+	if err := json.Unmarshal(b, &sar); err != nil {
 		return nil, fmt.Errorf("invalid JSON request '%s', %v", b, err)
 	}
-	if r.APIVersion != authzSupportedVersion {
-		return nil, fmt.Errorf("unsupported authorization version, want '%s', got '%s'", authzSupportedVersion, r.APIVersion)
+	if sar.APIVersion == authzSupportedBetaVersion {
+		var sarV1Beta1 authzv1beta1.SubjectAccessReview
+		if err := json.Unmarshal(b, &sarV1Beta1); err != nil {
+			return nil, fmt.Errorf("invalid JSON request '%s', %v", b, err)
+		}
+		sar = convertIntoV1(sarV1Beta1)
 	}
-	if r.Kind != authzSupportedKind {
-		return nil, fmt.Errorf("unsupported authorization kind, want '%s', got '%s'", authzSupportedKind, r.Kind)
+	if sar.APIVersion != authzSupportedVersion {
+		return nil, fmt.Errorf("unsupported authorization version, want '%s', got '%s'", authzSupportedVersion, sar.APIVersion)
 	}
-	if r.Spec.ResourceAttributes == nil && r.Spec.NonResourceAttributes == nil {
+	if sar.Kind != authzSupportedKind {
+		return nil, fmt.Errorf("unsupported authorization kind, want '%s', got '%s'", authzSupportedKind, sar.Kind)
+	}
+	if sar.Spec.ResourceAttributes == nil && sar.Spec.NonResourceAttributes == nil {
 		return nil, fmt.Errorf("bad authorization spec, must have one of resource or non-resource attributes")
 	}
-	return &r, nil
+	return &sar, nil
 }
 
 // grantStatus adds extra information to a review status.
