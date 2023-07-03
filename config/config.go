@@ -21,11 +21,12 @@ import (
 	"regexp"
 	"strings"
 	"sync"
-	"github.com/kpango/glg"
-	assertion "github.com/AthenZ/athenz-authorizer/v5/policy"
 
+	assertion "github.com/AthenZ/athenz-authorizer/v5/policy"
+	"github.com/kpango/glg"
+
+	webhook "github.com/AthenZ/garm/v3/third_party/webhook"
 	"github.com/pkg/errors"
-	webhook "github.com/yahoo/k8s-athenz-webhook"
 	"gopkg.in/yaml.v2"
 )
 

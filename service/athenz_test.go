@@ -29,7 +29,7 @@ import (
 	"time"
 
 	"github.com/AthenZ/garm/v3/config"
-	webhook "github.com/yahoo/k8s-athenz-webhook"
+	webhook "github.com/AthenZ/garm/v3/third_party/webhook"
 
 	authn "k8s.io/api/authentication/v1"
 	authz "k8s.io/api/authorization/v1"

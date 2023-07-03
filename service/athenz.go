@@ -22,8 +22,8 @@ import (
 	"time"
 
 	"github.com/AthenZ/garm/v3/config"
+	webhook "github.com/AthenZ/garm/v3/third_party/webhook"
 	"github.com/pkg/errors"
-	webhook "github.com/yahoo/k8s-athenz-webhook"
 )
 
 // Athenz interface is used to send HTTP requests to Athenz server.

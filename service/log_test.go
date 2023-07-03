@@ -28,8 +28,8 @@ import (
 
 	"github.com/AthenZ/garm/v3/config"
 	"github.com/AthenZ/garm/v3/log"
+	webhook "github.com/AthenZ/garm/v3/third_party/webhook"
 	"github.com/kpango/glg"
-	webhook "github.com/yahoo/k8s-athenz-webhook"
 )
 
 func TestNewLogger(t *testing.T) {

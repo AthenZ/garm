@@ -26,9 +26,9 @@ import (
 
 	"github.com/AthenZ/athenz/libs/go/zmssvctoken"
 	"github.com/AthenZ/garm/v3/config"
+	webhook "github.com/AthenZ/garm/v3/third_party/webhook"
 	"github.com/kpango/glg"
 	"github.com/pkg/errors"
-	webhook "github.com/yahoo/k8s-athenz-webhook"
 )
 
 // TokenService represents an interface for user to get the token, and automatically update the token.

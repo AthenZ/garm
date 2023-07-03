@@ -19,8 +19,8 @@ package log
 import (
 	"io"
 
+	webhook "github.com/AthenZ/garm/v3/third_party/webhook"
 	"github.com/kpango/glg"
-	webhook "github.com/yahoo/k8s-athenz-webhook"
 )
 
 // Logger represents a logger interface for logging.
