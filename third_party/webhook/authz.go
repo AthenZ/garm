@@ -9,7 +9,6 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/kpango/glg"
 	authz "k8s.io/api/authorization/v1"
 	authzv1beta1 "k8s.io/api/authorization/v1beta1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -143,19 +142,14 @@ func (a *authorizer) getSubjectAccessReview(ctx context.Context, req *http.Reque
 		return nil, fmt.Errorf("invalid JSON request '%s', %v", b, err)
 	}
 	if r.APIVersion == authzSupportedBetaVersion {
-		glg.Info("[deprecated] received '%s' will be deleted in the near future", authzSupportedBetaVersion) // TODO: Delete me
 		var rV1Beta1 authzv1beta1.SubjectAccessReview
 		if err := json.Unmarshal(b, &rV1Beta1); err != nil {
 			return nil, fmt.Errorf("invalid JSON request '%s', %v", b, err)
 		}
-		glg.Info("Data", convertIntoV1(rV1Beta1)) // TODO: Delete me
 		r = convertIntoV1(rV1Beta1)
-	} else {
-		glg.Info("Did not run!!!") // TODO: Delete me
 	}
 	if r.APIVersion != authzSupportedVersion {
-		// TODO: fixme: Remove it
-		return nil, fmt.Errorf("fixme: unsupported authorization version, want '%s', got '%s'", authzSupportedVersion, r.APIVersion)
+		return nil, fmt.Errorf("unsupported authorization version, want '%s', got '%s'", authzSupportedVersion, r.APIVersion)
 	}
 	if r.Kind != authzSupportedKind {
 		return nil, fmt.Errorf("unsupported authorization kind, want '%s', got '%s'", authzSupportedKind, r.Kind)
