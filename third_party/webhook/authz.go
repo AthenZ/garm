@@ -153,9 +153,9 @@ func (a *authorizer) getSubjectAccessReview(ctx context.Context, req *http.Reque
 	} else {
 		glg.Info("Did not run!!!") // TODO: Delete me
 	}
-	// if r.APIVersion != authzSupportedVersion {
-	// 	return nil, fmt.Errorf("unsupported authorization version, want '%s', got '%s'", authzSupportedVersion, r.APIVersion)
-	// }
+	if r.APIVersion != authzSupportedVersion {
+		return nil, fmt.Errorf("unsupported authorization version, want '%s', got '%s'", authzSupportedVersion, r.APIVersion)
+	}
 	if r.Kind != authzSupportedKind {
 		return nil, fmt.Errorf("unsupported authorization kind, want '%s', got '%s'", authzSupportedKind, r.Kind)
 	}
