@@ -91,13 +91,18 @@ func (a *authorizer) clientX509(ctx context.Context) (*client, error) {
 }
 
 func convertIntoV1(rV1Beta1 authzv1beta1.SubjectAccessReview) authz.SubjectAccessReview {
+	v1Extra := make(map[string]authz.ExtraValue)
+	for key, value := range rV1Beta1.Spec.Extra {
+		v1Extra[key] = authz.ExtraValue(value)
+	}
+
 	return authz.SubjectAccessReview{
 		TypeMeta:   rV1Beta1.TypeMeta,
 		ObjectMeta: rV1Beta1.ObjectMeta,
 		Spec: authz.SubjectAccessReviewSpec{
-			User: rV1Beta1.Spec.User,
-			UID:  rV1Beta1.Spec.UID,
-			// Extra: r2.Spec.Extra, // TODO: How to copy the extra from v1beta to v1?
+			User:                  rV1Beta1.Spec.User,
+			UID:                   rV1Beta1.Spec.UID,
+			Extra:                 v1Extra,
 			Groups:                rV1Beta1.Spec.Groups,
 			NonResourceAttributes: (*authz.NonResourceAttributes)(rV1Beta1.Spec.DeepCopy().NonResourceAttributes),
 			ResourceAttributes: &authz.ResourceAttributes{
