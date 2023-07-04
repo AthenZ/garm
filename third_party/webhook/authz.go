@@ -12,6 +12,7 @@ import (
 	"github.com/kpango/glg"
 	authz "k8s.io/api/authorization/v1"
 	authzv1beta1 "k8s.io/api/authorization/v1beta1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 const (
@@ -97,7 +98,10 @@ func convertIntoV1(rV1Beta1 authzv1beta1.SubjectAccessReview) authz.SubjectAcces
 	}
 
 	return authz.SubjectAccessReview{
-		TypeMeta:   rV1Beta1.TypeMeta,
+		TypeMeta: metav1.TypeMeta{
+			Kind:       rV1Beta1.Kind,
+			APIVersion: authzSupportedVersion,
+		},
 		ObjectMeta: rV1Beta1.ObjectMeta,
 		Spec: authz.SubjectAccessReviewSpec{
 			User:                  rV1Beta1.Spec.User,
