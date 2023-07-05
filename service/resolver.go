@@ -324,14 +324,14 @@ func (r *resolve) IsAllowed(verb, namespace, apiGroup, resource, name string) bo
 
 	for _, white := range r.cfg.WhiteList {
 		if white.Match(ri) {
-			glg.Debugf("⏩ Excluded from blacklist with whitelist \"%v\" matches \"%v\"\n", white, ri)
+			glg.Debugf("Excluded from blacklist with whitelist \"%v\" matches \"%v\"\n", white, ri)
 			return true
 		}
 	}
 
 	for _, black := range r.cfg.BlackList {
 		if black.Match(ri) {
-			glg.Debugf("❌ Explicitly denied by blacklist with blacklist \"%v\" matches \"%v\"\n", black, ri)
+			glg.Debugf("Explicitly denied with blacklist \"%v\" matches \"%v\"\n", black, ri)
 			return false
 		}
 	}
