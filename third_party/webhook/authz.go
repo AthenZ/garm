@@ -103,11 +103,14 @@ func convertIntoV1(rV1Beta1 authzv1beta1.SubjectAccessReview) authz.SubjectAcces
 		},
 		ObjectMeta: *rV1Beta1.ObjectMeta.DeepCopy(),
 		Spec: authz.SubjectAccessReviewSpec{
-			User:                  rV1Beta1.Spec.User,
-			UID:                   rV1Beta1.Spec.UID,
-			Extra:                 v1Extra,
-			Groups:                rV1Beta1.Spec.Groups,
-			NonResourceAttributes: (*authz.NonResourceAttributes)(rV1Beta1.Spec.DeepCopy().NonResourceAttributes),
+			User:   rV1Beta1.Spec.User,
+			UID:    rV1Beta1.Spec.UID,
+			Extra:  v1Extra,
+			Groups: rV1Beta1.Spec.Groups,
+			NonResourceAttributes: &authz.NonResourceAttributes{
+				Path: rV1Beta1.Spec.NonResourceAttributes.Path,
+				Verb: rV1Beta1.Spec.NonResourceAttributes.Verb,
+			},
 			ResourceAttributes: &authz.ResourceAttributes{
 				Namespace: rV1Beta1.Spec.ResourceAttributes.Namespace,
 				Verb:      rV1Beta1.Spec.ResourceAttributes.Verb,
@@ -118,10 +121,10 @@ func convertIntoV1(rV1Beta1 authzv1beta1.SubjectAccessReview) authz.SubjectAcces
 			},
 		},
 		Status: authz.SubjectAccessReviewStatus{
-			Allowed: rV1Beta1.Status.Allowed,
-			Denied:  rV1Beta1.Status.Denied,
-			Reason:  rV1Beta1.Status.Reason,
-			EvaluationError:  rV1Beta1.Status.EvaluationError,
+			Allowed:         rV1Beta1.Status.Allowed,
+			Denied:          rV1Beta1.Status.Denied,
+			Reason:          rV1Beta1.Status.Reason,
+			EvaluationError: rV1Beta1.Status.EvaluationError,
 		},
 	}
 }
