@@ -438,7 +438,7 @@ func Test_resourceMapper_MapResource(t *testing.T) {
 			wantIdentity:           "",
 			wantAthenzAccessChecks: nil,
 			wantError: fmt.Errorf(
-				"❌ user-322's request is explicitly denied by the blacklist! Verb: \"verb-317\", Namespace: \"namespace-316\", API Group: \"group-320\", Resource: \"resource-318.sub-resource-319\", Resource Name: \"name-315\""),
+				"Explicitly denied user-322's request by the blacklist! Verb: \"verb-317\", Namespace: \"namespace-316\", API Group: \"group-320\", Resource: \"resource-318.sub-resource-319\", Resource Name: \"name-315\""),
 		},
 	}
 	for _, tt := range tests {
