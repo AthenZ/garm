@@ -112,12 +112,13 @@ func convertIntoV1(rV1Beta1 authzv1beta1.SubjectAccessReview) authz.SubjectAcces
 				Verb: rV1Beta1.Spec.NonResourceAttributes.Verb,
 			},
 			ResourceAttributes: &authz.ResourceAttributes{
-				Namespace: rV1Beta1.Spec.ResourceAttributes.Namespace,
-				Verb:      rV1Beta1.Spec.ResourceAttributes.Verb,
-				Group:     rV1Beta1.Spec.ResourceAttributes.Group,
-				Version:   rV1Beta1.Spec.ResourceAttributes.Version,
-				Resource:  rV1Beta1.Spec.ResourceAttributes.Resource,
-				Name:      rV1Beta1.Spec.ResourceAttributes.Name,
+				Namespace:   rV1Beta1.Spec.ResourceAttributes.Namespace,
+				Verb:        rV1Beta1.Spec.ResourceAttributes.Verb,
+				Group:       rV1Beta1.Spec.ResourceAttributes.Group,
+				Version:     rV1Beta1.Spec.ResourceAttributes.Version,
+				Resource:    rV1Beta1.Spec.ResourceAttributes.Resource,
+				Subresource: rV1Beta1.Spec.ResourceAttributes.Subresource,
+				Name:        rV1Beta1.Spec.ResourceAttributes.Name,
 			},
 		},
 		Status: authz.SubjectAccessReviewStatus{
@@ -145,6 +146,7 @@ func (a *authorizer) getSubjectAccessReview(ctx context.Context, req *http.Reque
 	if err := json.Unmarshal(b, &r); err != nil {
 		return nil, fmt.Errorf("invalid JSON request '%s', %v", b, err)
 	}
+	// TODO: This is a temporary fix to support both v1 and v1beta1 versions of SubjectAccessReview & will be removed in future.
 	if r.APIVersion == authzSupportedBetaVersion {
 		var rV1Beta1 authzv1beta1.SubjectAccessReview
 		if err := json.Unmarshal(b, &rV1Beta1); err != nil {
