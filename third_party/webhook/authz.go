@@ -90,6 +90,7 @@ func (a *authorizer) clientX509(ctx context.Context) (*client, error) {
 	return newClient(a.ZMSEndpoint, a.ZTSEndpoint, a.Timeout, xpX509), nil
 }
 
+// TODO: convertIntoV1() is a temporary fix to support both v1 and v1beta1 versions of SubjectAccessReview & will be removed in future.
 func convertIntoV1(rV1Beta1 authzv1beta1.SubjectAccessReview) authz.SubjectAccessReview {
 	v1Extra := make(map[string]authz.ExtraValue)
 	for key, value := range rV1Beta1.Spec.Extra {
