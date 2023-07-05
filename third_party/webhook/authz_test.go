@@ -14,6 +14,7 @@ import (
 	"time"
 
 	authz "k8s.io/api/authorization/v1"
+	authzv1beta1 "k8s.io/api/authorization/v1beta1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -298,6 +299,52 @@ func TestAuthzMapperError(t *testing.T) {
 			errors.New("foobar")
 	})
 	input := stdAuthzInput()
+	ar := runAuthzTest(s, serialize(input), nil)
+	w := ar.w
+	body := ar.body
+
+	if w.Result().StatusCode != 200 {
+		t.Fatal("invalid status code", w.Result().StatusCode)
+	}
+	tr := checkGrant(t, body.Bytes(), false)
+	msg := "mapping error: foobar"
+	if tr.Status.EvaluationError != msg {
+		t.Errorf("want '%s', got '%s'", msg, tr.Status.EvaluationError)
+	}
+	if tr.Status.Reason != helpText {
+		t.Error("authz internals leak")
+	}
+	s.containsLog(msg)
+}
+
+// TODO: This is a temporary test to ensure that the old API version is still supported & will be eventually removed.
+func stdAuthzBeta1Input() authzv1beta1.SubjectAccessReview {
+	return authzv1beta1.SubjectAccessReview{
+		TypeMeta: metav1.TypeMeta{
+			Kind:       authzSupportedKind,
+			APIVersion: authzSupportedBetaVersion,
+		},
+		Spec: authzv1beta1.SubjectAccessReviewSpec{
+			User: "bob",
+			ResourceAttributes: &authzv1beta1.ResourceAttributes{
+				Namespace: "foo-bar",
+				Verb:      "get",
+				Resource:  "baz",
+			},
+		},
+	}
+}
+
+// TODO: This is a temporary test to ensure that the old API version is still supported & will be eventually removed.
+func TestAuthzBetaV1ApiConversion(t *testing.T) {
+	s := newAuthzScaffold(t)
+	defer s.Close()
+	s.config.Mapper = mrfn(func(ctx context.Context, spec authz.SubjectAccessReviewSpec) (principal string, checks []AthenzAccessCheck, err error) {
+		return "",
+			nil,
+			errors.New("foobar")
+	})
+	input := stdAuthzBeta1Input()
 	ar := runAuthzTest(s, serialize(input), nil)
 	w := ar.w
 	body := ar.body

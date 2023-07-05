@@ -104,14 +104,11 @@ func convertIntoV1(rV1Beta1 authzv1beta1.SubjectAccessReview) authz.SubjectAcces
 		},
 		ObjectMeta: *rV1Beta1.ObjectMeta.DeepCopy(),
 		Spec: authz.SubjectAccessReviewSpec{
-			User:   rV1Beta1.Spec.User,
-			UID:    rV1Beta1.Spec.UID,
-			Extra:  v1Extra,
-			Groups: rV1Beta1.Spec.Groups,
-			NonResourceAttributes: &authz.NonResourceAttributes{
-				Path: rV1Beta1.Spec.NonResourceAttributes.Path,
-				Verb: rV1Beta1.Spec.NonResourceAttributes.Verb,
-			},
+			User:                  rV1Beta1.Spec.User,
+			UID:                   rV1Beta1.Spec.UID,
+			Extra:                 v1Extra,
+			Groups:                rV1Beta1.Spec.Groups,
+			NonResourceAttributes: (*authz.NonResourceAttributes)(rV1Beta1.Spec.DeepCopy().NonResourceAttributes),
 			ResourceAttributes: &authz.ResourceAttributes{
 				Namespace:   rV1Beta1.Spec.ResourceAttributes.Namespace,
 				Verb:        rV1Beta1.Spec.ResourceAttributes.Verb,
