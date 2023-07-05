@@ -101,7 +101,7 @@ func convertIntoV1(rV1Beta1 authzv1beta1.SubjectAccessReview) authz.SubjectAcces
 			Kind:       rV1Beta1.Kind,
 			APIVersion: authzSupportedVersion,
 		},
-		ObjectMeta: rV1Beta1.ObjectMeta,
+		ObjectMeta: *rV1Beta1.ObjectMeta.DeepCopy(),
 		Spec: authz.SubjectAccessReviewSpec{
 			User:                  rV1Beta1.Spec.User,
 			UID:                   rV1Beta1.Spec.UID,
