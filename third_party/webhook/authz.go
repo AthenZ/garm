@@ -121,6 +121,7 @@ func convertIntoV1(rV1Beta1 authzv1beta1.SubjectAccessReview) authz.SubjectAcces
 			Allowed: rV1Beta1.Status.Allowed,
 			Denied:  rV1Beta1.Status.Denied,
 			Reason:  rV1Beta1.Status.Reason,
+			EvaluationError:  rV1Beta1.Status.EvaluationError,
 		},
 	}
 }
