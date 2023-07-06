@@ -10,8 +10,6 @@ import (
 	"strings"
 
 	authz "k8s.io/api/authorization/v1"
-	authzv1beta1 "k8s.io/api/authorization/v1beta1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 const (
@@ -90,44 +88,6 @@ func (a *authorizer) clientX509(ctx context.Context) (*client, error) {
 	return newClient(a.ZMSEndpoint, a.ZTSEndpoint, a.Timeout, xpX509), nil
 }
 
-// TODO: convertIntoV1() is a temporary fix to support both v1 and v1beta1 versions of SubjectAccessReview & will be removed in future.
-func convertIntoV1(rV1Beta1 authzv1beta1.SubjectAccessReview) authz.SubjectAccessReview {
-	v1Extra := make(map[string]authz.ExtraValue)
-	for key, value := range rV1Beta1.Spec.Extra {
-		v1Extra[key] = authz.ExtraValue(value)
-	}
-
-	return authz.SubjectAccessReview{
-		TypeMeta: metav1.TypeMeta{
-			Kind:       rV1Beta1.Kind,
-			APIVersion: authzSupportedVersion,
-		},
-		ObjectMeta: *rV1Beta1.ObjectMeta.DeepCopy(),
-		Spec: authz.SubjectAccessReviewSpec{
-			User:                  rV1Beta1.Spec.User,
-			UID:                   rV1Beta1.Spec.UID,
-			Extra:                 v1Extra,
-			Groups:                rV1Beta1.Spec.Groups,
-			NonResourceAttributes: (*authz.NonResourceAttributes)(rV1Beta1.Spec.DeepCopy().NonResourceAttributes),
-			ResourceAttributes: &authz.ResourceAttributes{
-				Namespace:   rV1Beta1.Spec.ResourceAttributes.Namespace,
-				Verb:        rV1Beta1.Spec.ResourceAttributes.Verb,
-				Group:       rV1Beta1.Spec.ResourceAttributes.Group,
-				Version:     rV1Beta1.Spec.ResourceAttributes.Version,
-				Resource:    rV1Beta1.Spec.ResourceAttributes.Resource,
-				Subresource: rV1Beta1.Spec.ResourceAttributes.Subresource,
-				Name:        rV1Beta1.Spec.ResourceAttributes.Name,
-			},
-		},
-		Status: authz.SubjectAccessReviewStatus{
-			Allowed:         rV1Beta1.Status.Allowed,
-			Denied:          rV1Beta1.Status.Denied,
-			Reason:          rV1Beta1.Status.Reason,
-			EvaluationError: rV1Beta1.Status.EvaluationError,
-		},
-	}
-}
-
 // getSubjectAccessReview extracts the subject access review object from the request and returns it.
 func (a *authorizer) getSubjectAccessReview(ctx context.Context, req *http.Request) (*authz.SubjectAccessReview, error) {
 	b, err := ioutil.ReadAll(req.Body)
@@ -146,11 +106,8 @@ func (a *authorizer) getSubjectAccessReview(ctx context.Context, req *http.Reque
 	}
 	// TODO: This is a temporary fix to support both v1 and v1beta1 versions of SubjectAccessReview & will be removed in future.
 	if r.APIVersion == authzSupportedBetaVersion {
-		var rV1Beta1 authzv1beta1.SubjectAccessReview
-		if err := json.Unmarshal(b, &rV1Beta1); err != nil {
-			return nil, fmt.Errorf("invalid JSON request '%s', %v", b, err)
-		}
-		r = convertIntoV1(rV1Beta1)
+		// This is feasible as the only difference between v1 and v1beta1 is the APIVersion.
+		r.APIVersion = authzSupportedVersion
 	}
 	if r.APIVersion != authzSupportedVersion {
 		return nil, fmt.Errorf("unsupported authorization version, want '%s', got '%s'", authzSupportedVersion, r.APIVersion)
