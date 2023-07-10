@@ -112,9 +112,8 @@ func (a *authorizer) getSubjectAccessReview(ctx context.Context, req *http.Reque
 		if err := json.Unmarshal(b, &rV1Beta1); err != nil {
 			return nil, fmt.Errorf("invalid JSON request '%s', %v", b, err)
 		}
-		glg.Info("🔴 rV1Beta1", rV1Beta1)
 		r = ConvertIntoV1(rV1Beta1)
-		glg.Info("🔵 converted rV1Beta1", r)
+		glg.Warn("Your cluster is using deprecated authorization.k8s.io/v1beta instead of authorization.k8s.io/v1", "convertedFrom", rV1Beta1, "convertedTo", r)
 	}
 	if r.APIVersion != authzSupportedVersion {
 		return nil, fmt.Errorf("unsupported authorization version, want '%s', got '%s'", authzSupportedVersion, r.APIVersion)
