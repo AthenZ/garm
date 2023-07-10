@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/kpango/glg"
 	authz "k8s.io/api/authorization/v1"
 	authzv1beta1 "k8s.io/api/authorization/v1beta1"
 )
@@ -111,8 +112,9 @@ func (a *authorizer) getSubjectAccessReview(ctx context.Context, req *http.Reque
 		if err := json.Unmarshal(b, &rV1Beta1); err != nil {
 			return nil, fmt.Errorf("invalid JSON request '%s', %v", b, err)
 		}
-		r.APIVersion = authzSupportedVersion
-		r.Spec.Groups = rV1Beta1.Spec.Groups
+		glg.Info("🔴 rV1Beta1", rV1Beta1)
+		r = ConvertIntoV1(rV1Beta1)
+		glg.Info("🔵 converted rV1Beta1", rV1Beta1)
 	}
 	if r.APIVersion != authzSupportedVersion {
 		return nil, fmt.Errorf("unsupported authorization version, want '%s', got '%s'", authzSupportedVersion, r.APIVersion)
