@@ -3,7 +3,6 @@ package webhook
 import (
 	"context"
 	"errors"
-	"fmt"
 	"testing"
 
 	authz "k8s.io/api/authorization/v1"
@@ -25,11 +24,9 @@ func tester(t *testing.T, input authzv1beta1.SubjectAccessReview) {
 	})
 
 	ar := runAuthzTest(s, serialize(input), nil)
-	fmt.Printf("input: %+v\n", ar.body)
 	w := ar.w
 	body := ar.body
 	result := w.Result()
-	fmt.Print(result)
 
 	if result.StatusCode != 200 {
 		t.Fatal("invalid status code", result.StatusCode)
