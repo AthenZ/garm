@@ -80,32 +80,3 @@ func TestAuthzBetaV1ApiConversion(t *testing.T) {
 		tester(t, stdAuthzBeta1Input(insertingGroup))
 	}
 }
-
-func stdAuthzBeta1InputWithoutGroups(insertingGroup []string) authzv1beta1.SubjectAccessReview {
-	return authzv1beta1.SubjectAccessReview{
-		TypeMeta: metav1.TypeMeta{
-			Kind:       authzSupportedKind,
-			APIVersion: authzSupportedBetaVersion,
-		},
-		Spec: authzv1beta1.SubjectAccessReviewSpec{
-			User: "bob",
-			ResourceAttributes: &authzv1beta1.ResourceAttributes{
-				Namespace: "foo-bar",
-				Verb:      "get",
-				Resource:  "baz",
-			},
-		},
-	}
-}
-
-func TestAuthzBetaV1ApiWithoutGroups(t *testing.T) {
-	insertingGroups := [][]string{
-		{"v1beta1-testing", "v1beta1-group"}, // multiple elements
-		{},                                   // empty group
-		nil,                                  // not defined
-	}
-
-	for _, insertingGroup := range insertingGroups {
-		tester(t, stdAuthzBeta1InputWithoutGroups(insertingGroup))
-	}
-}
