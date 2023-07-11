@@ -15,6 +15,41 @@ import (
 
 // TODO: This is a temporary test to ensure that the old API version is still supported & will be eventually removed.
 
+func tester(t *testing.T, input authzv1beta1.SubjectAccessReview) {
+	s := newAuthzScaffold(t)
+	defer s.Close()
+	s.config.Mapper = mrfn(func(ctx context.Context, spec authz.SubjectAccessReviewSpec) (principal string, checks []AthenzAccessCheck, err error) {
+		return "",
+			nil,
+			errors.New("foobar")
+	})
+
+	ar := runAuthzTest(s, serialize(input), nil)
+	fmt.Printf("input: %+v\n", ar.body)
+	w := ar.w
+	body := ar.body
+	result := w.Result()
+	fmt.Print(result)
+
+	if result.StatusCode != 200 {
+		t.Fatal("invalid status code", result.StatusCode)
+	}
+	tr := checkGrant(t, body.Bytes(), false)
+
+	if tr.APIVersion != authzSupportedBetaVersion {
+		t.Errorf("wrong API version. Want '%s', got '%s'", authzSupportedBetaVersion, tr.APIVersion)
+	}
+
+	msg := "mapping error: foobar"
+	if tr.Status.EvaluationError != msg {
+		t.Errorf("want '%s', got '%s'", msg, tr.Status.EvaluationError)
+	}
+	if tr.Status.Reason != helpText {
+		t.Error("authz internals leak")
+	}
+	s.containsLog(msg)
+}
+
 func stdAuthzBeta1Input(insertingGroup []string) authzv1beta1.SubjectAccessReview {
 	return authzv1beta1.SubjectAccessReview{
 		TypeMeta: metav1.TypeMeta{
@@ -35,13 +70,6 @@ func stdAuthzBeta1Input(insertingGroup []string) authzv1beta1.SubjectAccessRevie
 
 // TODO: This is a temporary test to ensure that the old API version is still supported & will be eventually removed.
 func TestAuthzBetaV1ApiConversion(t *testing.T) {
-	s := newAuthzScaffold(t)
-	defer s.Close()
-	s.config.Mapper = mrfn(func(ctx context.Context, spec authz.SubjectAccessReviewSpec) (principal string, checks []AthenzAccessCheck, err error) {
-		return "",
-			nil,
-			errors.New("foobar")
-	})
 	insertingGroups := [][]string{
 		{"v1beta1-testing", "v1beta1-group"}, // multiple elements
 		{},                                   // empty group
@@ -49,30 +77,35 @@ func TestAuthzBetaV1ApiConversion(t *testing.T) {
 	}
 
 	for _, insertingGroup := range insertingGroups {
-		input := stdAuthzBeta1Input(insertingGroup)
-		ar := runAuthzTest(s, serialize(input), nil)
-		fmt.Printf("input: %+v\n", ar.body)
-		w := ar.w
-		body := ar.body
-		result := w.Result()
-		fmt.Print(result)
+		tester(t, stdAuthzBeta1Input(insertingGroup))
+	}
+}
 
-		if result.StatusCode != 200 {
-			t.Fatal("invalid status code", result.StatusCode)
-		}
-		tr := checkGrant(t, body.Bytes(), false)
+func stdAuthzBeta1InputWithoutGroups(insertingGroup []string) authzv1beta1.SubjectAccessReview {
+	return authzv1beta1.SubjectAccessReview{
+		TypeMeta: metav1.TypeMeta{
+			Kind:       authzSupportedKind,
+			APIVersion: authzSupportedBetaVersion,
+		},
+		Spec: authzv1beta1.SubjectAccessReviewSpec{
+			User: "bob",
+			ResourceAttributes: &authzv1beta1.ResourceAttributes{
+				Namespace: "foo-bar",
+				Verb:      "get",
+				Resource:  "baz",
+			},
+		},
+	}
+}
 
-		if tr.APIVersion != authzSupportedBetaVersion {
-			t.Errorf("wrong API version. Want '%s', got '%s'", authzSupportedBetaVersion, tr.APIVersion)
-		}
+func TestAuthzBetaV1ApiWithoutGroups(t *testing.T) {
+	insertingGroups := [][]string{
+		{"v1beta1-testing", "v1beta1-group"}, // multiple elements
+		{},                                   // empty group
+		nil,                                  // not defined
+	}
 
-		msg := "mapping error: foobar"
-		if tr.Status.EvaluationError != msg {
-			t.Errorf("want '%s', got '%s'", msg, tr.Status.EvaluationError)
-		}
-		if tr.Status.Reason != helpText {
-			t.Error("authz internals leak")
-		}
-		s.containsLog(msg)
+	for _, insertingGroup := range insertingGroups {
+		tester(t, stdAuthzBeta1InputWithoutGroups(insertingGroup))
 	}
 }
