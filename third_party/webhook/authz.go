@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	authz "k8s.io/api/authorization/v1"
+	authzv1beta1 "k8s.io/api/authorization/v1beta1"
 )
 
 const (
@@ -89,36 +90,42 @@ func (a *authorizer) clientX509(ctx context.Context) (*client, error) {
 }
 
 // getSubjectAccessReview extracts the subject access review object from the request and returns it.
-func (a *authorizer) getSubjectAccessReview(ctx context.Context, req *http.Request) (*authz.SubjectAccessReview, error) {
+func (a *authorizer) getSubjectAccessReview(ctx context.Context, req *http.Request) (bool, *authz.SubjectAccessReview, error) {
+	isV1Beta := false // TODO: Remove me! Temporary fix to support both v1 and v1beta1 versions of SubjectAccessReview.
 	b, err := ioutil.ReadAll(req.Body)
 	if err != nil {
-		return nil, fmt.Errorf("body read error for authorization request, %v", err)
+		return isV1Beta, nil, fmt.Errorf("body read error for authorization request, %v", err)
 	}
 	if len(b) == 0 {
-		return nil, fmt.Errorf("empty body for authorization request")
+		return isV1Beta, nil, fmt.Errorf("empty body for authorization request")
 	}
 	if isLogEnabled(ctx, LogTraceServer) {
 		getLogger(ctx).Printf("request body: %s\n", b)
 	}
 	var r authz.SubjectAccessReview
 	if err := json.Unmarshal(b, &r); err != nil {
-		return nil, fmt.Errorf("invalid JSON request '%s', %v", b, err)
+		return isV1Beta, nil, fmt.Errorf("invalid JSON request '%s', %v", b, err)
 	}
-	// TODO: This is a temporary fix to support both v1 and v1beta1 versions of SubjectAccessReview & will be removed in future.
+	// TODO: Remove me! This is a temporary fix to support both v1 and v1beta1 versions of SubjectAccessReview & will be removed in future.
 	if r.APIVersion == authzSupportedBetaVersion {
-		// This is feasible as the only difference between v1 and v1beta1 is the APIVersion.
-		r.APIVersion = authzSupportedVersion
+		isV1Beta = true
+		var rV1Beta1 authzv1beta1.SubjectAccessReview
+		if err := json.Unmarshal(b, &rV1Beta1); err != nil {
+			return isV1Beta, nil, fmt.Errorf("invalid JSON request '%s', %v", b, err)
+		}
+		r = ConvertIntoV1(rV1Beta1)
+		// glg.Warn("Your cluster is using deprecated authorization.k8s.io/v1beta1 instead of authorization.k8s.io/v1", "convertedFrom:", rV1Beta1, "convertedTo:", r)
 	}
 	if r.APIVersion != authzSupportedVersion {
-		return nil, fmt.Errorf("unsupported authorization version, want '%s', got '%s'", authzSupportedVersion, r.APIVersion)
+		return isV1Beta, nil, fmt.Errorf("unsupported authorization version, want '%s', got '%s'", authzSupportedVersion, r.APIVersion)
 	}
 	if r.Kind != authzSupportedKind {
-		return nil, fmt.Errorf("unsupported authorization kind, want '%s', got '%s'", authzSupportedKind, r.Kind)
+		return isV1Beta, nil, fmt.Errorf("unsupported authorization kind, want '%s', got '%s'", authzSupportedKind, r.Kind)
 	}
 	if r.Spec.ResourceAttributes == nil && r.Spec.NonResourceAttributes == nil {
-		return nil, fmt.Errorf("bad authorization spec, must have one of resource or non-resource attributes")
+		return isV1Beta, nil, fmt.Errorf("bad authorization spec, must have one of resource or non-resource attributes")
 	}
-	return &r, nil
+	return isV1Beta, &r, nil
 }
 
 // grantStatus adds extra information to a review status.
@@ -315,7 +322,7 @@ func (a *authorizer) logOutcome(logger Logger, sr *authz.SubjectAccessReviewSpec
 
 func (a *authorizer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-	sr, err := a.getSubjectAccessReview(ctx, r)
+	isV1Beta, sr, err := a.getSubjectAccessReview(ctx, r)
 	if err != nil {
 		getLogger(ctx).Printf("authz request error from %s: %v\n", r.RemoteAddr, err)
 		http.Error(w, err.Error(), http.StatusBadRequest)
@@ -325,10 +332,16 @@ func (a *authorizer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	gs := a.authorize(ctx, sr.Spec)
 	a.logOutcome(getLogger(ctx), &sr.Spec, gs)
 
+	// TODO: Remove me! Temporary Tweaks to support both v1 and v1beta1
+	apiVersion := sr.APIVersion
+	if isV1Beta {
+		apiVersion = authzSupportedBetaVersion
+	}
+
 	resp := struct {
 		APIVersion string                          `json:"apiVersion"`
 		Kind       string                          `json:"kind"`
 		Status     authz.SubjectAccessReviewStatus `json:"status"`
-	}{sr.APIVersion, sr.Kind, gs.status}
+	}{apiVersion, sr.Kind, gs.status}
 	writeJSON(ctx, w, &resp)
 }

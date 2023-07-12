@@ -14,11 +14,11 @@ import (
 	"time"
 
 	authz "k8s.io/api/authorization/v1"
-	authzv1beta1 "k8s.io/api/authorization/v1beta1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 var helpText = "help me!"
+var expectedApiVersion = authzSupportedVersion
 
 func TestAuthzError(t *testing.T) {
 	e := NewAuthzError(errors.New("foobar"), "this is bad")
@@ -126,6 +126,7 @@ func stdAuthzInput() authz.SubjectAccessReview {
 				Verb:      "get",
 				Resource:  "baz",
 			},
+			Groups: []string{"v1-testing", "v1-group"},
 		},
 	}
 }
@@ -190,6 +191,9 @@ func TestAuthzHappyPath(t *testing.T) {
 		t.Error("invalid ZMS URL path", urlPath)
 	}
 	tr := checkGrant(t, body.Bytes(), true)
+	if tr.APIVersion != expectedApiVersion {
+		t.Errorf("wrong API version. Want '%s', got '%s'", expectedApiVersion, tr.APIVersion)
+	}
 	if tr.Kind != input.Kind {
 		t.Error("invalid Kind", tr.Kind)
 	}
@@ -222,6 +226,9 @@ func TestAuthzHappyPathX509(t *testing.T) {
 		t.Error("invalid ZMS URL path", urlPath)
 	}
 	tr := checkGrant(t, body.Bytes(), true)
+	if tr.APIVersion != expectedApiVersion {
+		t.Errorf("wrong API version. Want '%s', got '%s'", expectedApiVersion, tr.APIVersion)
+	}
 	if tr.Kind != input.Kind {
 		t.Error("invalid Kind", tr.Kind)
 	}
@@ -259,6 +266,9 @@ func TestAuthzZMSReject(t *testing.T) {
 				t.Fatal("invalid status code", w.Result().StatusCode)
 			}
 			tr := checkGrant(t, body.Bytes(), false)
+			if tr.APIVersion != expectedApiVersion {
+				t.Errorf("wrong API version. Want '%s', got '%s'", expectedApiVersion, tr.APIVersion)
+			}
 			if tr.Status.EvaluationError == "" {
 				t.Error("eval error not set")
 			}
@@ -307,52 +317,9 @@ func TestAuthzMapperError(t *testing.T) {
 		t.Fatal("invalid status code", w.Result().StatusCode)
 	}
 	tr := checkGrant(t, body.Bytes(), false)
-	msg := "mapping error: foobar"
-	if tr.Status.EvaluationError != msg {
-		t.Errorf("want '%s', got '%s'", msg, tr.Status.EvaluationError)
+	if tr.APIVersion != expectedApiVersion {
+		t.Errorf("wrong API version. Want '%s', got '%s'", expectedApiVersion, tr.APIVersion)
 	}
-	if tr.Status.Reason != helpText {
-		t.Error("authz internals leak")
-	}
-	s.containsLog(msg)
-}
-
-// TODO: This is a temporary test to ensure that the old API version is still supported & will be eventually removed.
-func stdAuthzBeta1Input() authzv1beta1.SubjectAccessReview {
-	return authzv1beta1.SubjectAccessReview{
-		TypeMeta: metav1.TypeMeta{
-			Kind:       authzSupportedKind,
-			APIVersion: authzSupportedBetaVersion,
-		},
-		Spec: authzv1beta1.SubjectAccessReviewSpec{
-			User: "bob",
-			ResourceAttributes: &authzv1beta1.ResourceAttributes{
-				Namespace: "foo-bar",
-				Verb:      "get",
-				Resource:  "baz",
-			},
-		},
-	}
-}
-
-// TODO: This is a temporary test to ensure that the old API version is still supported & will be eventually removed.
-func TestAuthzBetaV1ApiConversion(t *testing.T) {
-	s := newAuthzScaffold(t)
-	defer s.Close()
-	s.config.Mapper = mrfn(func(ctx context.Context, spec authz.SubjectAccessReviewSpec) (principal string, checks []AthenzAccessCheck, err error) {
-		return "",
-			nil,
-			errors.New("foobar")
-	})
-	input := stdAuthzBeta1Input()
-	ar := runAuthzTest(s, serialize(input), nil)
-	w := ar.w
-	body := ar.body
-
-	if w.Result().StatusCode != 200 {
-		t.Fatal("invalid status code", w.Result().StatusCode)
-	}
-	tr := checkGrant(t, body.Bytes(), false)
 	msg := "mapping error: foobar"
 	if tr.Status.EvaluationError != msg {
 		t.Errorf("want '%s', got '%s'", msg, tr.Status.EvaluationError)
@@ -378,6 +345,9 @@ func TestAuthzTokenErrors(t *testing.T) {
 		t.Fatal("invalid status code", w.Result().StatusCode)
 	}
 	tr := checkGrant(t, body.Bytes(), false)
+	if tr.APIVersion != expectedApiVersion {
+		t.Errorf("wrong API version. Want '%s', got '%s'", expectedApiVersion, tr.APIVersion)
+	}
 	msg := "no token for you"
 	if tr.Status.EvaluationError != msg {
 		t.Errorf("want '%s', got '%s'", msg, tr.Status.EvaluationError)
@@ -403,6 +373,9 @@ func TestAuthzBadToken(t *testing.T) {
 		t.Fatal("invalid status code", w.Result().StatusCode)
 	}
 	tr := checkGrant(t, body.Bytes(), false)
+	if tr.APIVersion != expectedApiVersion {
+		t.Errorf("wrong API version. Want '%s', got '%s'", expectedApiVersion, tr.APIVersion)
+	}
 	reason := "internal setup error." + helpText
 	if tr.Status.Reason != reason {
 		t.Errorf("reason mismatch: want '%s', got'%s'", reason, tr.Status.Reason)
@@ -424,6 +397,9 @@ func TestAuthzAthenz400(t *testing.T) {
 		t.Fatal("invalid status code", w.Result().StatusCode)
 	}
 	tr := checkGrant(t, body.Bytes(), false)
+	if tr.APIVersion != expectedApiVersion {
+		t.Errorf("wrong API version. Want '%s', got '%s'", expectedApiVersion, tr.APIVersion)
+	}
 	reason := "Invalid ResourceName error."
 	if tr.Status.Reason != reason {
 		t.Errorf("reason mismatch: want '%s', got'%s'", reason, tr.Status.Reason)
@@ -446,6 +422,9 @@ func TestAuthzAthenz404(t *testing.T) {
 		t.Fatal("invalid status code", w.Result().StatusCode)
 	}
 	tr := checkGrant(t, body.Bytes(), false)
+	if tr.APIVersion != expectedApiVersion {
+		t.Errorf("wrong API version. Want '%s', got '%s'", expectedApiVersion, tr.APIVersion)
+	}
 	reason := "" // Continue to the the next check
 	if tr.Status.Reason != reason {
 		t.Errorf("reason mismatch: want '%s', got'%s'", reason, tr.Status.Reason)
@@ -473,6 +452,9 @@ func TestAuthzAthenz500(t *testing.T) {
 		t.Fatal("invalid status code", w.Result().StatusCode)
 	}
 	tr := checkGrant(t, body.Bytes(), false)
+	if tr.APIVersion != expectedApiVersion {
+		t.Errorf("wrong API version. Want '%s', got '%s'", expectedApiVersion, tr.APIVersion)
+	}
 	if tr.Status.Reason != helpText {
 		t.Errorf("reason mismatch: want '%s', got'%s'", helpText, tr.Status.Reason)
 	}
