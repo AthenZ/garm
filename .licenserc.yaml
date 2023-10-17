@@ -6,6 +6,7 @@ header:
   paths:
     - '**/*.go'
   paths-ignore:
+    - 'third_party/**'
     - 'LICENSE'
     - 'MAINTAINERS'
     - '**/.*'
