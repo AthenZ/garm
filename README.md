@@ -13,10 +13,9 @@
 
 - [What is Garm](#what-is-garm)
 - [Use Case](#use-case)
-    - [Authorization](#authorization)
-    - [Docker](#docker)
-    - [Usage](#usage)
-- [Contributor License Agreement](#contributor-license-agreement)
+  - [Authorization](#authorization)
+  - [Docker](#docker)
+  - [Usage](#usage)
 - [About releases](#about-releases)
 
 <!-- /TOC -->
@@ -61,14 +60,8 @@ $ docker pull docker.io/athenz/garm
 - [configure k8s webhook](https://github.com/AthenZ/garm/blob/master/docs/installation/03.%20config-k8s-in-webhook-mode.md)
 - [configure Athenz & Garm yaml](./docs/config-detail.md)
 
-## Contributor License Agreement
-
-This project requires contributors to agree to a [Contributor License Agreement (CLA)](https://gist.github.com/ydnjp/3095832f100d5c3d2592).
-
-Note that only for contributions to the garm repository on the [GitHub](https://github.com/AthenZ/garm), the contributors of them shall be deemed to have agreed to the CLA without individual written agreements.
-
 ## About releases
 
 - Releases
-    - [![GitHub release (latest by date)](https://img.shields.io/github/v/release/AthenZ/garm?style=flat-square&label=Github%20version)](https://github.com/AthenZ/garm/releases/latest)
-    - [![Docker Image Version (tag latest)](https://img.shields.io/docker/v/athenz/garm/latest?style=flat-square&label=Docker%20version)](https://hub.docker.com/r/athenz/garm/tags)
+  - [![GitHub release (latest by date)](https://img.shields.io/github/v/release/AthenZ/garm?style=flat-square&label=Github%20version)](https://github.com/AthenZ/garm/releases/latest)
+  - [![Docker Image Version (tag latest)](https://img.shields.io/docker/v/athenz/garm/latest?style=flat-square&label=Docker%20version)](https://hub.docker.com/r/athenz/garm/tags)
