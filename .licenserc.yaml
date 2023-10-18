@@ -1,0 +1,20 @@
+header:
+  license:
+    spdx-id: Apache-2.0
+    copyright-owner: LY Corporation
+    software-name: garm
+  paths:
+    - '**/*.go'
+  paths-ignore:
+    - 'third_party/**'
+    - 'LICENSE'
+    - 'MAINTAINERS'
+    - '**/.*'
+    - '**/*.md'
+    - '**/go.mod'
+    - '**/go.sum'
+  comment: on-failure
+
+dependency:
+  files:
+    - go.mod # If this is a Go project.
