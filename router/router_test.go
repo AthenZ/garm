@@ -19,7 +19,6 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"reflect"
@@ -123,7 +122,7 @@ func TestNewServeMux(t *testing.T) {
 					serveMux.ServeHTTP(recorder, request)
 					response = recorder.Result()
 					defer response.Body.Close()
-					gotByte, err = ioutil.ReadAll(response.Body)
+					gotByte, err = io.ReadAll(response.Body)
 					if err != nil {
 						return
 					}
@@ -142,7 +141,7 @@ func TestNewServeMux(t *testing.T) {
 					serveMux.ServeHTTP(recorder, request)
 					response = recorder.Result()
 					defer response.Body.Close()
-					gotByte, err = ioutil.ReadAll(response.Body)
+					gotByte, err = io.ReadAll(response.Body)
 					if err != nil {
 						return
 					}
@@ -236,7 +235,7 @@ func Test_routing(t *testing.T) {
 
 					response := recorder.Result()
 					defer response.Body.Close()
-					gotByte, err := ioutil.ReadAll(response.Body)
+					gotByte, err := io.ReadAll(response.Body)
 					if err != nil {
 						return err
 					}
@@ -282,7 +281,7 @@ func Test_routing(t *testing.T) {
 
 					response := recorder.Result()
 					defer response.Body.Close()
-					gotByte, err := ioutil.ReadAll(response.Body)
+					gotByte, err := io.ReadAll(response.Body)
 					if err != nil {
 						return err
 					}
@@ -318,7 +317,7 @@ func Test_routing(t *testing.T) {
 
 					response := recorder.Result()
 					defer response.Body.Close()
-					gotByte, err := ioutil.ReadAll(response.Body)
+					gotByte, err := io.ReadAll(response.Body)
 					if err != nil {
 						return err
 					}
@@ -358,7 +357,7 @@ func Test_routing(t *testing.T) {
 
 					response := recorder.Result()
 					defer response.Body.Close()
-					gotByte, err := ioutil.ReadAll(response.Body)
+					gotByte, err := io.ReadAll(response.Body)
 					if err != nil {
 						return err
 					}
@@ -400,7 +399,7 @@ func Test_routing(t *testing.T) {
 
 						response := recorder.Result()
 						defer response.Body.Close()
-						gotByte, err := ioutil.ReadAll(response.Body)
+						gotByte, err := io.ReadAll(response.Body)
 						if err != nil {
 							return err
 						}
@@ -593,7 +592,7 @@ func Test_routing(t *testing.T) {
 					pr, pw := io.Pipe()
 					logch := make(chan string)
 					go func() {
-						bytes, err := ioutil.ReadAll(pr)
+						bytes, err := io.ReadAll(pr)
 						if err != nil {
 							logch <- fmt.Errorf("routing() fail to read log from glg: %v", err).Error()
 							return
@@ -626,7 +625,7 @@ func Test_routing(t *testing.T) {
 					// get request body
 					response := recorder.Result()
 					defer response.Body.Close()
-					gotByte, err := ioutil.ReadAll(response.Body)
+					gotByte, err := io.ReadAll(response.Body)
 					if err != nil {
 						return err
 					}
@@ -787,7 +786,7 @@ func Test_recoverWrap(t *testing.T) {
 
 					response := recorder.Result()
 					defer response.Body.Close()
-					gotByte, err := ioutil.ReadAll(response.Body)
+					gotByte, err := io.ReadAll(response.Body)
 					if err != nil {
 						return err
 					}
@@ -834,7 +833,7 @@ func Test_recoverWrap(t *testing.T) {
 
 					response := recorder.Result()
 					defer response.Body.Close()
-					gotByte, err := ioutil.ReadAll(response.Body)
+					gotByte, err := io.ReadAll(response.Body)
 					if err != nil {
 						return err
 					}
