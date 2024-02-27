@@ -5,6 +5,7 @@ go 1.20
 replace (
 	github.com/AthenZ/athenz => github.com/AthenZ/athenz v1.11.26
 	golang.org/x/net => golang.org/x/net v0.7.0
+	golang.org/x/net/http2 => golang.org/x/net/http2 v0.17.0
 	k8s.io/client-go => k8s.io/client-go v0.26.0
 )
 
