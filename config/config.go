@@ -162,6 +162,12 @@ type Token struct {
 
 	// Expiration represents the duration of the expiration.
 	Expiration string `yaml:"expiration"`
+
+	// UseServiceCertAuthN represents using service certificate for authentication instead of using n-token directly.
+	UseServiceCertAuthN string `yaml:"use_service_cert_authentication"`
+
+	// ServiceCertRefreshDuration represents the service certificate refresh duration. Default is 24h.
+	ServiceCertRefreshDuration string `yaml:"service_cert_refresh_duration"`
 }
 
 // Mapping represents the mapping rules from K8s authentication and authorization requests to Athenz requests.

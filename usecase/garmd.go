@@ -40,23 +40,26 @@ type garm struct {
 // The daemon contains a token service authentication and authorization server.
 // This function will also initialize the mapping rules for the authentication and authorization check.
 func New(cfg config.Config) (GarmDaemon, error) {
-	token, err := service.NewTokenService(cfg.Token)
-	if err != nil {
-		return nil, errors.Wrap(err, "token service instantiate failed")
-	}
 
-	resolver := service.NewResolver(cfg.Mapping)
-	// set up mapper
-	cfg.Athenz.AuthZ.Mapper = service.NewResourceMapper(resolver)
-	cfg.Athenz.AuthN.Mapper = service.NewUserMapper(resolver)
-
-	// set token source (function pointer)
-	cfg.Athenz.AuthZ.Token = token.GetToken
-
+	// setup Athenz API connection details
 	athenz, err := service.NewAthenz(cfg.Athenz, service.NewLogger(cfg.Logger))
 	if err != nil {
 		return nil, errors.Wrap(err, "athenz service instantiate failed")
 	}
+
+	// setup Athenz authentication for Athenz API access
+	token, err := service.NewTokenService(cfg.Athenz, cfg.Token)
+	if err != nil {
+		return nil, errors.Wrap(err, "token service instantiate failed")
+	}
+	cfg.Athenz.AuthZ.Token = token.GetToken
+	cfg.Athenz.AuthZ.AthenzX509 = token.GetAthenzX509
+	cfg.Athenz.AuthZ.AthenzClientAuthnx509Mode = token.UseServiceCert()
+
+	// setup K8s resource to Athenz resource mapper
+	resolver := service.NewResolver(cfg.Mapping)
+	cfg.Athenz.AuthZ.Mapper = service.NewResourceMapper(resolver)
+	cfg.Athenz.AuthN.Mapper = service.NewUserMapper(resolver)
 
 	return &garm{
 		cfg:    cfg,
