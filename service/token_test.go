@@ -83,7 +83,7 @@ func TestNewTokenService(t *testing.T) {
 				afterFunc: func() {
 					os.Unsetenv(keyEnvName)
 				},
-				wantErr: fmt.Errorf("invalid token certificate: open %v", "notexists: no such file or directory"),
+				wantErr: fmt.Errorf("invalid token private key: open %v", "notexists: no such file or directory"),
 			}
 		}(),
 		func() test {
@@ -109,7 +109,7 @@ func TestNewTokenService(t *testing.T) {
 				afterFunc: func() {
 					os.Unsetenv(keyEnvName)
 				},
-				wantErr: fmt.Errorf("invalid token certificate: open %v", "notexists: no such file or directory"),
+				wantErr: fmt.Errorf("invalid token private key: open %v", "notexists: no such file or directory"),
 			}
 		}(),
 		func() test {
