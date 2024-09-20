@@ -45,6 +45,8 @@ func New(cfg config.Config) (GarmDaemon, error) {
 		return nil, errors.Wrap(err, "token service instantiate failed")
 	}
 
+	// maybe read x509 certificate
+
 	resolver := service.NewResolver(cfg.Mapping)
 	// set up mapper
 	cfg.Athenz.AuthZ.Mapper = service.NewResourceMapper(resolver)
@@ -52,6 +54,8 @@ func New(cfg config.Config) (GarmDaemon, error) {
 
 	// set token source (function pointer)
 	cfg.Athenz.AuthZ.Token = token.GetToken
+	cfg.Athenz.Athuz.AthenzX509 = 
+	cfg.Athenz.AuthZ.AthenzClientAuthnx509Mode = token.UseServiceCert()
 
 	athenz, err := service.NewAthenz(cfg.Athenz, service.NewLogger(cfg.Logger))
 	if err != nil {

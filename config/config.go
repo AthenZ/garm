@@ -30,7 +30,8 @@ import (
 
 const (
 	// currentVersion represents the configuration version.
-	currentVersion string = "v2.0.0"
+	// v2.1.0: Includes x509 certificate configs for connecting to Athenz.
+	currentVersion string = "v2.1.0"
 	// delimiter represents delimiter used to serialize RequestInfo. Must NOT use valid characters allowed in the all the fields of RequestInfo.
 	// Choose the delimiter that RequestInfo's verb, namespace, API Group, Resource and Name CANNOT use.
 	// i.e) If end user can set its resource name with hyphens, we cannot use hyphen as delimiter.
@@ -57,11 +58,21 @@ type Config struct {
 	// Athenz represents Athenz configuration for Garm to connect to Athenz server.
 	Athenz Athenz `yaml:"athenz"`
 
+	// X509 represents 3rd party generated x509 certificate to connect to Athenz.
+	X509 X509Config `yaml:"x509"`
+
 	// Token represents configuration to generate n-token for connecting to Athenz.
 	Token Token `yaml:"token"`
 
 	// Mapping represents the mapping rule for mapping K8s authentication and authorization requests to Athenz requests.
 	Mapping Mapping `yaml:"map_rule"`
+}
+
+type X509Config struct {
+	Cert         string `yaml:"cert"`
+	Key          string `yaml:"key"`
+	CA           string `yaml:"ca"`
+	ValidateCert bool   `yaml:"validate_cert"`
 }
 
 // Logger represents logging configuration for Garm.
