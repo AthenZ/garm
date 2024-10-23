@@ -39,8 +39,8 @@ RUN apk del build-dependencies --purge \
     && rm -rf "${GOPATH}"
 
 # Start From Scratch For Running Environment
-FROM scratch
-# FROM alpine:latest
+# FROM scratch
+FROM alpine:latest
 LABEL maintainer "cncf-athenz-maintainers@lists.cncf.io"
 
 ENV APP_NAME garm
