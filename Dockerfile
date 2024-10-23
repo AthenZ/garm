@@ -35,6 +35,10 @@ RUN BUILD_TIME=$(date -u +%Y%m%d-%H%M%S) \
 # allow well-known port binding
 RUN setcap 'cap_net_bind_service=+ep' "/usr/bin/${APP_NAME}"
 
+# 🟡 Check setcap
+RUN getcap "/usr/bin/${APP_NAME}"
+RUN getcap "/go/bin/${APP_NAME}"
+
 RUN apk del build-dependencies --purge \
     && rm -rf "${GOPATH}"
 
@@ -59,8 +63,8 @@ COPY --from=builder /usr/bin/${APP_NAME} /go/bin/${APP_NAME}
 COPY --from=builder /etc/passwd /etc/passwd
 USER ${APP_NAME}
 
-# Check setcap
-RUN getcap "/go/bin/${APP_NAME}" # Verify capabilities
+# 🟡 Check setcap
+RUN getcap "/go/bin/${APP_NAME}"
 
 HEALTHCHECK NONE
 ENTRYPOINT ["/go/bin/garm"]
