@@ -2,7 +2,7 @@ FROM golang:1.20-alpine AS base
 
 RUN set -eux \
     && apk --no-cache add ca-certificates \
-    && apk --no-cache add --virtual build-dependencies cmake g++ make unzip curl git libcap
+    && apk --no-cache add --virtual build-dependencies cmake g++ make unzip curl git
 
 WORKDIR ${GOPATH}/src/github.com/AthenZ/garm
 
@@ -32,18 +32,19 @@ RUN BUILD_TIME=$(date -u +%Y%m%d-%H%M%S) \
     go build -ldflags "-s -w -linkmode 'external' -extldflags '-static -fPIC -m64 -pthread -std=c++11 -lstdc++' -X 'main.Version=${APP_VERSION} at ${BUILD_TIME} by ${GO_VERSION}'" -a -tags "cgo netgo" -installsuffix "cgo netgo" -o "${APP_NAME}" \
     && mv "${APP_NAME}" "/usr/bin/${APP_NAME}"
 
-# allow well-known port binding
-RUN setcap 'cap_net_bind_service=+ep' "/usr/bin/${APP_NAME}"
-
 RUN apk del build-dependencies --purge \
     && rm -rf "${GOPATH}"
 
 # Start From Scratch For Running Environment
-FROM scratch
-# FROM alpine:latest
+# FROM scratch
+# 🟡 Modified Part:
+FROM alpine:latest
 LABEL maintainer "cncf-athenz-maintainers@lists.cncf.io"
 
 ENV APP_NAME garm
+
+# 🟡 Modified Part: Install libcap to use setcap and getcap
+RUN apk --no-cache add libcap
 
 # Copy certificates for SSL/TLS
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
@@ -54,6 +55,12 @@ COPY --from=builder /usr/bin/${APP_NAME} /go/bin/${APP_NAME}
 # Copy user
 COPY --from=builder /etc/passwd /etc/passwd
 USER ${APP_NAME}
+
+# 🟡 Install libcap, set capabilities, and remove libcap
+RUN apk --no-cache add libcap \
+    && setcap 'cap_net_bind_service=+ep' "/go/bin/${APP_NAME}" \
+    && getcap "/go/bin/${APP_NAME}" \
+    && apk del libcap
 
 HEALTHCHECK NONE
 ENTRYPOINT ["/go/bin/garm"]
