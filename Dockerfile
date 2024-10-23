@@ -40,10 +40,14 @@ RUN apk del build-dependencies --purge \
 
 # Start From Scratch For Running Environment
 # FROM scratch
+# 🟡 Modified Part:
 FROM alpine:latest
 LABEL maintainer "cncf-athenz-maintainers@lists.cncf.io"
 
 ENV APP_NAME garm
+
+# 🟡 Modified Part: Install libcap to use setcap and getcap
+RUN apk --no-cache add libcap
 
 # Copy certificates for SSL/TLS
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
@@ -54,6 +58,9 @@ COPY --from=builder /usr/bin/${APP_NAME} /go/bin/${APP_NAME}
 # Copy user
 COPY --from=builder /etc/passwd /etc/passwd
 USER ${APP_NAME}
+
+# Check setcap
+RUN getcap "/go/bin/${APP_NAME}" # Verify capabilities
 
 HEALTHCHECK NONE
 ENTRYPOINT ["/go/bin/garm"]
