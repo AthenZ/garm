@@ -132,8 +132,9 @@ func (s *server) ListenAndServe(ctx context.Context) chan []error {
 	if err != nil {
 		glg.Error(errors.Wrap(err, "failed to get current user"))
 	} else {
-		// Log the current user information
-		glg.Infof("Running garm as user [%s] with UID [%s] ...", currentUser.Username, currentUser.Uid)
+		// Log the current user information:
+		// With security perspective of UID: https://help.switch.ch/aai/support/documents/attributes/uid/#:~:text=uid%20is%20security%20sensitive%20since,anyhow%20not%20unique%20across%20organizations.
+		glg.Debugf("Running garm as user [%s] with UID [%s] ...", currentUser.Username, currentUser.Uid)
 	}
 
 	// start both webhook server and health check server
