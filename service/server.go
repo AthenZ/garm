@@ -18,6 +18,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"os/user"
 	"sync"
 	"time"
 
@@ -126,6 +127,14 @@ func (s *server) ListenAndServe(ctx context.Context) chan []error {
 
 	wg := new(sync.WaitGroup)
 	wg.Add(2)
+
+	currentUser, err := user.Current()
+	if err != nil {
+		glg.Error(errors.Wrap(err, "failed to get current user"))
+	} else {
+		// Log the current user information
+		glg.Infof("Running garm as user [%s] with UID [%s] ...", currentUser.Username, currentUser.Uid)
+	}
 
 	// start both webhook server and health check server
 	go func() {
