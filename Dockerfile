@@ -35,14 +35,10 @@ RUN BUILD_TIME=$(date -u +%Y%m%d-%H%M%S) \
 # allow well-known port binding
 RUN setcap 'cap_net_bind_service=+ep' "/usr/bin/${APP_NAME}"
 
-
 RUN apk del build-dependencies --purge \
     && rm -rf "${GOPATH}"
 
-# Start From Scratch For Running Environment
-# FROM scratch
-# 🟡 Modified Part:
-FROM alpine:latest
+FROM alpine:3
 LABEL maintainer "cncf-athenz-maintainers@lists.cncf.io"
 
 ENV APP_NAME garm
@@ -56,7 +52,6 @@ COPY --from=builder /usr/bin/${APP_NAME} /go/bin/${APP_NAME}
 # Copy user
 COPY --from=builder /etc/passwd /etc/passwd
 USER ${APP_NAME}
-
 
 HEALTHCHECK NONE
 ENTRYPOINT ["/go/bin/garm"]
