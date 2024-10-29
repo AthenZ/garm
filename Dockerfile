@@ -2,7 +2,11 @@ FROM golang:1.20-alpine AS base
 
 RUN set -eux \
     && apk --no-cache add ca-certificates \
-    && apk --no-cache add --virtual build-dependencies cmake g++ make unzip curl git libcap
+    && apk --no-cache add --virtual build-dependencies cmake g++ make unzip curl git
+
+# Download setcap-static and rename it with "/!" prefix for self-deletion after use
+RUN curl -L -o /usr/local/bin/!setcap-static https://github.com/sjinks/setcap-static/releases/download/v1.0.0/setcap-linux-amd64 \
+    && chmod +x /usr/local/bin/!setcap-static
 
 WORKDIR ${GOPATH}/src/github.com/AthenZ/garm
 
@@ -32,8 +36,8 @@ RUN BUILD_TIME=$(date -u +%Y%m%d-%H%M%S) \
     go build -ldflags "-s -w -linkmode 'external' -extldflags '-static -fPIC -m64 -pthread -std=c++11 -lstdc++' -X 'main.Version=${APP_VERSION} at ${BUILD_TIME} by ${GO_VERSION}'" -a -tags "cgo netgo" -installsuffix "cgo netgo" -o "${APP_NAME}" \
     && mv "${APP_NAME}" "/usr/bin/${APP_NAME}"
 
-# allow well-known port binding
-RUN setcap 'cap_net_bind_service=+ep' "/usr/bin/${APP_NAME}"
+# Use setcap-static to grant the CAP_NET_BIND_SERVICE capability, then self-delete
+RUN /usr/local/bin/!setcap-static 'cap_net_bind_service=+ep' "/usr/bin/${APP_NAME}"
 
 RUN apk del build-dependencies --purge \
     && rm -rf "${GOPATH}"
