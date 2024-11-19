@@ -18,6 +18,7 @@ import (
 	"crypto/tls"
 	"fmt"
 	"os"
+	"strings"
 	"sync"
 	"time"
 
@@ -36,6 +37,7 @@ type CertReloader struct {
 	l            sync.RWMutex
 	certFile     string
 	keyFile      string
+	athenzRootCA string
 	cert         *tls.Certificate
 	certPEM      []byte
 	keyPEM       []byte
@@ -62,10 +64,25 @@ func (w *CertReloader) GetCertAndKeyFromCache() ([]byte, []byte, error) {
 	return k, c, nil
 }
 
+// checkPrefixAndSuffix checks if the given string has given prefix and suffix.
+func (w *CertReloader) checkPrefixAndSuffix(str, pref, suf string) bool {
+	return strings.HasPrefix(str, pref) && strings.HasSuffix(str, suf)
+}
+
+// GetActualValue returns the environment variable value if the given val has "_" prefix and suffix, otherwise returns val directly.
+func (w *CertReloader) GetActualValue(val string) string {
+	if w.checkPrefixAndSuffix(val, "_", "_") {
+		return os.Getenv(strings.TrimPrefix(strings.TrimSuffix(val, "_"), "_"))
+	}
+	return val
+}
+
 // type IdentityAthenzX509 = func() (*tls.Config, error)
 func (w *CertReloader) GetWebhook() func() (*tls.Config, error) {
 	return func() (*tls.Config, error) {
 		cert, err := w.GetCertFromCache()
+		pool, err := NewX509CertPool(w.GetActualValue(w.athenzRootCA))
+
 		if err != nil {
 			return nil, err
 		}
@@ -74,6 +91,7 @@ func (w *CertReloader) GetWebhook() func() (*tls.Config, error) {
 			GetCertificate: func(hello *tls.ClientHelloInfo) (*tls.Certificate, error) {
 				return cert, nil
 			},
+			RootCAs: pool,
 		}, nil
 	}
 }
@@ -159,6 +177,7 @@ type CertReloaderCfg struct {
 	// Init     bool
 	CertPath     string        // the cert file path i.e) /var/run/athenz/tls.cert
 	KeyPath      string        // the key file path i.e) /var/run/athenz/tls.key
+	AthenzRootCa string        // the root CA file path i.e) /var/run/athenz/root_ca.pem
 	Logger       logger        // custom log function for errors, optional
 	PollInterval time.Duration // TODO: Comment me
 }
@@ -184,6 +203,7 @@ func NewCertReloader(config CertReloaderCfg) (*CertReloader, error) {
 		// logger:       config.Logger,
 		pollInterval: config.PollInterval,
 		stop:         make(chan struct{}, 10),
+		athenzRootCA: config.AthenzRootCa,
 	}
 
 	// load file once during the initialization:
