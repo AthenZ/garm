@@ -71,6 +71,9 @@ func (w *CertReloader) GetWebhook() func() (*tls.Config, error) {
 		}
 		return &tls.Config{
 			Certificates: []tls.Certificate{*cert},
+			GetCertificate: func(hello *tls.ClientHelloInfo) (*tls.Certificate, error) {
+				return cert, nil
+			},
 		}, nil
 	}
 }
