@@ -175,10 +175,10 @@ type CertReloaderCfg struct {
 	// if init mode: if it fails to read from cert/key files, it will return error.
 	// if non-init mode: it will keep using the cache if it fails to read from cert/key files.
 	// Init     bool
-	CertPath     string        // the cert file path i.e) /var/run/athenz/tls.cert
-	KeyPath      string        // the key file path i.e) /var/run/athenz/tls.key
-	AthenzRootCa string        // the root CA file path i.e) /var/run/athenz/root_ca.pem
-	Logger       logger        // custom log function for errors, optional
+	CertPath     string // the cert file path i.e) /var/run/athenz/tls.cert
+	KeyPath      string // the key file path i.e) /var/run/athenz/tls.key
+	AthenzRootCa string // the root CA file path i.e) /var/run/athenz/root_ca.pem
+	// Logger       logger        // custom log function for errors, optional
 	PollInterval time.Duration // TODO: Comment me
 }
 
@@ -188,6 +188,9 @@ func NewCertReloader(config CertReloaderCfg) (*CertReloader, error) {
 	// if &config.Logger == nil {
 	// 	return nil, errors.New("logger is required for CertReloader")
 	// }
+
+	// log configs:
+	glg.Info("CertPath: %s KeyPath: %s, RootCA [%s]", config.CertPath, config.KeyPath, config.AthenzRootCa)
 
 	if config.CertPath == "" || config.KeyPath == "" {
 		return nil, fmt.Errorf("both cert [%s] and key file [%s] paths are required for CertReloader", config.CertPath, config.KeyPath)
