@@ -67,10 +67,10 @@ func New(cfg config.Config) (GarmDaemon, error) {
 
 	// set token source (function pointer)
 	// cfg.Athenz.AuthZ.Token = token.GetToken
-	cfg.Athenz.AuthZ.AthenzClientAuthnx509Mode = true
-	cfg.Athenz.AuthZ.AthenzX509 = certReloader.GetWebhook()
+	// cfg.Athenz.AuthZ.AthenzClientAuthnx509Mode = true
+	// cfg.Athenz.AuthZ.AthenzX509 = certReloader.GetWebhook()
 
-	athenz, err := service.NewAthenz(cfg.Athenz, logger)
+	athenz, err := service.NewX509Athenz(cfg.Athenz, certReloader.GetWebhook(), logger)
 	if err != nil {
 		return nil, errors.Wrap(err, "athenz service instantiate failed")
 	}
