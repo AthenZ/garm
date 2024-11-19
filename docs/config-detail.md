@@ -83,7 +83,7 @@ map_rule.tld.service_athenz_domains
 #### Note
 - Garm can directly reject kube-apiserver requests without querying Athenz.
 - `in black_list AND NOT in white_list` => directly reject
-- Support wildcard `*` matching.
+- Support wildcard `?`, `*` matching.
 
 ---
 

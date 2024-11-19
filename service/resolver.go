@@ -1,25 +1,25 @@
-/*
-Copyright (C)  2018 Yahoo Japan Corporation Athenz team.
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
+// Copyright 2023 LY Corporation
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 package service
 
 import (
 	"strings"
 
-	"github.com/AthenZ/garm/config"
+	"github.com/kpango/glg"
+
+	"github.com/AthenZ/garm/v3/config"
 )
 
 // Resolver is used to map K8s webhook requests to Athenz requests. (Athenz cannot use ":", hence, needs mapping.)
@@ -30,6 +30,8 @@ type Resolver interface {
 	MapK8sResourceAthenzResource(string) string
 	// BuildDomainsFromNamespace creates Athenz domains with namespace.
 	BuildDomainsFromNamespace(string) []string
+	// BuildServiceAccountPrefixFromNamespace creates Athenz domains for service account with namespace.
+	BuildServiceAccountPrefixFromNamespace(string) []string
 	// PrincipalFromUser creates principal name from user.
 	PrincipalFromUser(user string, groups []string) string
 	// GetAdminDomain creates Athenz admin domain with namespace.
@@ -157,7 +159,8 @@ func (r *resolve) BuildDomainsFromNamespace(namespace string) []string {
 	return r.buildAthenzDomain(r.athenzDomains, namespace)
 }
 
-//  BuildServiceAccountPrefixFromNamespace returns domains by processing AthenzServiceAccountPrefix.
+//	BuildServiceAccountPrefixFromNamespace returns domains by processing AthenzServiceAccountPrefix.
+//
 // if namespace != "", replace `/ = .`, then `.. => -`, then replace "_namespace_" in AthenzServiceAccountPrefix with namespace;
 // else replace "._namespace_" in AthenzServiceAccountPrefix with namespace;
 // trim ".", then "-", then ":"
@@ -309,29 +312,24 @@ func (r *resolve) TrimResource(res string) string {
 // returns false, only if inside blacklist
 // i.e. return (in whitelist || not in blacklist)
 func (r *resolve) IsAllowed(verb, namespace, apiGroup, resource, name string) bool {
-	var ok bool
+	ri := config.RequestInfo{
+		Verb:      verb,
+		Namespace: namespace,
+		APIGroup:  apiGroup,
+		Resource:  resource,
+		Name:      name,
+	}
+
 	for _, white := range r.cfg.WhiteList {
-		ok = white.Match(config.RequestInfo{
-			Verb:      verb,
-			Namespace: namespace,
-			APIGroup:  apiGroup,
-			Resource:  resource,
-			Name:      name,
-		})
-		if ok {
+		if white.Match(ri) {
+			glg.Debugf("Excluded from checking blacklist as whitelist \"%v\" matches \"%v\"\n", white, ri)
 			return true
 		}
 	}
 
 	for _, black := range r.cfg.BlackList {
-		ok = black.Match(config.RequestInfo{
-			Verb:      verb,
-			Namespace: namespace,
-			APIGroup:  apiGroup,
-			Resource:  resource,
-			Name:      name,
-		})
-		if ok {
+		if black.Match(ri) {
+			glg.Debugf("Explicitly denied with blacklist \"%v\" matches \"%v\"\n", black, ri)
 			return false
 		}
 	}
@@ -341,16 +339,14 @@ func (r *resolve) IsAllowed(verb, namespace, apiGroup, resource, name string) bo
 
 // IsAdminAccess returns true, if any admin access in config match
 func (r *resolve) IsAdminAccess(verb, namespace, apiGroup, resource, name string) bool {
-	var ok bool
 	for _, admin := range r.cfg.AdminAccessList {
-		ok = admin.Match(config.RequestInfo{
+		if admin.Match(config.RequestInfo{
 			Verb:      verb,
 			Namespace: namespace,
 			APIGroup:  apiGroup,
 			Resource:  resource,
 			Name:      name,
-		})
-		if ok {
+		}) {
 			return true
 		}
 	}
