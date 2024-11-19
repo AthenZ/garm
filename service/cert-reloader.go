@@ -166,7 +166,7 @@ func NewCertReloader(config CertReloaderCfg) (*CertReloader, error) {
 	// }
 
 	if config.CertPath == "" || config.KeyPath == "" {
-		return nil, errors.New("both cert and key file paths are required for CertReloader")
+		return nil, errors.New("both cert and key file paths are required for CertReloader. Got cert: " + config.CertPath + ", key: " + config.KeyPath + " instead")
 	}
 
 	if config.PollInterval == 0 {
