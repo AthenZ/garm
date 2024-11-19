@@ -1,18 +1,16 @@
-/*
-Copyright (C)  2018 Yahoo Japan Corporation Athenz team.
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
+// Copyright 2023 LY Corporation
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 package config
 
@@ -22,14 +20,23 @@ import (
 	"strings"
 	"sync"
 
+	assertion "github.com/AthenZ/athenz-authorizer/v5/policy"
+	"github.com/kpango/glg"
+
+	webhook "github.com/AthenZ/garm/v3/third_party/webhook"
 	"github.com/pkg/errors"
-	webhook "github.com/yahoo/k8s-athenz-webhook"
 	"gopkg.in/yaml.v2"
 )
 
 const (
 	// currentVersion represents the configuration version.
-	currentVersion = "v2.0.0"
+	currentVersion string = "v2.0.0"
+	// delimiter represents delimiter used to serialize RequestInfo. Must NOT use valid characters allowed in the all the fields of RequestInfo.
+	// Choose the delimiter that RequestInfo's verb, namespace, API Group, Resource and Name CANNOT use.
+	// i.e) If end user can set its resource name with hyphens, we cannot use hyphen as delimiter.
+	// This will wrongfully grant access to privileged actions like DELETE or POST
+	// for resources with hyphens in their names when minimum access rights such as GET is given.
+	delimiter string = ","
 )
 
 // Config represents an application configuration content (config.yaml).
@@ -256,11 +263,9 @@ type RequestInfo struct {
 	once *sync.Once
 }
 
-// Serialize returns RequestInfo in string format.
-// 1. replacedAPIGroup = replace `. => _` in r.APIGroup
-// 2. output format: `${r.Verb}-${r.Namespace}-${replacedAPIGroup}-${r.Resource}-${r.Name}`
+// Serialize returns RequestInfo in string, separated by the delimiter.
 func (r *RequestInfo) Serialize() string {
-	return strings.Join([]string{r.Verb, r.Namespace, strings.Replace(r.APIGroup, ".", "_", -1), r.Resource, r.Name}, "-")
+	return strings.Join([]string{r.Verb, r.Namespace, r.APIGroup, r.Resource, r.Name}, delimiter)
 }
 
 // Match checks if the given RequestInfo matches with the regular expression in this RequestInfo.
@@ -273,10 +278,16 @@ func (r *RequestInfo) Match(req RequestInfo) bool {
 		r.once = new(sync.Once)
 	}
 	r.once.Do(func() {
-		r.reg = regexp.MustCompile(strings.Replace(strings.Replace(r.Serialize(), "*", ".*", -1), "..*", ".*", -1))
+		ass, err := assertion.NewAssertion("", ":"+r.Serialize(), "")
+		if err != nil {
+			glg.Error(errors.Wrap(err, "regex creation error: invalid blacklist/whitelist config"))
+			r.reg = regexp.MustCompile("")
+		} else {
+			r.reg = ass.ResourceRegexp
+		}
 	})
 
-	return r.reg.Copy().MatchString(req.Serialize())
+	return r.reg.Copy().MatchString(strings.ToLower(req.Serialize()))
 }
 
 // New returns the decoded configuration YAML file as *Config struct. Returns non-nil error if any.

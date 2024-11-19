@@ -1,18 +1,16 @@
-/*
-Copyright (C)  2018 Yahoo Japan Corporation Athenz team.
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
+// Copyright 2023 LY Corporation
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 package service
 
@@ -21,7 +19,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/AthenZ/garm/config"
+	"github.com/AthenZ/garm/v3/config"
 )
 
 func TestNewResolver(t *testing.T) {
@@ -1461,7 +1459,7 @@ func Test_resolve_IsAdminAccess(t *testing.T) {
 			want: true,
 		},
 		{
-			name: "Check resolve IsAdminAccess regex match",
+			name: "Check resource with asterisk",
 			fields: fields{
 				cfg: config.Platform{
 					AdminAccessList: []*config.RequestInfo{
@@ -1469,7 +1467,7 @@ func Test_resolve_IsAdminAccess(t *testing.T) {
 							Verb:      "verb-461",
 							Namespace: "namespace-462",
 							APIGroup:  "apiGroup-463",
-							Resource:  "resource-.*",
+							Resource:  "resource-*",
 							Name:      "name-465",
 						},
 					},
@@ -1509,7 +1507,7 @@ func Test_resolve_IsAdminAccess(t *testing.T) {
 			want: false,
 		},
 		{
-			name: "Check resolve IsAdminAccess regex match success after APIGroup replace",
+			name: "Check period in APIGroup gets escaped successfully",
 			fields: fields{
 				cfg: config.Platform{
 					AdminAccessList: []*config.RequestInfo{
@@ -1526,7 +1524,7 @@ func Test_resolve_IsAdminAccess(t *testing.T) {
 			args: args{
 				verb:      "verb-509",
 				namespace: "namespace-510",
-				apiGroup:  "apiGroup-_______________",
+				apiGroup:  "apiGroup-._______________",
 				resource:  "resource-512",
 				name:      "name-513",
 			},

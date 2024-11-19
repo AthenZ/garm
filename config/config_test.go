@@ -1,18 +1,16 @@
-/*
-Copyright (C)  2018 Yahoo Japan Corporation Athenz team.
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
+// Copyright 2023 LY Corporation
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 package config
 
@@ -23,7 +21,7 @@ import (
 	"testing"
 	"time"
 
-	webhook "github.com/yahoo/k8s-athenz-webhook"
+	webhook "github.com/AthenZ/garm/v3/third_party/webhook"
 )
 
 func Test_requestInfo_Serialize(t *testing.T) {
@@ -46,10 +44,10 @@ func Test_requestInfo_Serialize(t *testing.T) {
 					Name:      "dummyName",
 				},
 			},
-			want: "dummyVerb-dummyNamespace-dummyAPIGroup-dummyResource-dummyName",
+			want: "dummyVerb,dummyNamespace,dummyAPIGroup,dummyResource,dummyName",
 		},
 		{
-			name: "Check serialize with replace API group",
+			name: "Check serialize with API group containing period",
 			fields: fields{
 				req: RequestInfo{
 					Verb:      "dummyVerb",
@@ -59,7 +57,7 @@ func Test_requestInfo_Serialize(t *testing.T) {
 					Name:      "dummyName",
 				},
 			},
-			want: "dummyVerb-dummyNamespace-dummy_APIGroup-dummyResource-dummyName",
+			want: "dummyVerb,dummyNamespace,dummy.APIGroup,dummyResource,dummyName",
 		},
 	}
 	for _, tt := range tests {
@@ -95,11 +93,6 @@ func Test_requestInfo_Match(t *testing.T) {
 					APIGroup:  "dummyAPIGroup",
 					Resource:  "dummyResource",
 					Name:      "dummyName",
-
-					/*reg: func() *regexp.Regexp {
-						reg, _ := regexp.Compile("dummy")
-						return reg
-					}(),*/
 				},
 			},
 			args: args{
@@ -122,11 +115,6 @@ func Test_requestInfo_Match(t *testing.T) {
 					APIGroup:  "dummyAPIGroup",
 					Resource:  "dummyResource",
 					Name:      "dummyName",
-
-					/*reg: func() *regexp.Regexp {
-						reg, _ := regexp.Compile("dummy")
-						return reg
-					}(),*/
 				},
 			},
 			args: args{
@@ -149,11 +137,6 @@ func Test_requestInfo_Match(t *testing.T) {
 					APIGroup:  "dummyAPIGroup",
 					Resource:  "dummyResource",
 					Name:      "*",
-
-					/*reg: func() *regexp.Regexp {
-						reg, _ := regexp.Compile("dummy")
-						return reg
-					}(),*/
 				},
 			},
 			args: args{
@@ -177,11 +160,6 @@ func Test_requestInfo_Match(t *testing.T) {
 					APIGroup:  "dummyAPIGroup",
 					Resource:  "*",
 					Name:      "*",
-
-					/*reg: func() *regexp.Regexp {
-						reg, _ := regexp.Compile("dummy")
-						return reg
-					}(),*/
 				},
 			},
 			args: args{
@@ -194,6 +172,28 @@ func Test_requestInfo_Match(t *testing.T) {
 				},
 			},
 			want: true,
+		},
+		{
+			name: "Check malicious resource name not match",
+			fields: fields{
+				req: RequestInfo{
+					Verb:      "get",
+					Namespace: "kube-system",
+					APIGroup:  "garm",
+					Resource:  "pods",
+					Name:      "*",
+				},
+			},
+			args: args{
+				req: RequestInfo{
+					Verb:      "create",
+					Namespace: "kube-system",
+					APIGroup:  "garm",
+					Resource:  "pods",
+					Name:      "get-kube-system-garm-pods-test",
+				},
+			},
+			want: false,
 		},
 	}
 	for _, tt := range tests {

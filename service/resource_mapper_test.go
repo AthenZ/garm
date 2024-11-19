@@ -1,18 +1,16 @@
-/*
-Copyright (C)  2018 Yahoo Japan Corporation Athenz team.
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
+// Copyright 2023 LY Corporation
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 package service
 
@@ -22,9 +20,9 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/AthenZ/garm/config"
-	webhook "github.com/yahoo/k8s-athenz-webhook"
-	authz "k8s.io/api/authorization/v1beta1"
+	"github.com/AthenZ/garm/v3/config"
+	webhook "github.com/AthenZ/garm/v3/third_party/webhook"
+	authz "k8s.io/api/authorization/v1"
 )
 
 func TestNewResourceMapper(t *testing.T) {
@@ -438,7 +436,7 @@ func Test_resourceMapper_MapResource(t *testing.T) {
 			wantIdentity:           "",
 			wantAthenzAccessChecks: nil,
 			wantError: fmt.Errorf(
-				"----user-322's request is not allowed----\nVerb:\tverb-317\nNamespaceb:\tnamespace-316\nAPI Group:\tgroup-320\nResource:\tresource-318.sub-resource-319\nResource Name:\tname-315\n"),
+				"Explicitly denied user-322's request by the blacklist! Verb: \"verb-317\", Namespace: \"namespace-316\", API Group: \"group-320\", Resource: \"resource-318.sub-resource-319\", Resource Name: \"name-315\""),
 		},
 	}
 	for _, tt := range tests {

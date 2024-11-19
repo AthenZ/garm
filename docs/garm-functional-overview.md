@@ -4,14 +4,13 @@
 
 <!-- MarkdownTOC levels="1,2" -->
 
-- [Garm Functional Overview](#garm-functional-overview)
-	- [Parse k8s resources](#parse-k8s-resources)
-	- [Map resources](#map-resources)
-	- [Subsitute Athenz domain & principal](#subsitute-athenz-domain--principal)
-	- [Filter k8s request](#filter-k8s-request)
-	- [Select Athenz domain](#select-athenz-domain)
-	- [Create Athenz assertion](#create-athenz-assertion)
-					- [P.S. during mapping](#ps-during-mapping)
+- [Parse k8s resources](#parse-k8s-resources)
+- [Map resources](#map-resources)
+- [Subsitute Athenz domain \& principal](#subsitute-athenz-domain--principal)
+- [Filter k8s request](#filter-k8s-request)
+- [Select Athenz domain](#select-athenz-domain)
+- [Create Athenz assertion](#create-athenz-assertion)
+        - [P.S. during mapping](#ps-during-mapping)
 
 <!-- /MarkdownTOC -->
 
@@ -23,10 +22,10 @@
 1. [K8s authorization attributes](https://kubernetes.io/docs/reference/access-authn-authz/webhook/)
 	1. ResourceAttributes
 		- [ResourceAttributes webhook.go](https://github.com/kubernetes/apiserver/blob/master/plugin/pkg/authorizer/webhook/webhook.go#L160-L168)
-		- [ResourceAttributes struct](https://github.com/stefanprodan/kubectl-kubesec/blob/master/vendor/k8s.io/api/authorization/v1beta1/types.go#L86-L112)
+		- [ResourceAttributes struct](https://github.com/stefanprodan/kubectl-kubesec/blob/master/vendor/k8s.io/api/authorization/v1/types.go#L86-L112)
 	1. NonResourceAttributes
 		- [NonResourceAttributes webhook.go](https://github.com/kubernetes/apiserver/blob/master/plugin/pkg/authorizer/webhook/webhook.go#L170-L173)
-		- [NonResourceAttributes struct](https://github.com/stefanprodan/kubectl-kubesec/blob/master/vendor/k8s.io/api/authorization/v1beta1/types.go#L114-L122)
+		- [NonResourceAttributes struct](https://github.com/stefanprodan/kubectl-kubesec/blob/master/vendor/k8s.io/api/authorization/v1/types.go#L114-L122)
 1. garm resource attributes
 	1. `var namespace, verb, group, resource, name string`
 
@@ -93,9 +92,9 @@ P.S. It may be easier to read the code directly. [createAthenzDomains()](../serv
 - `in black_list AND NOT in white_list` => directly reject
 	- `config.yaml`, `map_rule.tld.platform.black_list` & `map_rule.tld.platform.white_list`
 - Matching logic
-	-  create rule RegExp for matching
-		- ![garm resource matching](./assets/garm-resource-matching.png)
-	- Garm resource attribute is serialized before matching with the rule RegExp.
+	- create black_list/white_list rules that allow wildcard matching
+	- Garm resource attribute is serialized before matching with the black_list/white_list rule.
+	- ![garm resource matching](./assets/garm-resource-matching.png)
 - Example
 	- `RequestInfo{ Verb: "get", Namespace: "kube-system", APIGroup: "*", Resource: "secrets", Name: "alertmanager"}` => check with Athenz
 		- black_list contains `RequestInfo{ Verb: "*", Namespace: "kube-system", APIGroup: "*", Resource: "*", Name: "*"}`.
@@ -121,4 +120,3 @@ P.S. It may be easier to read the code directly. [createAthenzDomains()](../serv
 	- ![create athenz assertion on service domain](./assets/create-athenz-assertion-on-service-domain.png)
 - Athenz admin domain (2 requests to Athenz, OR logic, any one is allowed implies the action is allowed.)
 	- ![create athenz assertion on admin domain](./assets/create-athenz-assertion-on-admin-domain.png)
-

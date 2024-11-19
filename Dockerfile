@@ -1,8 +1,8 @@
-FROM golang:1.18-alpine AS base
+FROM golang:1.20-alpine AS base
 
 RUN set -eux \
     && apk --no-cache add ca-certificates \
-    && apk --no-cache add --virtual build-dependencies cmake g++ make unzip curl upx git
+    && apk --no-cache add --virtual build-dependencies cmake g++ make unzip curl git libcap
 
 WORKDIR ${GOPATH}/src/github.com/AthenZ/garm
 
@@ -30,7 +30,10 @@ RUN BUILD_TIME=$(date -u +%Y%m%d-%H%M%S) \
     GOARCH=$(go env GOARCH) \
     GO111MODULE=on \
     go build -ldflags "-s -w -linkmode 'external' -extldflags '-static -fPIC -m64 -pthread -std=c++11 -lstdc++' -X 'main.Version=${APP_VERSION} at ${BUILD_TIME} by ${GO_VERSION}'" -a -tags "cgo netgo" -installsuffix "cgo netgo" -o "${APP_NAME}" \
-    && upx --best -o "/usr/bin/${APP_NAME}" "${APP_NAME}"
+    && mv "${APP_NAME}" "/usr/bin/${APP_NAME}"
+
+# allow well-known port binding
+RUN setcap 'cap_net_bind_service=+ep' "/usr/bin/${APP_NAME}"
 
 RUN apk del build-dependencies --purge \
     && rm -rf "${GOPATH}"

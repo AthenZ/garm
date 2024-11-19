@@ -1,18 +1,16 @@
-/*
-Copyright (C)  2018 Yahoo Japan Corporation Athenz team.
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
+// Copyright 2023 LY Corporation
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 package router
 
@@ -21,7 +19,6 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"reflect"
@@ -30,8 +27,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/AthenZ/garm/config"
-	"github.com/AthenZ/garm/handler"
+	"github.com/AthenZ/garm/v3/config"
+	"github.com/AthenZ/garm/v3/handler"
 	"github.com/kpango/glg"
 )
 
@@ -125,7 +122,7 @@ func TestNewServeMux(t *testing.T) {
 					serveMux.ServeHTTP(recorder, request)
 					response = recorder.Result()
 					defer response.Body.Close()
-					gotByte, err = ioutil.ReadAll(response.Body)
+					gotByte, err = io.ReadAll(response.Body)
 					if err != nil {
 						return
 					}
@@ -144,7 +141,7 @@ func TestNewServeMux(t *testing.T) {
 					serveMux.ServeHTTP(recorder, request)
 					response = recorder.Result()
 					defer response.Body.Close()
-					gotByte, err = ioutil.ReadAll(response.Body)
+					gotByte, err = io.ReadAll(response.Body)
 					if err != nil {
 						return
 					}
@@ -238,7 +235,7 @@ func Test_routing(t *testing.T) {
 
 					response := recorder.Result()
 					defer response.Body.Close()
-					gotByte, err := ioutil.ReadAll(response.Body)
+					gotByte, err := io.ReadAll(response.Body)
 					if err != nil {
 						return err
 					}
@@ -284,7 +281,7 @@ func Test_routing(t *testing.T) {
 
 					response := recorder.Result()
 					defer response.Body.Close()
-					gotByte, err := ioutil.ReadAll(response.Body)
+					gotByte, err := io.ReadAll(response.Body)
 					if err != nil {
 						return err
 					}
@@ -320,7 +317,7 @@ func Test_routing(t *testing.T) {
 
 					response := recorder.Result()
 					defer response.Body.Close()
-					gotByte, err := ioutil.ReadAll(response.Body)
+					gotByte, err := io.ReadAll(response.Body)
 					if err != nil {
 						return err
 					}
@@ -360,7 +357,7 @@ func Test_routing(t *testing.T) {
 
 					response := recorder.Result()
 					defer response.Body.Close()
-					gotByte, err := ioutil.ReadAll(response.Body)
+					gotByte, err := io.ReadAll(response.Body)
 					if err != nil {
 						return err
 					}
@@ -402,7 +399,7 @@ func Test_routing(t *testing.T) {
 
 						response := recorder.Result()
 						defer response.Body.Close()
-						gotByte, err := ioutil.ReadAll(response.Body)
+						gotByte, err := io.ReadAll(response.Body)
 						if err != nil {
 							return err
 						}
@@ -595,7 +592,7 @@ func Test_routing(t *testing.T) {
 					pr, pw := io.Pipe()
 					logch := make(chan string)
 					go func() {
-						bytes, err := ioutil.ReadAll(pr)
+						bytes, err := io.ReadAll(pr)
 						if err != nil {
 							logch <- fmt.Errorf("routing() fail to read log from glg: %v", err).Error()
 							return
@@ -628,7 +625,7 @@ func Test_routing(t *testing.T) {
 					// get request body
 					response := recorder.Result()
 					defer response.Body.Close()
-					gotByte, err := ioutil.ReadAll(response.Body)
+					gotByte, err := io.ReadAll(response.Body)
 					if err != nil {
 						return err
 					}
@@ -789,7 +786,7 @@ func Test_recoverWrap(t *testing.T) {
 
 					response := recorder.Result()
 					defer response.Body.Close()
-					gotByte, err := ioutil.ReadAll(response.Body)
+					gotByte, err := io.ReadAll(response.Body)
 					if err != nil {
 						return err
 					}
@@ -836,7 +833,7 @@ func Test_recoverWrap(t *testing.T) {
 
 					response := recorder.Result()
 					defer response.Body.Close()
-					gotByte, err := ioutil.ReadAll(response.Body)
+					gotByte, err := io.ReadAll(response.Body)
 					if err != nil {
 						return err
 					}
