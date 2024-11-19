@@ -53,7 +53,7 @@ func New(cfg config.Config) (GarmDaemon, error) {
 	certReloader, err := service.NewCertReloader(service.CertReloaderCfg{
 		CertPath:     cfg.X509.Cert,
 		KeyPath:      cfg.X509.Key,
-		PollInterval: time.Minute, // TODO: Is this correct that we fix the poll interval?
+		PollInterval: time.Second, // TODO: Is this correct that we fix the poll interval?
 	})
 	if err != nil {
 		return nil, errors.Wrap(err, "cert reloader instantiate failed")
