@@ -16,6 +16,7 @@ package usecase
 
 import (
 	"context"
+	"time"
 
 	"github.com/AthenZ/garm/v3/config"
 	"github.com/AthenZ/garm/v3/handler"
@@ -30,19 +31,33 @@ type GarmDaemon interface {
 }
 
 type garm struct {
-	cfg    config.Config
-	token  service.TokenService
-	athenz service.Athenz
-	server service.Server
+	cfg config.Config
+	// token        service.TokenService
+	athenz       service.Athenz
+	server       service.Server
+	certReloader *service.CertReloader
 }
 
 // New returns a Garm daemon, or error occurred.
 // The daemon contains a token service authentication and authorization server.
 // This function will also initialize the mapping rules for the authentication and authorization check.
 func New(cfg config.Config) (GarmDaemon, error) {
-	token, err := service.NewTokenService(cfg.Token)
+	// TODO: Create a logic later:
+	// token, err := service.NewTokenService(cfg.Token)
+	// if err != nil {
+	// 	return nil, errors.Wrap(err, "token service instantiate failed")
+	// }
+	logger := service.NewLogger(cfg.Logger)
+
+	// TODO: use certReloader to reload cert
+	certReloader, err := service.NewCertReloader(service.CertReloaderCfg{
+		CertPath: cfg.X509.Cert,
+		KeyPath:  cfg.X509.Key,
+		// Logger: logger,
+		PollInterval: time.Minute, // TODO: Is this correct that we fix the poll interval?
+	})
 	if err != nil {
-		return nil, errors.Wrap(err, "token service instantiate failed")
+		return nil, errors.Wrap(err, "cert reloader instantiate failed")
 	}
 
 	resolver := service.NewResolver(cfg.Mapping)
@@ -51,23 +66,26 @@ func New(cfg config.Config) (GarmDaemon, error) {
 	cfg.Athenz.AuthN.Mapper = service.NewUserMapper(resolver)
 
 	// set token source (function pointer)
-	cfg.Athenz.AuthZ.Token = token.GetToken
+	// cfg.Athenz.AuthZ.Token = token.GetToken
+	cfg.Athenz.AuthZ.AthenzClientAuthnx509Mode = true
+	cfg.Athenz.AuthZ.AthenzX509 = certReloader.GetWebhook()
 
-	athenz, err := service.NewAthenz(cfg.Athenz, service.NewLogger(cfg.Logger))
+	athenz, err := service.NewAthenz(cfg.Athenz, logger)
 	if err != nil {
 		return nil, errors.Wrap(err, "athenz service instantiate failed")
 	}
 
 	return &garm{
-		cfg:    cfg,
-		token:  token,
-		athenz: athenz,
-		server: service.NewServer(cfg.Server, router.New(cfg.Server, handler.New(athenz))),
+		cfg: cfg,
+		// token:        token,
+		athenz:       athenz,
+		server:       service.NewServer(cfg.Server, router.New(cfg.Server, handler.New(athenz))),
+		certReloader: certReloader,
 	}, nil
 }
 
 // Start returns an error slice channel. This error channel reports the errors inside Garm server.
 func (g *garm) Start(ctx context.Context) chan []error {
-	g.token.StartTokenUpdater(ctx)
+	// g.token.StartTokenUpdater(ctx)
 	return g.server.ListenAndServe(ctx)
 }
