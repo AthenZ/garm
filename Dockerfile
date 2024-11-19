@@ -13,7 +13,7 @@ RUN GO111MODULE=on go mod download
 
 FROM base AS builder
 
-ENV APP_NAME garm
+ENV APP_NAME=garm
 ARG APP_VERSION='development version'
 
 COPY . .
@@ -41,9 +41,9 @@ RUN apk del build-dependencies --purge \
 # Start From Scratch For Running Environment
 FROM scratch
 # FROM alpine:latest
-LABEL maintainer "cncf-athenz-maintainers@lists.cncf.io"
+LABEL maintainer="cncf-athenz-maintainers@lists.cncf.io"
 
-ENV APP_NAME garm
+ENV APP_NAME=garm
 
 # Copy certificates for SSL/TLS
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
