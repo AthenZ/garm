@@ -9,7 +9,7 @@ WORKDIR ${GOPATH}/src/github.com/AthenZ/garm
 COPY go.mod .
 COPY go.sum .
 
-RUN go mod download
+RUN go mod download -x
 
 FROM base AS builder
 
