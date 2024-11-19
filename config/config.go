@@ -69,9 +69,9 @@ type Config struct {
 
 // TODO: Comment me
 type X509Config struct {
-	Cert         string `yaml:"cert"`
-	Key          string `yaml:"key"`
-	CA           string `yaml:"ca"`
+	Cert string `yaml:"cert"`
+	Key  string `yaml:"key"`
+	CA   string `yaml:"ca"`
 }
 
 // Logger represents logging configuration for Garm.

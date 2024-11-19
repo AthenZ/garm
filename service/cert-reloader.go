@@ -21,6 +21,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/kpango/glg"
 	"github.com/pkg/errors"
 )
 
@@ -108,7 +109,8 @@ func (w *CertReloader) loadLocalCertAndKey() error {
 	w.keyPEM = keyPEM
 	w.mtime = st.ModTime()
 	w.l.Unlock()
-	// w.logger("certs reloaded from local file: key[%s], cert[%s] at %v", w.keyFile, w.certFile, time.Now()) // TODO: Rename log
+
+	glg.Info("certs reloaded from local file: key[%s], cert[%s] at %v", w.keyFile, w.certFile, time.Now()) // TODO: Check if it is "info"
 	return nil
 }
 
@@ -119,7 +121,7 @@ func (w *CertReloader) pollRefresh() error {
 		select {
 		case <-poll.C:
 			if err := w.loadLocalCertAndKey(); err != nil {
-				// w.logger("cert reload error from local file: key[%s], cert[%s]: %v\n", w.keyFile, w.certFile, err) // TODO: Rename log
+				glg.Info("cert reload error from local file: key[%s], cert[%s]: %v", w.keyFile, w.certFile, err) // TODO: Check if it is "info"
 			}
 		case <-w.stop:
 			return nil
@@ -142,7 +144,7 @@ func (w *CertReloader) UpdateCertificate(certPEM []byte, keyPEM []byte) error {
 	w.keyPEM = keyPEM
 	w.mtime = time.Now()
 
-	// w.logger("certs updated at %v", w.mtime) // TODO: Rename log
+	glg.Info("certs reloaded from provided PEM data at %v", time.Now()) // TODO: Check if it is "info"
 
 	return nil
 }
@@ -152,9 +154,9 @@ type CertReloaderCfg struct {
 	// if init mode: if it fails to read from cert/key files, it will return error.
 	// if non-init mode: it will keep using the cache if it fails to read from cert/key files.
 	// Init     bool
-	CertPath string // the cert file path i.e) /var/run/athenz/tls.cert
-	KeyPath  string // the key file path i.e) /var/run/athenz/tls.key
-	// Logger       logger        // custom log function for errors, optional
+	CertPath     string        // the cert file path i.e) /var/run/athenz/tls.cert
+	KeyPath      string        // the key file path i.e) /var/run/athenz/tls.key
+	Logger       logger        // custom log function for errors, optional
 	PollInterval time.Duration // TODO: Comment me
 }
 
