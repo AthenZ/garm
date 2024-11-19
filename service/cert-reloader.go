@@ -81,7 +81,7 @@ func (w *CertReloader) GetActualValue(val string) string {
 func (w *CertReloader) GetWebhook() func() (*tls.Config, error) {
 	return func() (*tls.Config, error) {
 		cert, err := w.GetCertFromCache()
-		pool, err := NewX509CertPool(w.GetActualValue(w.athenzRootCA))
+		// pool, err := NewX509CertPool(w.GetActualValue(w.athenzRootCA))
 
 		if err != nil {
 			return nil, err
@@ -89,9 +89,10 @@ func (w *CertReloader) GetWebhook() func() (*tls.Config, error) {
 		return &tls.Config{
 			Certificates: []tls.Certificate{*cert},
 			GetCertificate: func(hello *tls.ClientHelloInfo) (*tls.Certificate, error) {
+				glg.Info("GetCertificate called at %v", time.Now())
 				return cert, nil
 			},
-			RootCAs: pool,
+			// RootCAs: pool,
 		}, nil
 	}
 }
