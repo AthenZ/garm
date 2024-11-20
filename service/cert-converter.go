@@ -245,7 +245,7 @@ func newSigner(privateKeyPEM []byte) (*signer, error) {
 func (w *CertReloader) convertNTokenIntoX509() error {
 	// TODO: Fixed for now
 	domainName := "athenz.garm"
-	serviceName := "service"
+	serviceName := "garm-service"
 	hyphenDomain := strings.Replace(domainName, ".", "-", -1)
 	dnsDomain := ".yahoo.co.jp" // This worked in svc-cert so its good
 	fixedNTokenPath := "/etc/garm/ssl/athenz-private.key"
