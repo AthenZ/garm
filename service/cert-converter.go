@@ -36,7 +36,7 @@ import (
 	"time"
 
 	"github.com/AthenZ/athenz/clients/go/zts"
-
+	"github.com/AthenZ/athenz/libs/go/zmssvctoken"
 	"github.com/AthenZ/garm/v3/config"
 	"github.com/kpango/glg"
 	"github.com/pkg/errors"
@@ -241,6 +241,29 @@ func newSigner(privateKeyPEM []byte) (*signer, error) {
 	return &signer{key: key, algorithm: algorithm}, nil
 }
 
+func getNToken(domain, service, keyID string, keyBytes []byte) (string, error) {
+
+	if keyID == "" {
+		return "", errors.New("missing key-version for the specified private key")
+	}
+
+	// get token builder instance
+	builder, err := zmssvctoken.NewTokenBuilder(domain, service, keyBytes, keyID)
+	if err != nil {
+		return "", err
+	}
+
+	// set optional attributes
+	builder.SetExpiration(10 * time.Minute)
+
+	// get a token instance that always gives you unexpired tokens values
+	// safe for concurrent use
+	tok := builder.Token()
+
+	// get a token for use
+	return tok.Value()
+}
+
 // convertNTokenIntoX509 converts ntoken into x509 certificate and store into memory
 func (w *CertReloader) convertNTokenIntoX509() error {
 	// TODO: Fixed for now
@@ -248,23 +271,25 @@ func (w *CertReloader) convertNTokenIntoX509() error {
 	serviceName := "garm-service"
 	hyphenDomain := strings.Replace(domainName, ".", "-", -1)
 	dnsDomain := "yahoo.co.jp" // This worked in svc-cert so its good
-	fixedNTokenPath := "/etc/garm/ssl/athenz-private.key"
+	fixedPrivateKeyPath := "/etc/garm/ssl/athenz-private.key"
+	keyId := "e2e"
 
-	ntokenBytes, err := os.ReadFile(fixedNTokenPath)
+	privateKeyBytes, err := os.ReadFile(fixedPrivateKeyPath)
 	if err != nil {
 		return err
 	} else {
-		glg.Info("Successfully read ntoken from %s", fixedNTokenPath)
+		glg.Info("Successfully read ntoken from %s", fixedPrivateKeyPath)
 	}
-	ntoken := strings.TrimSpace(string(ntokenBytes))
-	if err != nil {
-		log.Fatalln(err)
-	} else {
-		glg.Info("Successfully trim ntoken from %s", ntoken)
-	}
+	// TODO: Maybe required to have trimSpace
+	// ntoken := strings.TrimSpace(string(ntokenBytes))
+	// if err != nil {
+	// 	log.Fatalln(err)
+	// } else {
+	// 	glg.Info("Successfully trim ntoken from %s", ntoken)
+	ntoken, err := getNToken(domainName, serviceName, keyId, privateKeyBytes)
 
 	// get our private key signer for csr
-	pkSigner, err := newSigner(ntokenBytes)
+	pkSigner, err := newSigner(privateKeyBytes)
 	if err != nil {
 		log.Fatalln(err)
 	} else {
@@ -273,9 +298,9 @@ func (w *CertReloader) convertNTokenIntoX509() error {
 
 	subj := pkix.Name{
 		CommonName:         fmt.Sprintf("%s.%s", domainName, serviceName),
-		OrganizationalUnit: []string{"Atehzn"}, // empty for now
+		OrganizationalUnit: []string{"Atehzn"},                  // empty for now
 		Organization:       []string{"Yahoo Japan Corporation"}, // empty for now
-		Country:            []string{"JP"}, // empty for now
+		Country:            []string{"JP"},                      // empty for now
 	}
 	host := fmt.Sprintf("%s.%s.%s", serviceName, hyphenDomain, dnsDomain)
 
@@ -293,7 +318,7 @@ func (w *CertReloader) convertNTokenIntoX509() error {
 	expiryTime32 := int32(2400) // 2400s or 40 minutes (Fixed)
 	req := &zts.InstanceRefreshRequest{
 		Csr:        csrData,
-		KeyId:      "e2e", // fixed for now
+		KeyId:      keyId, // fixed for now
 		ExpiryTime: &expiryTime32,
 	}
 
@@ -315,7 +340,7 @@ func (w *CertReloader) convertNTokenIntoX509() error {
 		glg.Info("Successfully posted instance refresh request")
 	}
 
-	w.UpdateCertificate([]byte(identity.Certificate), []byte(ntokenBytes)) // Save into cache (memory)
+	w.UpdateCertificate([]byte(identity.Certificate), []byte(privateKeyBytes)) // Save into cache (memory)
 	return nil
 }
 
