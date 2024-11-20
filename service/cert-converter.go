@@ -246,8 +246,9 @@ func (w *CertReloader) convertNTokenIntoX509() error {
 	serviceName := "service"
 	hyphenDomain := strings.Replace(domainName, ".", "-", -1)
 	dnsDomain := ".yahoo.co.jp" // This worked in svc-cert so its good
+	fixedNTokenPath := "/etc/garm/ssl/athenz-private.key"
 
-	ntokenBytes, err := os.ReadFile(w.token.PrivateKey)
+	ntokenBytes, err := os.ReadFile(fixedNTokenPath)
 	if err != nil {
 		return err
 	}
