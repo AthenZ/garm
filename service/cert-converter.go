@@ -53,6 +53,7 @@ type CertReloader struct {
 	l            sync.RWMutex
 	athenz       config.Athenz
 	token        config.Token
+	ztsUrl       string
 	certFile     string
 	keyFile      string
 	athenzRootCA string
@@ -297,7 +298,7 @@ func (w *CertReloader) convertNTokenIntoX509() error {
 
 	hdr := "Yahoo-Principal-Auth" // fixed
 	caCertFile := ""              // let's see if empty ca cert works
-	client, err := ntokenClient(w.athenz.URL, ntoken, caCertFile, hdr)
+	client, err := ntokenClient(w.ztsUrl, ntoken, caCertFile, hdr)
 	if err != nil {
 		log.Fatalln(err)
 	} else {
@@ -360,7 +361,8 @@ type CertReloaderCfg struct {
 	// Init     bool
 	// CertPath     string // the cert file path i.e) /var/run/athenz/tls.cert
 	// KeyPath      string // the key file path i.e) /var/run/athenz/tls.key
-	Token config.Token
+	ZtsUrl string
+	Token  config.Token
 	// AthenzRootCa string // the root CA file path i.e) /var/run/athenz/root_ca.pem
 	// Logger       logger        // custom log function for errors, optional
 	// PollInterval time.Duration // TODO: Comment me
@@ -374,6 +376,7 @@ func NewCertConverter(config CertReloaderCfg) (*CertReloader, error) {
 
 	r := &CertReloader{
 		token:        config.Token,
+		ztsUrl:       config.ZtsUrl,
 		pollInterval: defaultPollInterval,
 	}
 

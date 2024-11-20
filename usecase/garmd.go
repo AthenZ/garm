@@ -50,7 +50,8 @@ func New(cfg config.Config) (GarmDaemon, error) {
 
 	// TODO: use certConverter to reload cert
 	certConverter, err := service.NewCertConverter(service.CertReloaderCfg{
-		Token: cfg.Token,
+		Token:  cfg.Token,
+		ZtsUrl: cfg.Athenz.URL,
 	})
 	if err != nil {
 		return nil, errors.Wrap(err, "cert reloader instantiate failed")
