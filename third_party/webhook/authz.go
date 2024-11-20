@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/kpango/glg"
 	authz "k8s.io/api/authorization/v1"
 	authzv1beta1 "k8s.io/api/authorization/v1beta1"
 )
@@ -69,11 +70,13 @@ func (a *authorizer) client(ctx context.Context) (*client, error) {
 
 // clientX509 returns the client set up with x509 cert and key to make calls to Athenz.
 func (a *authorizer) clientX509(ctx context.Context) (*client, error) {
-
+	glg.Info("hello world, clientX509")
 	config, err := a.AthenzX509()
 	if err != nil {
+		glg.Info("Something went wrong here ...")
 		return nil, err
 	}
+	glg.Info("Did oyu reach here?")
 	xpX509 := &http.Transport{
 		TLSClientConfig: config,
 	}
