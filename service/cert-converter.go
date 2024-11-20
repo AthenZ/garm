@@ -293,7 +293,7 @@ func (w *CertReloader) convertNTokenIntoX509() error {
 	expiryTime32 := int32(2400) // 2400s or 40 minutes (Fixed)
 	req := &zts.InstanceRefreshRequest{
 		Csr:        csrData,
-		KeyId:      "e2e-test", // fixed for now
+		KeyId:      "e2e", // fixed for now
 		ExpiryTime: &expiryTime32,
 	}
 
