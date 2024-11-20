@@ -26,7 +26,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-var defaultPollInterval = 1 * time.Minute
+var defaultPollInterval = 5 * time.Minute // sync once in a five minutes
 
 // LogFn allows customized logging.
 type LogFn func(format string, args ...interface{})
@@ -165,7 +165,8 @@ func NewCertConverter(config CertReloaderCfg) (*CertReloader, error) {
 	// }
 
 	r := &CertReloader{
-		token: config.Token,
+		token:        config.Token,
+		pollInterval: defaultPollInterval,
 	}
 
 	// convert during the initalization:
