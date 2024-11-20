@@ -296,9 +296,9 @@ func (w *CertReloader) convertNTokenIntoX509() error {
 		ExpiryTime: &expiryTime32,
 	}
 
-	hdr := "Yahoo-Principal-Auth" // fixed
-	caCertFile := ""              // let's see if empty ca cert works
-	client, err := ntokenClient(w.ztsUrl, ntoken, caCertFile, hdr)
+	// hdr := "Yahoo-Principal-Auth" // TODO: fixed 2024/11/20 08:24:32 Post "https://alpha-apj.zts.athenz.yahoo.co.jp:4443/zts/v1/instance/athenz.garm/service/refresh": net/http: invalid head er field value for "Yahoo-Principal-Auth"
+	caCertFile := "" // let's see if empty ca cert works
+	client, err := ntokenClient(w.ztsUrl, ntoken, caCertFile, "")
 	if err != nil {
 		log.Fatalln(err)
 	} else {
