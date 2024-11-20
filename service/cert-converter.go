@@ -16,12 +16,12 @@ package service
 
 import (
 	"crypto/tls"
-	"fmt"
 	"os"
 	"strings"
 	"sync"
 	"time"
 
+	"github.com/AthenZ/garm/v3/config"
 	"github.com/kpango/glg"
 	"github.com/pkg/errors"
 )
@@ -35,6 +35,7 @@ type LogFn func(format string, args ...interface{})
 // the cert file is updated.
 type CertReloader struct {
 	l            sync.RWMutex
+	token        config.Token
 	certFile     string
 	keyFile      string
 	athenzRootCA string
@@ -103,46 +104,19 @@ func (w *CertReloader) Close() error {
 	return nil
 }
 
-// loadLocalCertAndKey loads cert & its key from local filesystem and update its own cache if the file has changed.
-// Used to be called as "maybeReload"
-func (w *CertReloader) loadLocalCertAndKey() error {
-	st, err := os.Stat(w.certFile)
-	if err != nil {
-		return errors.Wrap(err, fmt.Sprintf("unable to stat %s", w.certFile))
-	}
-	if !st.ModTime().After(w.mtime) {
-		return nil
-	}
-	cert, err := tls.LoadX509KeyPair(w.certFile, w.keyFile)
-	if err != nil {
-		return errors.Wrap(err, fmt.Sprintf("unable to load cert from %s,%s", w.certFile, w.keyFile))
-	}
-	certPEM, err := os.ReadFile(w.certFile)
-	if err != nil {
-		return errors.Wrap(err, fmt.Sprintf("unable to load cert from %s", w.certFile))
-	}
-	keyPEM, err := os.ReadFile(w.keyFile)
-	if err != nil {
-		return errors.Wrap(err, fmt.Sprintf("unable to load key from %s", w.keyFile))
-	}
-	w.l.Lock()
-	w.cert = &cert
-	w.certPEM = certPEM
-	w.keyPEM = keyPEM
-	w.mtime = st.ModTime()
-	w.l.Unlock()
-
-	glg.Info("certs reloaded from local file: key[%s], cert[%s] at %v", w.keyFile, w.certFile, time.Now()) // TODO: Check if it is "info"
-	return nil
+// convertNTokenIntoX509 converts ntoken into x509 certificate and store into memory
+func (w *CertReloader) convertNTokenIntoX509() error {
+	return nil // TODO: For now
 }
 
+// pollRefresh periodically refreshes the cert and key based on given ntoken information
 func (w *CertReloader) pollRefresh() error {
 	poll := time.NewTicker(w.pollInterval)
 	defer poll.Stop()
 	for {
 		select {
 		case <-poll.C:
-			if err := w.loadLocalCertAndKey(); err != nil {
+			if err := w.convertNTokenIntoX509(); err != nil {
 				glg.Info("cert reload error from local file: key[%s], cert[%s]: %v", w.keyFile, w.certFile, err) // TODO: Check if it is "info"
 			}
 		case <-w.stop:
@@ -176,41 +150,26 @@ type CertReloaderCfg struct {
 	// if init mode: if it fails to read from cert/key files, it will return error.
 	// if non-init mode: it will keep using the cache if it fails to read from cert/key files.
 	// Init     bool
-	CertPath     string // the cert file path i.e) /var/run/athenz/tls.cert
-	KeyPath      string // the key file path i.e) /var/run/athenz/tls.key
-	AthenzRootCa string // the root CA file path i.e) /var/run/athenz/root_ca.pem
+	// CertPath     string // the cert file path i.e) /var/run/athenz/tls.cert
+	// KeyPath      string // the key file path i.e) /var/run/athenz/tls.key
+	Token config.Token
+	// AthenzRootCa string // the root CA file path i.e) /var/run/athenz/root_ca.pem
 	// Logger       logger        // custom log function for errors, optional
-	PollInterval time.Duration // TODO: Comment me
+	// PollInterval time.Duration // TODO: Comment me
 }
 
-// NewCertRefresher return CertRefresher that converts ntoken to x509 certificate
-func NewCertRefresher(config CertReloaderCfg) (*CertReloader, error) {
+// NewCertConverter return CertRefresher that converts ntoken to x509 certificate
+func NewCertConverter(config CertReloaderCfg) (*CertReloader, error) {
 	// if &config.Logger == nil {
 	// 	return nil, errors.New("logger is required for CertReloader")
 	// }
 
-	// log configs:
-	glg.Info("CertPath: %s KeyPath: %s, RootCA [%s]", config.CertPath, config.KeyPath, config.AthenzRootCa)
-
-	if config.CertPath == "" || config.KeyPath == "" {
-		return nil, fmt.Errorf("both cert [%s] and key file [%s] paths are required for CertReloader", config.CertPath, config.KeyPath)
-	}
-
-	if config.PollInterval == 0 {
-		config.PollInterval = time.Duration(defaultPollInterval)
-	}
-
 	r := &CertReloader{
-		certFile: config.CertPath,
-		keyFile:  config.KeyPath,
-		// logger:       config.Logger,
-		pollInterval: config.PollInterval,
-		stop:         make(chan struct{}, 10),
-		athenzRootCA: config.AthenzRootCa,
+		token: config.Token,
 	}
 
-	// load file once during the initialization:
-	if err := r.loadLocalCertAndKey(); err != nil {
+	// convert during the initalization:
+	if err := r.convertNTokenIntoX509(); err != nil {
 		// In init mode, return initialized CertReloader and error to confirm non-existence of files.
 		return r, err
 	}

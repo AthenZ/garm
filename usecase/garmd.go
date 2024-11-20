@@ -16,7 +16,6 @@ package usecase
 
 import (
 	"context"
-	"time"
 
 	"github.com/AthenZ/garm/v3/config"
 	"github.com/AthenZ/garm/v3/handler"
@@ -49,12 +48,9 @@ func New(cfg config.Config) (GarmDaemon, error) {
 	// }
 	logger := service.NewLogger(cfg.Logger)
 
-	// TODO: use certReloader to reload cert
-	certReloader, err := service.NewCertRefresher(service.CertReloaderCfg{
-		CertPath:     cfg.X509.Cert,
-		KeyPath:      cfg.X509.Key,
-		PollInterval: time.Second, // TODO: Is this correct that we fix the poll interval?
-		AthenzRootCa: cfg.Athenz.AthenzRootCA,
+	// TODO: use certConverter to reload cert
+	certConverter, err := service.NewCertConverter(service.CertReloaderCfg{
+		Token: cfg.Token,
 	})
 	if err != nil {
 		return nil, errors.Wrap(err, "cert reloader instantiate failed")
@@ -70,7 +66,7 @@ func New(cfg config.Config) (GarmDaemon, error) {
 	// cfg.Athenz.AuthZ.AthenzClientAuthnx509Mode = true
 	// cfg.Athenz.AuthZ.AthenzX509 = certReloader.GetWebhook()
 
-	athenz, err := service.NewX509Athenz(cfg.Athenz, certReloader.GetWebhook(), logger)
+	athenz, err := service.NewX509Athenz(cfg.Athenz, certConverter.GetWebhook(), logger)
 	if err != nil {
 		return nil, errors.Wrap(err, "athenz service instantiate failed")
 	}
@@ -80,7 +76,7 @@ func New(cfg config.Config) (GarmDaemon, error) {
 		// token:        token,
 		athenz:       athenz,
 		server:       service.NewServer(cfg.Server, router.New(cfg.Server, handler.New(athenz))),
-		certReloader: certReloader,
+		certReloader: certConverter,
 	}, nil
 }
 

@@ -42,9 +42,6 @@ const (
 // Config represents an application configuration content (config.yaml).
 // In K8s environment, this configuration is stored in K8s ConfigMap.
 type Config struct {
-	// X509 represents 3rd party generated x509 certificate to connect to Athenz.
-	X509 X509Config `yaml:"x509"`
-
 	// Version represents configuration file version.
 	Version string `yaml:"version"`
 
@@ -65,13 +62,6 @@ type Config struct {
 
 	// Mapping represents the mapping rule for mapping K8s authentication and authorization requests to Athenz requests.
 	Mapping Mapping `yaml:"map_rule"`
-}
-
-// TODO: Comment me
-type X509Config struct {
-	Cert string `yaml:"cert"`
-	Key  string `yaml:"key"`
-	CA   string `yaml:"ca"`
 }
 
 // Logger represents logging configuration for Garm.
