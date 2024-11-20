@@ -15,11 +15,27 @@
 package service
 
 import (
+	"bytes"
+	"crypto"
+	"crypto/ecdsa"
+	"crypto/rand"
+	"crypto/rsa"
 	"crypto/tls"
+	"crypto/x509"
+	"crypto/x509/pkix"
+	"encoding/pem"
+	"fmt"
+	"log"
+	"net"
+	"net/http"
+	"net/url"
 	"os"
+	"reflect"
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/AthenZ/athenz/clients/go/zts"
 
 	"github.com/AthenZ/garm/v3/config"
 	"github.com/kpango/glg"
@@ -35,6 +51,7 @@ type LogFn func(format string, args ...interface{})
 // the cert file is updated.
 type CertReloader struct {
 	l            sync.RWMutex
+	athenz       config.Athenz
 	token        config.Token
 	certFile     string
 	keyFile      string
@@ -104,9 +121,186 @@ func (w *CertReloader) Close() error {
 	return nil
 }
 
+type signer struct {
+	key       crypto.Signer
+	algorithm x509.SignatureAlgorithm
+}
+
+func generateCSR(keySigner *signer, subj pkix.Name, host, instanceId, ip, uri string) (string, error) {
+	template := x509.CertificateRequest{
+		Subject:            subj,
+		SignatureAlgorithm: keySigner.algorithm,
+	}
+	if host != "" {
+		template.DNSNames = []string{host}
+	}
+	if uri != "" {
+		uriptr, err := url.Parse(uri)
+		if err == nil {
+			template.URIs = []*url.URL{uriptr}
+		}
+	}
+	if instanceId != "" {
+		uriptr, err := url.Parse(instanceId)
+		if err == nil {
+			if len(template.URIs) > 0 {
+				template.URIs = append(template.URIs, uriptr)
+			} else {
+				template.URIs = []*url.URL{uriptr}
+			}
+		}
+	}
+	if ip != "" {
+		template.IPAddresses = []net.IP{net.ParseIP(ip)}
+	}
+	csr, err := x509.CreateCertificateRequest(rand.Reader, &template, keySigner.key)
+	if err != nil {
+		return "", fmt.Errorf("cannot create CSR: %v", err)
+	}
+	block := &pem.Block{
+		Type:  "CERTIFICATE REQUEST",
+		Bytes: csr,
+	}
+	var buf bytes.Buffer
+	err = pem.Encode(&buf, block)
+	if err != nil {
+		return "", fmt.Errorf("cannot encode CSR to PEM: %v", err)
+	}
+	return buf.String(), nil
+}
+
+func ntokenClient(ztsURL, ntoken, caCertFile, hdr string) (*zts.ZTSClient, error) {
+
+	transport := &http.Transport{
+		Proxy:                 http.ProxyFromEnvironment,
+		ResponseHeaderTimeout: 30 * time.Second,
+	}
+	if caCertFile != "" {
+		config := &tls.Config{}
+		certPool := x509.NewCertPool()
+		caCert, err := os.ReadFile(caCertFile)
+		if err != nil {
+			return nil, err
+		}
+		certPool.AppendCertsFromPEM(caCert)
+		config.RootCAs = certPool
+		transport.TLSClientConfig = config
+	}
+	// use the ntoken to talk to Athenz
+	client := zts.NewClient(ztsURL, transport)
+	client.AddCredentials(hdr, ntoken)
+	return &client, nil
+}
+
+// ExtractSignerInfo extract crypto.Signer and x509.SignatureAlgorithm from the given private key (ECDSA or RSA).
+func ExtractSignerInfo(privateKeyPEM []byte) (crypto.Signer, x509.SignatureAlgorithm, error) {
+	block, _ := pem.Decode(privateKeyPEM)
+	if block == nil {
+		return nil, x509.UnknownSignatureAlgorithm, fmt.Errorf("unable to load private key")
+	}
+
+	switch block.Type {
+	case "EC PRIVATE KEY":
+		key, err := x509.ParseECPrivateKey(block.Bytes)
+		if err != nil {
+			return nil, x509.UnknownSignatureAlgorithm, err
+		}
+		return key, x509.ECDSAWithSHA256, nil
+	case "RSA PRIVATE KEY":
+		key, err := x509.ParsePKCS1PrivateKey(block.Bytes)
+		if err != nil {
+			return nil, x509.UnknownSignatureAlgorithm, err
+		}
+		return key, x509.SHA256WithRSA, nil
+	case "PRIVATE KEY":
+		key, err := x509.ParsePKCS8PrivateKey(block.Bytes)
+		if err != nil {
+			return nil, x509.UnknownSignatureAlgorithm, err
+		}
+		switch k := key.(type) {
+		case *ecdsa.PrivateKey:
+			return k, x509.ECDSAWithSHA256, nil
+		case *rsa.PrivateKey:
+			return k, x509.SHA256WithRSA, nil
+		default:
+			// PKCS#8 format may contain multiple key types other than RSA / EC, but current ZMS / ZTS server implementation only supports RSA / EC private keys
+			return nil, x509.UnknownSignatureAlgorithm, fmt.Errorf("unsupported private key type: %s", reflect.TypeOf(k).Name())
+		}
+	default:
+		return nil, x509.UnknownSignatureAlgorithm, fmt.Errorf("unsupported private key type: %s", block.Type)
+	}
+}
+
+func newSigner(privateKeyPEM []byte) (*signer, error) {
+	key, algorithm, err := ExtractSignerInfo(privateKeyPEM)
+	if err != nil {
+		return nil, err
+	}
+	return &signer{key: key, algorithm: algorithm}, nil
+}
+
 // convertNTokenIntoX509 converts ntoken into x509 certificate and store into memory
 func (w *CertReloader) convertNTokenIntoX509() error {
-	return nil // TODO: For now
+	// TODO: Fixed for now
+	domainName := "athenz.garm"
+	serviceName := "service"
+	hyphenDomain := strings.Replace(domainName, ".", "-", -1)
+	dnsDomain := ".yahoo.co.jp" // This worked in svc-cert so its good
+
+	ntokenBytes, err := os.ReadFile(w.token.PrivateKey)
+	if err != nil {
+		return err
+	}
+	ntoken := strings.TrimSpace(string(ntokenBytes))
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	// get our private key signer for csr
+	pkSigner, err := newSigner(ntokenBytes)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	subj := pkix.Name{
+		CommonName:         fmt.Sprintf("%s.%s", domainName, serviceName),
+		OrganizationalUnit: []string{}, // empty for now
+		Organization:       []string{}, // empty for now
+		Country:            []string{}, // empty for now
+	}
+	host := fmt.Sprintf("%s.%s.%s", serviceName, hyphenDomain, dnsDomain)
+
+	instanceId := "" // empty for now (it was empty for instance)
+	ip := ""         // empty for now
+	uri := ""        // empty for now
+	csrData, err := generateCSR(pkSigner, subj, host, instanceId, ip, uri)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	expiryTime32 := int32(2400) // 2400s or 40 minutes (Fixed)
+	req := &zts.InstanceRefreshRequest{
+		Csr:        csrData,
+		KeyId:      "e2e-test", // fixed for now
+		ExpiryTime: &expiryTime32,
+	}
+
+	hdr := "Yahoo-Principal-Auth" // fixed
+	caCertFile := ""              // let's see if empty ca cert works
+	client, err := ntokenClient(w.athenz.URL, ntoken, caCertFile, hdr)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	// request a tls certificate for this service
+
+	identity, err := client.PostInstanceRefreshRequest(zts.CompoundName(domainName), zts.SimpleName(serviceName), req)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	w.UpdateCertificate([]byte(identity.Certificate), []byte(ntokenBytes)) // Save into cache (memory)
+	return nil
 }
 
 // pollRefresh periodically refreshes the cert and key based on given ntoken information

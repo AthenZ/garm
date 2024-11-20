@@ -30,8 +30,8 @@ type GarmDaemon interface {
 }
 
 type garm struct {
-	cfg config.Config
-	// token        service.TokenService
+	cfg          config.Config
+	token        service.TokenService
 	athenz       service.Athenz
 	server       service.Server
 	certReloader *service.CertReloader
