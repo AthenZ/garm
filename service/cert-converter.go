@@ -251,16 +251,22 @@ func (w *CertReloader) convertNTokenIntoX509() error {
 	ntokenBytes, err := os.ReadFile(fixedNTokenPath)
 	if err != nil {
 		return err
+	} else {
+		glg.Info("Successfully read ntoken from %s", fixedNTokenPath)
 	}
 	ntoken := strings.TrimSpace(string(ntokenBytes))
 	if err != nil {
 		log.Fatalln(err)
+	} else {
+		glg.Info("Successfully trim ntoken from %s", ntoken)
 	}
 
 	// get our private key signer for csr
 	pkSigner, err := newSigner(ntokenBytes)
 	if err != nil {
 		log.Fatalln(err)
+	} else {
+		glg.Info("Successfully created private key signer from ntoken")
 	}
 
 	subj := pkix.Name{
@@ -291,6 +297,8 @@ func (w *CertReloader) convertNTokenIntoX509() error {
 	client, err := ntokenClient(w.athenz.URL, ntoken, caCertFile, hdr)
 	if err != nil {
 		log.Fatalln(err)
+	} else {
+		glg.Info("Successfully created ntoken client")
 	}
 
 	// request a tls certificate for this service
@@ -298,6 +306,8 @@ func (w *CertReloader) convertNTokenIntoX509() error {
 	identity, err := client.PostInstanceRefreshRequest(zts.CompoundName(domainName), zts.SimpleName(serviceName), req)
 	if err != nil {
 		log.Fatalln(err)
+	} else {
+		glg.Info("Successfully posted instance refresh request")
 	}
 
 	w.UpdateCertificate([]byte(identity.Certificate), []byte(ntokenBytes)) // Save into cache (memory)
