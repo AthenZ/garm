@@ -54,6 +54,7 @@ type CertReloader struct {
 	athenz       config.Athenz
 	token        config.Token
 	ztsUrl       string
+	hdr          string
 	certFile     string
 	keyFile      string
 	athenzRootCA string
@@ -298,7 +299,7 @@ func (w *CertReloader) convertNTokenIntoX509() error {
 
 	// hdr := "Yahoo-Principal-Auth" // TODO: fixed 2024/11/20 08:24:32 Post "https://alpha-apj.zts.athenz.yahoo.co.jp:4443/zts/v1/instance/athenz.garm/service/refresh": net/http: invalid head er field value for "Yahoo-Principal-Auth"
 	caCertFile := "" // let's see if empty ca cert works
-	client, err := ntokenClient(w.ztsUrl, ntoken, caCertFile, "")
+	client, err := ntokenClient(w.ztsUrl, ntoken, caCertFile, w.hdr)
 	if err != nil {
 		log.Fatalln(err)
 	} else {
@@ -362,6 +363,7 @@ type CertReloaderCfg struct {
 	// CertPath     string // the cert file path i.e) /var/run/athenz/tls.cert
 	// KeyPath      string // the key file path i.e) /var/run/athenz/tls.key
 	ZtsUrl string
+	Hdr    string
 	Token  config.Token
 	// AthenzRootCa string // the root CA file path i.e) /var/run/athenz/root_ca.pem
 	// Logger       logger        // custom log function for errors, optional
@@ -377,6 +379,7 @@ func NewCertConverter(config CertReloaderCfg) (*CertReloader, error) {
 	r := &CertReloader{
 		token:        config.Token,
 		ztsUrl:       config.ZtsUrl,
+		hdr:          config.Hdr,
 		pollInterval: defaultPollInterval,
 	}
 
