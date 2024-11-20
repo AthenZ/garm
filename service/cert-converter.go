@@ -283,6 +283,9 @@ func (w *CertReloader) convertNTokenIntoX509() error {
 	csrData, err := generateCSR(pkSigner, subj, host, instanceId, ip, uri)
 	if err != nil {
 		log.Fatalln(err)
+	} else {
+		// Write down the CSR data as log:
+		glg.Info("Successfully generated CSR data: %s", csrData)
 	}
 
 	expiryTime32 := int32(2400) // 2400s or 40 minutes (Fixed)
