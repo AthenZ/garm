@@ -183,9 +183,8 @@ type CertReloaderCfg struct {
 	PollInterval time.Duration // TODO: Comment me
 }
 
-// NewCertReloader returns a CertReloader that reloads the (key, cert) pair whenever
-// the cert file changes on the filesystem.
-func NewCertReloader(config CertReloaderCfg) (*CertReloader, error) {
+// NewCertRefresher return CertRefresher that converts ntoken to x509 certificate
+func NewCertRefresher(config CertReloaderCfg) (*CertReloader, error) {
 	// if &config.Logger == nil {
 	// 	return nil, errors.New("logger is required for CertReloader")
 	// }

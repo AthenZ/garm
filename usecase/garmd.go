@@ -50,7 +50,7 @@ func New(cfg config.Config) (GarmDaemon, error) {
 	logger := service.NewLogger(cfg.Logger)
 
 	// TODO: use certReloader to reload cert
-	certReloader, err := service.NewCertReloader(service.CertReloaderCfg{
+	certReloader, err := service.NewCertRefresher(service.CertReloaderCfg{
 		CertPath:     cfg.X509.Cert,
 		KeyPath:      cfg.X509.Key,
 		PollInterval: time.Second, // TODO: Is this correct that we fix the poll interval?
