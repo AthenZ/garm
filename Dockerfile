@@ -10,6 +10,7 @@ COPY go.mod .
 COPY go.sum .
 
 # RUN GO111MODULE=on go mod download
+RUN go mod tidy
 
 FROM base AS builder
 
