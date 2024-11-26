@@ -1,6 +1,6 @@
 module github.com/AthenZ/garm/v3
 
-go 1.21
+go 1.22
 
 replace (
 	github.com/AthenZ/athenz => github.com/AthenZ/athenz v1.11.26
