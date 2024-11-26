@@ -1,8 +1,6 @@
 module github.com/AthenZ/garm/v3
 
-go 1.23
-
-// toolchain go1.23.2
+go 1.21.3
 
 replace (
 	github.com/AthenZ/athenz => github.com/AthenZ/athenz v1.11.26
