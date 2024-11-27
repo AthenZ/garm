@@ -63,10 +63,45 @@ func NewAthenz(cfg config.Athenz, log Logger) (Athenz, error) {
 	cfg.AuthZ.AthenzX509 = func() (*tls.Config, error) {
 		pool, err := NewX509CertPool(config.GetActualValue(cfg.AthenzRootCA))
 		if err != nil {
-			err = errors.Wrap(err, "authorization x509 certpool error")
+			err = errors.Wrap(err, "authorization x509 certpool error") // found here
 		}
 		return &tls.Config{RootCAs: pool}, err
 	}
+
+	return &athenz{
+		authConfig: cfg,
+		authn:      webhook.NewAuthenticator(cfg.AuthN),
+		authz:      webhook.NewAuthorizer(cfg.AuthZ),
+	}, nil
+}
+
+func NewX509Athenz(cfg config.Athenz, w func() (*tls.Config, error), log Logger) (Athenz, error) {
+	athenzTimeout, err := time.ParseDuration(cfg.Timeout)
+	if err != nil {
+		return nil, errors.Wrap(err, "athenz timeout parse failed")
+	}
+
+	c := webhook.Config{
+		ZMSEndpoint: cfg.URL,
+		ZTSEndpoint: cfg.URL,
+		AuthHeader:  cfg.AuthHeader,
+		Timeout:     athenzTimeout,
+		LogProvider: log.GetProvider(),
+		LogFlags:    log.GetLogFlags(),
+	}
+	cfg.AuthN.Config = c
+	cfg.AuthZ.Config = c
+
+	cfg.AuthZ.AthenzClientAuthnx509Mode = true
+	cfg.AuthZ.AthenzX509 = w
+
+	// cfg.AuthZ.AthenzX509 = func() (*tls.Config, error) {
+	// 	pool, err := NewX509CertPool(config.GetActualValue(cfg.AthenzRootCA))
+	// 	if err != nil {
+	// 		err = errors.Wrap(err, "authorization x509 certpool error") // found here
+	// 	}
+	// 	return &tls.Config{RootCAs: pool}, err
+	// }
 
 	return &athenz{
 		authConfig: cfg,

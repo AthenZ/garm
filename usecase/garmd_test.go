@@ -132,8 +132,8 @@ func TestNew(t *testing.T) {
 
 					server := service.NewServer(cfg.Server, router.New(cfg.Server, handler.New(athenz)))
 					return &garm{
-						cfg:    cfg,
-						token:  token,
+						cfg: cfg,
+						// token:  token,
 						athenz: athenz,
 						server: server,
 					}
@@ -284,8 +284,8 @@ func Test_garm_Start(t *testing.T) {
 			}
 
 			g := &garm{
-				cfg:    tt.fields.cfg,
-				token:  tt.fields.token,
+				cfg: tt.fields.cfg,
+				// token:  tt.fields.token,
 				athenz: tt.fields.athenz,
 				server: tt.fields.server,
 			}
