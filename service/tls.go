@@ -112,5 +112,5 @@ func NewX509CertPool(path string) (*x509.CertPool, error) {
 		}
 		return pool, nil
 	}
-	return pool, errors.Wrap(err, "failed to read pem file")
+	return pool, errors.Wrap(err, "failed to read pem file") // error origin
 }
