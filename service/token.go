@@ -66,7 +66,7 @@ func NewTokenService(cfg config.Token) (TokenService, error) {
 	keyData, err := ioutil.ReadFile(config.GetActualValue(cfg.PrivateKey))
 	if err != nil && keyData == nil {
 		if cfg.NTokenPath == "" {
-			return nil, errors.Wrap(err, "invalid token certificate")
+			return nil, errors.Wrap(err, "invalid token private key")
 		}
 	}
 
