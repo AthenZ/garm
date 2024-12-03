@@ -20,8 +20,8 @@ athenz:
   timeout: 5s
   root_ca: _root_ca_
 x509:
-  cert: ""
-  key: ""
+  cert_path: "wrongful-path"
+  key_path: "wrongful-path"
 token:
   athenz_domain: _athenz_domain_
   service_name: _athenz_service_
@@ -37,14 +37,14 @@ map_rule:
     platform:
       name: aks
       # service_athenz_domains:
-      # - _tld_.k8s._segment_._uk-cluster_._namespace_._env_._k8s-cluster_._k8s-namespace_
+        # - _tld_.k8s._segment_._uk-cluster_._namespace_._env_._k8s-cluster_._k8s-namespace_
       service_athenz_domains:
-      - _kaas_namespace_.k8s._k8s_cluster_1._namespace_ # max-length = 44
-      - _kaas_namespace_.k8s._k8s_cluster_2._namespace_ # max-length = 44
+        - _kaas_namespace_.k8s._k8s_cluster_1._namespace_ # max-length = 44
+        - _kaas_namespace_.k8s._k8s_cluster_2._namespace_ # max-length = 44
       # service_athenz_domains:
-      # - _namespace_.aks
+        # - _namespace_.aks
       # service_athenz_domains:
-      # - _namespace_.k8s
+        # - _namespace_.k8s
       resource_mappings:
         k8sResource1: athenzResource1
         # k8sResource2: athenzResource2
@@ -63,8 +63,8 @@ map_rule:
       non_resource_api_group: nonres
       non_resource_namespace: nonres
       service_account_prefixes:
-      - "system:serviceaccount:"
-      - "system-serviceaccount-"
+        - "system:serviceaccount:" 
+        - "system-serviceaccount-"
       athenz_user_prefix: user.
       athenz_service_account_prefix: _kaas_namespace_.k8s._k8s_cluster_2._namespace_.service_account.
       admin_athenz_domain: aks.admin
