@@ -140,7 +140,7 @@ type CertReloaderCfg struct {
 // NewCertReloader returns a CertReloader that reloads the (key, cert) pair whenever
 // the cert file changes on the filesystem.
 func NewCertReloader(config CertReloaderCfg) (*CertReloader, error) {
-	glg.Infof("Booting X.509 Certificate reloader with x509.cert[%s], x509.key[%s], x509.poll_interval[%s]", config.CertPath, config.KeyPath, config.PollInterval)
+	glg.Infof("Booting X.509 certificate reloader with arg .x509.cert[%s] .x509.key[%s] .x509.poll_interval[%s]", config.CertPath, config.KeyPath, config.PollInterval)
 
 	if config.CertPath == "" || config.KeyPath == "" {
 		return nil, fmt.Errorf("both cert [%s] and key file [%s] paths are required for CertReloader", config.CertPath, config.KeyPath)
