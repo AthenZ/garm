@@ -96,14 +96,6 @@ func NewX509Athenz(cfg config.Athenz, w func() (*tls.Config, error), log Logger)
 	cfg.AuthZ.AthenzClientAuthnx509Mode = true
 	cfg.AuthZ.AthenzX509 = w
 
-	// cfg.AuthZ.AthenzX509 = func() (*tls.Config, error) {
-	// 	pool, err := NewX509CertPool(config.GetActualValue(cfg.AthenzRootCA))
-	// 	if err != nil {
-	// 		err = errors.Wrap(err, "authorization x509 certpool error") // found here
-	// 	}
-	// 	return &tls.Config{RootCAs: pool}, err
-	// }
-
 	return &athenz{
 		authConfig: cfg,
 		authn:      webhook.NewAuthenticator(cfg.AuthN),
