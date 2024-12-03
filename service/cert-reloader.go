@@ -132,7 +132,7 @@ func (w *CertReloader) loadLocalCertAndKey() error {
 	w.mtime = st.ModTime()
 	w.l.Unlock()
 
-	glg.Info("certs reloaded from local file: key[%s], cert[%s] at %v", w.keyFile, w.certFile, time.Now()) // TODO: Check if it is "info"
+	glg.Infof("Successfully loaded X.509 certificate [%s] and its key [%s] from local file", w.certFile, w.keyFile)
 	return nil
 }
 
@@ -143,7 +143,7 @@ func (w *CertReloader) pollRefresh() error {
 		select {
 		case <-poll.C:
 			if err := w.loadLocalCertAndKey(); err != nil {
-				glg.Info("cert reload error from local file: key[%s], cert[%s]: %v", w.keyFile, w.certFile, err) // TODO: Check if it is "info"
+				glg.Warnf("Failed to load X.509 certificate [%s] and its key [%s] from local file", w.certFile, w.keyFile)
 			}
 		case <-w.stop:
 			return nil
