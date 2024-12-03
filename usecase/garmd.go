@@ -16,6 +16,7 @@ package usecase
 
 import (
 	"context"
+	"time"
 
 	"github.com/AthenZ/garm/v3/config"
 	"github.com/AthenZ/garm/v3/handler"
@@ -66,8 +67,45 @@ func New(cfg config.Config) (GarmDaemon, error) {
 	}, nil
 }
 
+func NewX509(cfg config.Config) (GarmDaemon, error) {
+	pollInterval, err := time.ParseDuration(cfg.X509.PollInterval)
+	if err != nil {
+		return nil, errors.Wrap(err, "invalid 	config .x509.poll_interval ["+cfg.X509.PollInterval+"]")
+	}
+
+	certReloader, err := service.NewCertReloader(service.CertReloaderCfg{
+		CertPath:     cfg.X509.Cert,
+		KeyPath:      cfg.X509.Key,
+		PollInterval: pollInterval,
+	})
+	if err != nil {
+		return nil, errors.Wrap(err, "cert reloader instantiate failed")
+	}
+
+	resolver := service.NewResolver(cfg.Mapping)
+	// set up mapper
+	cfg.Athenz.AuthZ.Mapper = service.NewResourceMapper(resolver)
+	cfg.Athenz.AuthN.Mapper = service.NewUserMapper(resolver)
+
+	// Create Athenz object for X.509:
+	athenz, err := service.NewX509Athenz(cfg.Athenz, certReloader.GetWebhook(), service.NewLogger(cfg.Logger))
+	if err != nil {
+		return nil, errors.Wrap(err, "athenz service instantiate failed")
+	}
+
+	return &garm{
+		cfg:    cfg,
+		token:  nil, // token (ntoken) is not used
+		athenz: athenz,
+		server: service.NewServer(cfg.Server, router.New(cfg.Server, handler.New(athenz))),
+	}, nil
+}
+
 // Start returns an error slice channel. This error channel reports the errors inside Garm server.
 func (g *garm) Start(ctx context.Context) chan []error {
-	g.token.StartTokenUpdater(ctx)
+	if g.token != nil {
+		g.token.StartTokenUpdater(ctx)
+	}
+
 	return g.server.ListenAndServe(ctx)
 }

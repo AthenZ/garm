@@ -30,7 +30,7 @@ import (
 
 const (
 	// currentVersion represents the configuration version.
-	currentVersion string = "v2.0.0"
+	currentVersion string = "v2.1.0"
 	// delimiter represents delimiter used to serialize RequestInfo. Must NOT use valid characters allowed in the all the fields of RequestInfo.
 	// Choose the delimiter that RequestInfo's verb, namespace, API Group, Resource and Name CANNOT use.
 	// i.e) If end user can set its resource name with hyphens, we cannot use hyphen as delimiter.
@@ -56,6 +56,9 @@ type Config struct {
 
 	// Athenz represents Athenz configuration for Garm to connect to Athenz server.
 	Athenz Athenz `yaml:"athenz"`
+
+	// X509 represents 3rd party generated x509 certificate for connecting to Athenz.
+	X509 X509Config `yaml:"x509"`
 
 	// Token represents configuration to generate n-token for connecting to Athenz.
 	Token Token `yaml:"token"`
@@ -135,6 +138,13 @@ type Athenz struct {
 
 	// Config is the common configuration for authentication and authorization server.
 	Config webhook.Config
+}
+
+// X509Config represents X.509 certificate and its key path for connecting to Athenz.
+type X509Config struct {
+	Cert         string `yaml:"cert"`          // path to the X.509 certificate file i.e) /var/run/athenz/tls.crt
+	Key          string `yaml:"key"`           // path to the X.509 certificate key i.e) /var/run/athenz/tls.key
+	PollInterval string `yaml:"poll_interval"` // duration between consecutive reads of the certificate and key file i.e) 10s, 30m, 24h
 }
 
 // Token represents the token generation details or the n-token file for Copper Argos.
