@@ -151,26 +151,6 @@ func (w *CertReloader) pollRefresh() error {
 	}
 }
 
-// UpdateCertificate update certificate and key in cert reloader.
-func (w *CertReloader) UpdateCertificate(certPEM []byte, keyPEM []byte) error {
-	w.l.Lock()
-	defer w.l.Unlock()
-
-	cert, err := tls.X509KeyPair(certPEM, keyPEM)
-	if err != nil {
-		return errors.Wrap(err, "unable to create tls.Certificate from provided PEM data")
-	}
-
-	w.cert = &cert
-	w.certPEM = certPEM
-	w.keyPEM = keyPEM
-	w.mtime = time.Now()
-
-	glg.Info("certs reloaded from provided PEM data at %v", time.Now()) // TODO: Check if it is "info"
-
-	return nil
-}
-
 // CertReloaderCfg contains the config for cert reload.
 type CertReloaderCfg struct {
 	// if init mode: if it fails to read from cert/key files, it will return error.
