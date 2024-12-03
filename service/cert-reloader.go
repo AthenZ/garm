@@ -18,7 +18,6 @@ import (
 	"crypto/tls"
 	"fmt"
 	"os"
-	"strings"
 	"sync"
 	"time"
 
@@ -55,28 +54,7 @@ func (w *CertReloader) GetCertFromCache() (*tls.Certificate, error) {
 	return c, nil
 }
 
-// GetCertAndKeyFromCache returns the latest known key and certificate in raw bytes.
-func (w *CertReloader) GetCertAndKeyFromCache() ([]byte, []byte, error) {
-	w.l.RLock()
-	k := w.keyPEM
-	c := w.certPEM
-	w.l.RUnlock()
-	return k, c, nil
-}
-
-// checkPrefixAndSuffix checks if the given string has given prefix and suffix.
-func (w *CertReloader) checkPrefixAndSuffix(str, pref, suf string) bool {
-	return strings.HasPrefix(str, pref) && strings.HasSuffix(str, suf)
-}
-
-// GetActualValue returns the environment variable value if the given val has "_" prefix and suffix, otherwise returns val directly.
-func (w *CertReloader) GetActualValue(val string) string {
-	if w.checkPrefixAndSuffix(val, "_", "_") {
-		return os.Getenv(strings.TrimPrefix(strings.TrimSuffix(val, "_"), "_"))
-	}
-	return val
-}
-
+// GetWebhook returns a function that is used to get X.509 Certificate stored in memory to connect to Athenz server
 // type IdentityAthenzX509 = func() (*tls.Config, error)
 func (w *CertReloader) GetWebhook() func() (*tls.Config, error) {
 	return func() (*tls.Config, error) {
@@ -155,20 +133,13 @@ func (w *CertReloader) pollRefresh() error {
 type CertReloaderCfg struct {
 	CertPath     string        // path to the X.509 certificate file i.e) /var/run/athenz/tls.crt
 	KeyPath      string        // path to the X.509 certificate key i.e) /var/run/athenz/tls.key
-	AthenzRootCa string        // the root CA file path i.e) /var/run/athenz/root_ca.pem
 	PollInterval time.Duration // duration between consecutive reads of the certificate and key file i.e) 10s, 30m, 24h
 }
 
 // NewCertReloader returns a CertReloader that reloads the (key, cert) pair whenever
 // the cert file changes on the filesystem.
 func NewCertReloader(config CertReloaderCfg) (*CertReloader, error) {
-	// if &config.Logger == nil {
-	// 	return nil, errors.New("logger is required for CertReloader")
-	// }
-
-	// log configs:
-	// TODO: Possibly a better logger:
-	glg.Info("CertPath: %s KeyPath: %s, RootCA [%s]", config.CertPath, config.KeyPath, config.AthenzRootCa)
+	glg.Infof("Booting X.509 Certificate reloader with x509.cert[%s], x509.key[%s], x509.poll_interval[%s]", config.CertPath, config.KeyPath, config.PollInterval)
 
 	if config.CertPath == "" || config.KeyPath == "" {
 		return nil, fmt.Errorf("both cert [%s] and key file [%s] paths are required for CertReloader", config.CertPath, config.KeyPath)
@@ -184,7 +155,6 @@ func NewCertReloader(config CertReloaderCfg) (*CertReloader, error) {
 		// logger:       config.Logger,
 		pollInterval: config.PollInterval,
 		stop:         make(chan struct{}, 10),
-		athenzRootCA: config.AthenzRootCa,
 	}
 
 	// load file once during the initialization:

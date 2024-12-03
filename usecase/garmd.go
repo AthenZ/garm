@@ -77,7 +77,6 @@ func NewX509(cfg config.Config) (GarmDaemon, error) {
 		CertPath:     cfg.X509.Cert,
 		KeyPath:      cfg.X509.Key,
 		PollInterval: pollInterval,
-		AthenzRootCa: cfg.Athenz.AthenzRootCA,
 	})
 	if err != nil {
 		return nil, errors.Wrap(err, "cert reloader instantiate failed")
