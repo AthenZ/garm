@@ -64,12 +64,6 @@ func (w *CertReloader) GetWebhook() func() (*tls.Config, error) {
 		}
 		return &tls.Config{
 			Certificates: []tls.Certificate{*cert},
-			// TODO: Let's see if this is enough
-			// GetCertificate: func(hello *tls.ClientHelloInfo) (*tls.Certificate, error) {
-			// 	glg.Info("GetCertificate called at %v", time.Now())
-			// 	return cert, nil
-			// },
-			// RootCAs: pool,
 		}, nil
 	}
 }
