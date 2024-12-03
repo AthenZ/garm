@@ -104,8 +104,6 @@ func NewX509(cfg config.Config) (GarmDaemon, error) {
 
 // Start returns an error slice channel. This error channel reports the errors inside Garm server.
 func (g *garm) Start(ctx context.Context) chan []error {
-	// TODO: Does this have to be here? or it can be simply started during the initialization?:
-	// TODO: Prolly yes.
 	if g.token != nil {
 		g.token.StartTokenUpdater(ctx)
 	}
