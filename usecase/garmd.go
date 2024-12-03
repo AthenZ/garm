@@ -49,6 +49,11 @@ func New(cfg config.Config) (GarmDaemon, error) {
 	// Log out here:
 	glg.Info("Garm is starting with X.509 mode=", useX509Mode)
 
+	resolver := service.NewResolver(cfg.Mapping)
+	// set up mappers:
+	cfg.Athenz.AuthZ.Mapper = service.NewResourceMapper(resolver)
+	cfg.Athenz.AuthN.Mapper = service.NewUserMapper(resolver)
+
 	var token service.TokenService
 	var certReloader *service.CertReloader
 	var athenz service.Athenz
@@ -86,11 +91,6 @@ func New(cfg config.Config) (GarmDaemon, error) {
 		}
 	}
 
-	resolver := service.NewResolver(cfg.Mapping)
-	// set up mapper
-	cfg.Athenz.AuthZ.Mapper = service.NewResourceMapper(resolver)
-	cfg.Athenz.AuthN.Mapper = service.NewUserMapper(resolver)
-
 	return &garm{
 		UseX509Mode: useX509Mode,
 		cfg:         cfg,
@@ -102,10 +102,8 @@ func New(cfg config.Config) (GarmDaemon, error) {
 
 // Start returns an error slice channel. This error channel reports the errors inside Garm server.
 func (g *garm) Start(ctx context.Context) chan []error {
-	if g.UseX509Mode {
-		// ... TODO: Do something
-	} else {
+	if g.token != nil {
 		g.token.StartTokenUpdater(ctx)
-	}
+	} // TODO: Does this have to be here?
 	return g.server.ListenAndServe(ctx)
 }
