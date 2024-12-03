@@ -32,12 +32,10 @@ type GarmDaemon interface {
 }
 
 type garm struct {
-	UseX509Mode  bool // true: use x509 mode, false: use token mode
-	cfg          config.Config
-	certReloader *service.CertReloader
-	token        service.TokenService
-	athenz       service.Athenz
-	server       service.Server
+	cfg    config.Config
+	token  service.TokenService // becomes nil if config "X509Config" is provided by user
+	athenz service.Athenz
+	server service.Server
 }
 
 // New returns a Garm daemon, or error occurred.
@@ -55,12 +53,11 @@ func New(cfg config.Config) (GarmDaemon, error) {
 	cfg.Athenz.AuthN.Mapper = service.NewUserMapper(resolver)
 
 	var token service.TokenService
-	var certReloader *service.CertReloader
 	var athenz service.Athenz
 	var err error
 
 	if useX509Mode {
-		certReloader, err = service.NewCertReloader(service.CertReloaderCfg{
+		certReloader, err := service.NewCertReloader(service.CertReloaderCfg{
 			CertPath:     cfg.X509.Cert,
 			KeyPath:      cfg.X509.Key,
 			PollInterval: time.Second, // TODO: Is this correct that we fix the poll interval?
@@ -92,18 +89,18 @@ func New(cfg config.Config) (GarmDaemon, error) {
 	}
 
 	return &garm{
-		UseX509Mode: useX509Mode,
-		cfg:         cfg,
-		token:       token,
-		athenz:      athenz,
-		server:      service.NewServer(cfg.Server, router.New(cfg.Server, handler.New(athenz))),
+		cfg:    cfg,
+		token:  token,
+		athenz: athenz,
+		server: service.NewServer(cfg.Server, router.New(cfg.Server, handler.New(athenz))),
 	}, nil
 }
 
 // Start returns an error slice channel. This error channel reports the errors inside Garm server.
 func (g *garm) Start(ctx context.Context) chan []error {
 	if g.token != nil {
+		// TODO: Does this have to be here? or it can be simply started during the initialization?:
 		g.token.StartTokenUpdater(ctx)
-	} // TODO: Does this have to be here?
+	}
 	return g.server.ListenAndServe(ctx)
 }
