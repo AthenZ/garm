@@ -41,7 +41,7 @@ type CertReloader struct {
 	keyPEM       []byte
 	mtime        time.Time
 	pollInterval time.Duration
-	stop chan struct{}
+	stop         chan struct{}
 }
 
 // GetCertFromCache returns the latest known certificate.
