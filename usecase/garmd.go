@@ -47,7 +47,7 @@ func New(cfg config.Config) (GarmDaemon, error) {
 	logger := service.NewLogger(cfg.Logger)
 	useX509Mode := cfg.X509.Cert != "" && cfg.X509.Key != ""
 	// Log out here:
-	glg.Info("Garm is starting with X.509 mode=", useX509Mode)
+	glg.Info("Garm is starting with X.509 mode[", useX509Mode, "] ...")
 
 	resolver := service.NewResolver(cfg.Mapping)
 	// set up mappers:
