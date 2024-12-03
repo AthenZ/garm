@@ -153,14 +153,10 @@ func (w *CertReloader) pollRefresh() error {
 
 // CertReloaderCfg contains the config for cert reload.
 type CertReloaderCfg struct {
-	// if init mode: if it fails to read from cert/key files, it will return error.
-	// if non-init mode: it will keep using the cache if it fails to read from cert/key files.
-	// Init     bool
-	CertPath     string // the cert file path i.e) /var/run/athenz/tls.cert
-	KeyPath      string // the key file path i.e) /var/run/athenz/tls.key
-	AthenzRootCa string // the root CA file path i.e) /var/run/athenz/root_ca.pem
-	// Logger       logger        // custom log function for errors, optional
-	PollInterval time.Duration // TODO: Comment me
+	CertPath     string        // path to the X.509 certificate file i.e) /var/run/athenz/tls.crt
+	KeyPath      string        // path to the X.509 certificate key i.e) /var/run/athenz/tls.key
+	AthenzRootCa string        // the root CA file path i.e) /var/run/athenz/root_ca.pem
+	PollInterval time.Duration // duration between consecutive reads of the certificate and key file i.e) 10s, 30m, 24h
 }
 
 // NewCertReloader returns a CertReloader that reloads the (key, cert) pair whenever

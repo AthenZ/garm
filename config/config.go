@@ -142,9 +142,9 @@ type Athenz struct {
 
 // X509Config represents X.509 certificate and its key path for connecting to Athenz.
 type X509Config struct {
-	Cert         string `yaml:"cert"`
-	Key          string `yaml:"key"`
-	PollInterval string `yaml:"poll_interval"` // interval between reading certificate i.e) 10s, 30m ...
+	Cert         string `yaml:"cert"`          // path to the X.509 certificate file i.e) /var/run/athenz/tls.crt
+	Key          string `yaml:"key"`           // path to the X.509 certificate key i.e) /var/run/athenz/tls.key
+	PollInterval string `yaml:"poll_interval"` // duration between consecutive reads of the certificate and key file i.e) 10s, 30m, 24h
 }
 
 // Token represents the token generation details or the n-token file for Copper Argos.
