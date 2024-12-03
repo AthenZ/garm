@@ -22,6 +22,7 @@ import (
 	"github.com/AthenZ/garm/v3/handler"
 	"github.com/AthenZ/garm/v3/router"
 	"github.com/AthenZ/garm/v3/service"
+	"github.com/kpango/glg"
 	"github.com/pkg/errors"
 )
 
@@ -43,13 +44,15 @@ type garm struct {
 // The daemon contains a token service authentication and authorization server.
 // This function will also initialize the mapping rules for the authentication and authorization check.
 func New(cfg config.Config) (GarmDaemon, error) {
+	logger := service.NewLogger(cfg.Logger)
 	useX509Mode := cfg.X509.Cert != "" && cfg.X509.Key != ""
+	// Log out here:
+	glg.Info("Garm is starting with X.509 mode=", useX509Mode)
 
 	var token service.TokenService
 	var certReloader *service.CertReloader
 	var athenz service.Athenz
 	var err error
-	logger := service.NewLogger(cfg.Logger)
 
 	if useX509Mode {
 		certReloader, err = service.NewCertReloader(service.CertReloaderCfg{
