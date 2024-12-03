@@ -36,13 +36,11 @@ type CertReloader struct {
 	l            sync.RWMutex
 	certFile     string
 	keyFile      string
-	athenzRootCA string
 	cert         *tls.Certificate
 	certPEM      []byte
 	keyPEM       []byte
 	mtime        time.Time
 	pollInterval time.Duration
-	// logger       logger
 	stop chan struct{}
 }
 
