@@ -191,6 +191,7 @@ func NewCertReloader(config CertReloaderCfg) (*CertReloader, error) {
 	// }
 
 	// log configs:
+	// TODO: Possibly a better logger:
 	glg.Info("CertPath: %s KeyPath: %s, RootCA [%s]", config.CertPath, config.KeyPath, config.AthenzRootCa)
 
 	if config.CertPath == "" || config.KeyPath == "" {

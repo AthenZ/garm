@@ -85,6 +85,8 @@ func NewTokenService(cfg config.Token) (TokenService, error) {
 // StartTokenUpdater returns a TokenService.
 // It starts a go routine to update the token periodically.
 func (t *token) StartTokenUpdater(ctx context.Context) TokenService {
+	glg.Info("Starting ntoken updater with refresh duration[", t.refreshDuration, "] ...")
+
 	go func() {
 		err := t.update()
 		if err != nil {
