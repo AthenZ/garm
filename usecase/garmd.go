@@ -22,7 +22,6 @@ import (
 	"github.com/AthenZ/garm/v3/handler"
 	"github.com/AthenZ/garm/v3/router"
 	"github.com/AthenZ/garm/v3/service"
-	"github.com/kpango/glg"
 	"github.com/pkg/errors"
 )
 
@@ -33,7 +32,7 @@ type GarmDaemon interface {
 
 type garm struct {
 	cfg    config.Config
-	token  service.TokenService // becomes nil if config "X509Config" is provided by user
+	token  service.TokenService
 	athenz service.Athenz
 	server service.Server
 }
@@ -42,50 +41,22 @@ type garm struct {
 // The daemon contains a token service authentication and authorization server.
 // This function will also initialize the mapping rules for the authentication and authorization check.
 func New(cfg config.Config) (GarmDaemon, error) {
-	logger := service.NewLogger(cfg.Logger)
-	useX509Mode := cfg.X509.Cert != "" && cfg.X509.Key != ""
-	// Log out here:
-	glg.Info("Garm is starting with X.509 mode[", useX509Mode, "] ...")
+	token, err := service.NewTokenService(cfg.Token)
+	if err != nil {
+		return nil, errors.Wrap(err, "token service instantiate failed")
+	}
 
 	resolver := service.NewResolver(cfg.Mapping)
-	// set up mappers:
+	// set up mapper
 	cfg.Athenz.AuthZ.Mapper = service.NewResourceMapper(resolver)
 	cfg.Athenz.AuthN.Mapper = service.NewUserMapper(resolver)
 
-	var token service.TokenService
-	var athenz service.Athenz
-	var err error
+	// set token source (function pointer)
+	cfg.Athenz.AuthZ.Token = token.GetToken
 
-	if useX509Mode {
-		certReloader, err := service.NewCertReloader(service.CertReloaderCfg{
-			CertPath:     cfg.X509.Cert,
-			KeyPath:      cfg.X509.Key,
-			PollInterval: time.Second, // TODO: Is this correct that we fix the poll interval?
-			AthenzRootCa: cfg.Athenz.AthenzRootCA,
-		})
-		if err != nil {
-			return nil, errors.Wrap(err, "cert reloader instantiate failed")
-		}
-
-		// Create Athenz object for X.509:
-		athenz, err = service.NewX509Athenz(cfg.Athenz, certReloader.GetWebhook(), logger)
-		if err != nil {
-			return nil, errors.Wrap(err, "athenz service instantiate failed")
-		}
-	} else {
-		token, err = service.NewTokenService(cfg.Token)
-		if err != nil {
-			return nil, errors.Wrap(err, "token service instantiate failed")
-		}
-
-		// set token source (function pointer):
-		cfg.Athenz.AuthZ.Token = token.GetToken
-
-		// Create Athenz object:
-		athenz, err = service.NewAthenz(cfg.Athenz, logger)
-		if err != nil {
-			return nil, errors.Wrap(err, "athenz service instantiate failed")
-		}
+	athenz, err := service.NewAthenz(cfg.Athenz, service.NewLogger(cfg.Logger))
+	if err != nil {
+		return nil, errors.Wrap(err, "athenz service instantiate failed")
 	}
 
 	return &garm{
@@ -96,11 +67,43 @@ func New(cfg config.Config) (GarmDaemon, error) {
 	}, nil
 }
 
+func NewX509(cfg config.Config) (GarmDaemon, error) {
+	certReloader, err := service.NewCertReloader(service.CertReloaderCfg{
+		CertPath:     cfg.X509.Cert,
+		KeyPath:      cfg.X509.Key,
+		PollInterval: time.Second, // TODO: Is this correct that we fix the poll interval?
+		AthenzRootCa: cfg.Athenz.AthenzRootCA,
+	})
+	if err != nil {
+		return nil, errors.Wrap(err, "cert reloader instantiate failed")
+	}
+
+	resolver := service.NewResolver(cfg.Mapping)
+	// set up mapper
+	cfg.Athenz.AuthZ.Mapper = service.NewResourceMapper(resolver)
+	cfg.Athenz.AuthN.Mapper = service.NewUserMapper(resolver)
+
+	// Create Athenz object for X.509:
+	athenz, err := service.NewX509Athenz(cfg.Athenz, certReloader.GetWebhook(), service.NewLogger(cfg.Logger))
+	if err != nil {
+		return nil, errors.Wrap(err, "athenz service instantiate failed")
+	}
+
+	return &garm{
+		cfg:    cfg,
+		token:  nil, // token (ntoken) is not used
+		athenz: athenz,
+		server: service.NewServer(cfg.Server, router.New(cfg.Server, handler.New(athenz))),
+	}, nil
+}
+
 // Start returns an error slice channel. This error channel reports the errors inside Garm server.
 func (g *garm) Start(ctx context.Context) chan []error {
+	// TODO: Does this have to be here? or it can be simply started during the initialization?:
+	// TODO: Prolly yes.
 	if g.token != nil {
-		// TODO: Does this have to be here? or it can be simply started during the initialization?:
 		g.token.StartTokenUpdater(ctx)
 	}
+
 	return g.server.ListenAndServe(ctx)
 }
