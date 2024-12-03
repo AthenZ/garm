@@ -70,7 +70,7 @@ func New(cfg config.Config) (GarmDaemon, error) {
 func NewX509(cfg config.Config) (GarmDaemon, error) {
 	pollInterval, err := time.ParseDuration(cfg.X509.PollInterval)
 	if err != nil {
-		return nil, errors.Wrap(err, "config invalid .x509.poll_interval ["+cfg.X509.PollInterval+"]")
+		return nil, errors.Wrap(err, "invalid 	config .x509.poll_interval ["+cfg.X509.PollInterval+"]")
 	}
 
 	certReloader, err := service.NewCertReloader(service.CertReloaderCfg{

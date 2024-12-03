@@ -67,7 +67,7 @@ func run(cfg config.Config) []error {
 
 	// Check if X.509 cert mode:
 	useX509Mode := cfg.X509.Cert != "" && cfg.X509.Key != ""
-	glg.Info("Garm is starting with X.509 mode[", useX509Mode, "] ...")
+	glg.Infof("Garm is starting with X.509 mode[%b] ...", useX509Mode)
 
 	var daemon usecase.GarmDaemon
 	var daemonErr error
