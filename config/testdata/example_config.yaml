@@ -20,8 +20,9 @@ athenz:
   timeout: 5s
   root_ca: _root_ca_
 x509:
-  cert_path: "wrongful-path"
-  key_path: "wrongful-path"
+  cert: ""
+  key: ""
+  poll_interval: ""
 token:
   athenz_domain: _athenz_domain_
   service_name: _athenz_service_
