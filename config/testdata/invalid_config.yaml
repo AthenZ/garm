@@ -19,7 +19,6 @@ auth_header: Athenz-Principal-Auth
   url: https://www.athenz.io/zts/v1
   timeout: 5s
 root_ca: root_ca
-x509:
   path_cert: ""
   path_key: ""
 token:

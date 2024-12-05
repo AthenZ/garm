@@ -68,14 +68,15 @@ func New(cfg config.Config) (GarmDaemon, error) {
 }
 
 func NewX509(cfg config.Config) (GarmDaemon, error) {
-	pollInterval, err := time.ParseDuration(cfg.X509.PollInterval)
+	pollInterval, err := time.ParseDuration(cfg.Athenz.PollInterval)
 	if err != nil {
-		return nil, errors.Wrap(err, "invalid 	config .x509.poll_interval ["+cfg.X509.PollInterval+"]")
+		return nil, errors.Wrap(err, "invalid 	config .athenz.poll_interval ["+cfg.Athenz.PollInterval+"]")
 	}
 
 	certReloader, err := service.NewCertReloader(service.CertReloaderCfg{
-		CertPath:     cfg.X509.Cert,
-		KeyPath:      cfg.X509.Key,
+		CertPath: cfg.Athenz.Cert,
+		KeyPath:  cfg.Athenz.Key,
+		// TODO: Root CA
 		PollInterval: pollInterval,
 	})
 	if err != nil {

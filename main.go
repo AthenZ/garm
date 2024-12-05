@@ -69,7 +69,7 @@ func run(cfg config.Config) []error {
 	var daemon usecase.GarmDaemon
 	var daemonErr error
 
-	if cfg.X509.Cert != "" && cfg.X509.Key != "" { // useX509Mode := cfg.X509.Cert != "" && cfg.X509.Key != ""
+	if cfg.Athenz.Cert != "" && cfg.Athenz.Key != "" { // useX509Mode := cfg.Athenz.Cert != "" && cfg.Athenz.Key != ""
 		// TODO: Add log here instead:
 		glg.Info("🟡 TODO: Add me a good log ...")
 		daemon, daemonErr = usecase.NewX509(cfg)

@@ -57,9 +57,6 @@ type Config struct {
 	// Athenz represents Athenz configuration for Garm to connect to Athenz server.
 	Athenz Athenz `yaml:"athenz"`
 
-	// X509 represents 3rd party generated x509 certificate for connecting to Athenz.
-	X509 X509Config `yaml:"x509"`
-
 	// Token represents configuration to generate n-token for connecting to Athenz.
 	Token Token `yaml:"token"`
 
@@ -127,8 +124,17 @@ type Athenz struct {
 	// Timeout represents the request timeout duration to Athenz server.
 	Timeout string `yaml:"timeout"`
 
+	// path to the X.509 certificate file i.e) /var/run/athenz/tls.crt
+	Cert string `yaml:"cert"`
+
+	// path to the X.509 certificate key i.e) /var/run/athenz/tls.key
+	Key string `yaml:"key"`
+
 	// AthenzRootCA is the Athenz root CA certificate file path for connecting to Athenz.
 	AthenzRootCA string `yaml:"root_ca"`
+
+	// duration between consecutive reads of the CA, certificate and key file i.e) 10s, 30m, 24h
+	PollInterval string `yaml:"poll_interval"`
 
 	// AuthN represents the authentication configuration.
 	AuthN webhook.AuthenticationConfig
@@ -138,13 +144,6 @@ type Athenz struct {
 
 	// Config is the common configuration for authentication and authorization server.
 	Config webhook.Config
-}
-
-// X509Config represents X.509 certificate and its key path for connecting to Athenz.
-type X509Config struct {
-	Cert         string `yaml:"cert"`          // path to the X.509 certificate file i.e) /var/run/athenz/tls.crt
-	Key          string `yaml:"key"`           // path to the X.509 certificate key i.e) /var/run/athenz/tls.key
-	PollInterval string `yaml:"poll_interval"` // duration between consecutive reads of the certificate and key file i.e) 10s, 30m, 24h
 }
 
 // Token represents the token generation details or the n-token file for Copper Argos.

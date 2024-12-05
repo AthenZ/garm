@@ -18,10 +18,9 @@ athenz:
   auth_header: Athenz-Principal-Auth
   url: https://www.athenz.com/zts/v1
   timeout: 5s
-  root_ca: _root_ca_
-x509:
   cert: ""
   key: ""
+  root_ca: _root_ca_
   poll_interval: ""
 token:
   athenz_domain: _athenz_domain_

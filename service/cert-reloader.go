@@ -129,15 +129,16 @@ func (w *CertReloader) pollRefresh() error {
 
 // CertReloaderCfg contains the config for cert reload.
 type CertReloaderCfg struct {
-	CertPath     string        // path to the X.509 certificate file i.e) /var/run/athenz/tls.crt
-	KeyPath      string        // path to the X.509 certificate key i.e) /var/run/athenz/tls.key
+	CertPath string // path to the X.509 certificate file i.e) /var/run/athenz/tls.crt
+	KeyPath  string // path to the X.509 certificate key i.e) /var/run/athenz/tls.key
+	// TODO: RootCA Path string
 	PollInterval time.Duration // duration between consecutive reads of the certificate and key file i.e) 10s, 30m, 24h
 }
 
 // NewCertReloader returns a CertReloader that reloads the (key, cert) pair whenever
 // the cert file changes on the filesystem.
 func NewCertReloader(config CertReloaderCfg) (*CertReloader, error) {
-	glg.Infof("Booting X.509 certificate reloader with arg .x509.cert[%s] .x509.key[%s] .x509.poll_interval[%s]", config.CertPath, config.KeyPath, config.PollInterval)
+	glg.Infof("Booting X.509 certificate reloader with arg .athenz.cert[%s] .athenz.key[%s] .athenz.poll_interval[%s]", config.CertPath, config.KeyPath, config.PollInterval)
 
 	if config.CertPath == "" || config.KeyPath == "" {
 		return nil, fmt.Errorf("both cert [%s] and key file [%s] paths are required for CertReloader", config.CertPath, config.KeyPath)
