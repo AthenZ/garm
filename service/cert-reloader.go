@@ -14,7 +14,8 @@
 
 // TODO: This code is based on athenz/k8s-athenz-sia's implementation:
 // TODO: https://github.com/AthenZ/k8s-athenz-sia/blob/main/pkg/util/cert-reloader.go
-// TODO: Yet, the original code is tailored specifically to k8s-athenz-sia's logic.
+// TODO: Yet, the original code is tailored specifically to k8s-athenz-sia's logic
+// TODO: So we could not copy the k8s-athenz-sia's cert-reloader code as is.
 // TODO: It would be beneficial to develop a more general-purpose library for this functionality in the future.
 // TODO: This way, both Garm and k8s-athenz-sia could utilize the same library.
 package service
