@@ -42,9 +42,11 @@ type CertReloader struct {
 	l            sync.RWMutex
 	certPath     string
 	keyPath      string
+	caPath       string
 	cert         *tls.Certificate
 	certPEM      []byte
 	keyPEM       []byte
+	caPEM        []byte // TODO: Actually store it and return in GetWebhook
 	mtime        time.Time
 	pollInterval time.Duration
 	stop         chan struct{}
@@ -129,9 +131,9 @@ func (w *CertReloader) pollRefresh() error {
 
 // CertReloaderCfg contains the config for cert reload.
 type CertReloaderCfg struct {
-	CertPath string // path to the X.509 certificate file i.e) /var/run/athenz/tls.crt
-	KeyPath  string // path to the X.509 certificate key i.e) /var/run/athenz/tls.key
-	// TODO: RootCA Path string
+	CertPath     string        // path to the X.509 certificate file i.e) /var/run/athenz/tls.crt
+	KeyPath      string        // path to the X.509 certificate key i.e) /var/run/athenz/tls.key
+	CaPath       string        // path to the X.509 CA file i.e) /var/run/athenz/ca.crt
 	PollInterval time.Duration // duration between consecutive reads of the certificate and key file i.e) 10s, 30m, 24h
 }
 
@@ -149,9 +151,9 @@ func NewCertReloader(config CertReloaderCfg) (*CertReloader, error) {
 	}
 
 	r := &CertReloader{
-		certPath: config.CertPath,
-		keyPath:  config.KeyPath,
-		// logger:       config.Logger,
+		certPath:     config.CertPath,
+		keyPath:      config.KeyPath,
+		caPath:       config.CaPath,
 		pollInterval: config.PollInterval,
 		stop:         make(chan struct{}, 10),
 	}

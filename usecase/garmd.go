@@ -74,9 +74,9 @@ func NewX509(cfg config.Config) (GarmDaemon, error) {
 	}
 
 	certReloader, err := service.NewCertReloader(service.CertReloaderCfg{
-		CertPath: cfg.Athenz.Cert,
-		KeyPath:  cfg.Athenz.Key,
-		// TODO: Root CA
+		CertPath:     cfg.Athenz.Cert,
+		KeyPath:      cfg.Athenz.Key,
+		CaPath:       cfg.Athenz.AthenzRootCA,
 		PollInterval: pollInterval,
 	})
 	if err != nil {
