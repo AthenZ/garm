@@ -420,7 +420,7 @@ func TestGetVersion(t *testing.T) {
 	}{
 		{
 			name: "Test get version return garm version",
-			want: "v2.0.0",
+			want: "v2.1.0",
 		},
 	}
 	for _, tt := range tests {
