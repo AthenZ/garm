@@ -40,8 +40,8 @@ type LogFn func(format string, args ...interface{})
 // the cert file is updated.
 type CertReloader struct {
 	l            sync.RWMutex
-	certFile     string
-	keyFile      string
+	certPath     string
+	keyPath      string
 	cert         *tls.Certificate
 	certPEM      []byte
 	keyPEM       []byte
@@ -82,24 +82,24 @@ func (w *CertReloader) Close() error {
 // loadLocalCertAndKey loads cert & its key from local filesystem and update its own cache if the file has changed.
 // Used to be called as "maybeReload"
 func (w *CertReloader) loadLocalCertAndKey() error {
-	st, err := os.Stat(w.certFile)
+	st, err := os.Stat(w.certPath)
 	if err != nil {
-		return errors.Wrap(err, fmt.Sprintf("unable to stat %s", w.certFile))
+		return errors.Wrap(err, fmt.Sprintf("unable to stat %s", w.certPath))
 	}
 	if !st.ModTime().After(w.mtime) {
 		return nil
 	}
-	cert, err := tls.LoadX509KeyPair(w.certFile, w.keyFile)
+	cert, err := tls.LoadX509KeyPair(w.certPath, w.keyPath)
 	if err != nil {
-		return errors.Wrap(err, fmt.Sprintf("unable to load cert from %s,%s", w.certFile, w.keyFile))
+		return errors.Wrap(err, fmt.Sprintf("unable to load cert from %s,%s", w.certPath, w.keyPath))
 	}
-	certPEM, err := os.ReadFile(w.certFile)
+	certPEM, err := os.ReadFile(w.certPath)
 	if err != nil {
-		return errors.Wrap(err, fmt.Sprintf("unable to load cert from %s", w.certFile))
+		return errors.Wrap(err, fmt.Sprintf("unable to load cert from %s", w.certPath))
 	}
-	keyPEM, err := os.ReadFile(w.keyFile)
+	keyPEM, err := os.ReadFile(w.keyPath)
 	if err != nil {
-		return errors.Wrap(err, fmt.Sprintf("unable to load key from %s", w.keyFile))
+		return errors.Wrap(err, fmt.Sprintf("unable to load key from %s", w.keyPath))
 	}
 	w.l.Lock()
 	w.cert = &cert
@@ -108,7 +108,7 @@ func (w *CertReloader) loadLocalCertAndKey() error {
 	w.mtime = st.ModTime()
 	w.l.Unlock()
 
-	glg.Infof("Successfully loaded X.509 certificate [%s] and its key [%s] from local file", w.certFile, w.keyFile)
+	glg.Infof("Successfully loaded X.509 certificate [%s] and its key [%s] from local file", w.certPath, w.keyPath)
 	return nil
 }
 
@@ -119,7 +119,7 @@ func (w *CertReloader) pollRefresh() error {
 		select {
 		case <-poll.C:
 			if err := w.loadLocalCertAndKey(); err != nil {
-				glg.Warnf("Failed to load X.509 certificate [%s] and its key [%s] from local file", w.certFile, w.keyFile)
+				glg.Warnf("Failed to load X.509 certificate [%s] and its key [%s] from local file", w.certPath, w.keyPath)
 			}
 		case <-w.stop:
 			return nil
@@ -149,8 +149,8 @@ func NewCertReloader(config CertReloaderCfg) (*CertReloader, error) {
 	}
 
 	r := &CertReloader{
-		certFile: config.CertPath,
-		keyFile:  config.KeyPath,
+		certPath: config.CertPath,
+		keyPath:  config.KeyPath,
 		// logger:       config.Logger,
 		pollInterval: config.PollInterval,
 		stop:         make(chan struct{}, 10),
