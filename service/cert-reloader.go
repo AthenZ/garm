@@ -25,7 +25,6 @@ import (
 	"crypto/x509"
 	"fmt"
 	"os"
-	"strings"
 	"sync"
 	"time"
 
@@ -48,7 +47,7 @@ type CertReloader struct {
 	cert         *tls.Certificate
 	certPEM      []byte
 	keyPEM       []byte
-	caPool       *x509.CertPool
+	caPool       *x509.CertPool // This is optional and can be nil
 	mtime        time.Time
 	pollInterval time.Duration
 	stop         chan struct{}
@@ -84,17 +83,27 @@ func (w *CertReloader) Close() error {
 	return nil
 }
 
-// checkPrefixAndSuffix checks if the given string has given prefix and suffix.
-func checkPrefixAndSuffix(str, pref, suf string) bool {
-	return strings.HasPrefix(str, pref) && strings.HasSuffix(str, suf)
-}
-
-// GetActualValue returns the environment variable value if the given val has "_" prefix and suffix, otherwise returns val directly.
-func GetActualValue(val string) string {
-	if checkPrefixAndSuffix(val, "_", "_") {
-		return os.Getenv(strings.TrimPrefix(strings.TrimSuffix(val, "_"), "_"))
+// loadLocalCAPool loads the CA cert from the local filesystem and returns a CertPool.
+func (w *CertReloader) loadLocalCAPool() (*x509.CertPool, error) {
+	// CA is optional
+	if w.caPath == "" {
+		return nil, nil
 	}
-	return val
+
+	caPEM, err := os.ReadFile(w.caPath)
+	if err != nil {
+		return nil, errors.Wrap(err, fmt.Sprintf("unable to load ca cert from %s", w.caPath))
+	}
+
+	caPool, err := NewX509CertPool(w.caPath)
+	if err != nil {
+		return nil, errors.Wrap(err, "authorization x509 certpool error")
+	}
+
+	if !caPool.AppendCertsFromPEM(caPEM) {
+		return nil, errors.New("Certification Failed")
+	}
+	return caPool, nil
 }
 
 // loadLocalCertAndKey loads cert & its key from local filesystem and update its own cache if the file has changed.
@@ -119,10 +128,9 @@ func (w *CertReloader) loadLocalCertAndKey() error {
 	if err != nil {
 		return errors.Wrap(err, fmt.Sprintf("unable to load key from %s", w.keyPath))
 	}
-	// TODO: Maybe use the logic above!
-	caPool, err := NewX509CertPool(GetActualValue(w.caPath))
+	caPool, err := w.loadLocalCAPool()
 	if err != nil {
-		return errors.Wrap(err, "authorization x509 certpool error")
+		return err
 	}
 
 	w.l.Lock()
@@ -156,9 +164,12 @@ func (w *CertReloader) pollRefresh() error {
 type CertReloaderCfg struct {
 	CertPath string // path to the X.509 certificate file i.e) /var/run/athenz/tls.crt
 	KeyPath  string // path to the X.509 certificate key i.e) /var/run/athenz/tls.key
-	CaPath   string // path to the X.509 CA file i.e) /var/run/athenz/ca.crt (This is optional)
+	// path to the X.509 CA file i.e) /var/run/athenz/ca.crt
+	// This is optional and can be empty
+	// If empty, the reloader will not load the CA file.
+	CaPath string
 	// duration between consecutive reads of the certificate and key file i.e) 10s, 30m, 24h
-	// This is not optional as Garm is not aware how long the cert is valid for.
+	// This is not optional as the library is not aware how long the cert is valid for.
 	PollInterval time.Duration
 }
 
