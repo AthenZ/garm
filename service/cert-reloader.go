@@ -101,7 +101,7 @@ func (w *CertReloader) loadCAPool() error {
 	}
 
 	if !caPool.AppendCertsFromPEM(caPEM) {
-		return errors.New("Certification Failed")
+		return errors.New("appending ca certificate into ca pool has failed")
 	}
 
 	// Finally:
