@@ -70,12 +70,11 @@ func run(cfg config.Config) []error {
 	var daemonErr error
 
 	if cfg.Athenz.Cert != "" && cfg.Athenz.Key != "" { // useX509Mode := cfg.Athenz.Cert != "" && cfg.Athenz.Key != ""
-		// TODO: Add log here instead:
-		glg.Info("🟡 TODO: Add me a good log ...")
+		glg.Info("Garm will connect to the Athenz server using X.509 Certificate ...")
 		daemon, daemonErr = usecase.NewX509(cfg)
 	} else {
-		// TODO: Add log here instead:
-		glg.Info("🟡 TODO: Add me a good log ...")
+		glg.Info("Garm will connect to the Athenz server using an N-Token ...")
+		glg.Warn("If you want a more secure connection, you can prepare an X.509 Certificate and configure .athenz.cert and .athenz.key. Garm will then use the X.509 Certificate instead.")
 		daemon, daemonErr = usecase.New(cfg)
 	}
 
