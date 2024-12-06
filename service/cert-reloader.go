@@ -83,27 +83,30 @@ func (w *CertReloader) Close() error {
 	return nil
 }
 
-// loadLocalCAPool loads the CA cert from the local filesystem and returns a CertPool.
-func (w *CertReloader) loadLocalCAPool() (*x509.CertPool, error) {
+// loadCAPool reads the CA cert from the local filesystem and save into memory as "caPool"
+func (w *CertReloader) loadCAPool() error {
 	// CA is optional
 	if w.caPath == "" {
-		return nil, nil
+		return nil
 	}
 
 	caPEM, err := os.ReadFile(w.caPath)
 	if err != nil {
-		return nil, errors.Wrap(err, fmt.Sprintf("unable to load ca cert from %s", w.caPath))
+		return errors.Wrap(err, fmt.Sprintf("unable to load ca cert from %s", w.caPath))
 	}
 
 	caPool, err := NewX509CertPool(w.caPath)
 	if err != nil {
-		return nil, errors.Wrap(err, "authorization x509 certpool error")
+		return errors.Wrap(err, "authorization x509 certpool error")
 	}
 
 	if !caPool.AppendCertsFromPEM(caPEM) {
-		return nil, errors.New("Certification Failed")
+		return errors.New("Certification Failed")
 	}
-	return caPool, nil
+
+	// Finally:
+	w.caPool = caPool
+	return nil
 }
 
 // loadLocalCertAndKey loads cert & its key from local filesystem and update its own cache if the file has changed.
@@ -131,7 +134,7 @@ func (w *CertReloader) loadLocalCertAndKey() error {
 	if err != nil {
 		return errors.Wrap(err, fmt.Sprintf("unable to load key from %s", w.keyPath))
 	}
-	caPool, err := w.loadLocalCAPool()
+
 	if err != nil {
 		return err
 	}
@@ -140,7 +143,6 @@ func (w *CertReloader) loadLocalCertAndKey() error {
 	w.cert = &cert
 	w.certPEM = certPEM
 	w.keyPEM = keyPEM
-	w.caPool = caPool
 	w.mtime = st.ModTime()
 	w.l.Unlock()
 
@@ -196,6 +198,11 @@ func NewCertReloader(config CertReloaderCfg) (*CertReloader, error) {
 		caPath:       config.CaPath,
 		pollInterval: config.PollInterval,
 		stop:         make(chan struct{}, 10),
+	}
+
+	// Read CA only during the initialization:
+	if err := r.loadCAPool(); err != nil {
+		return nil, errors.Wrap(err, "failed to load CA pool")
 	}
 
 	// load file once during the initialization:
