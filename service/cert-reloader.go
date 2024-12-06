@@ -22,8 +22,10 @@ package service
 
 import (
 	"crypto/tls"
+	"crypto/x509"
 	"fmt"
 	"os"
+	"strings"
 	"sync"
 	"time"
 
@@ -46,7 +48,7 @@ type CertReloader struct {
 	cert         *tls.Certificate
 	certPEM      []byte
 	keyPEM       []byte
-	caPEM        []byte // TODO: Actually store it and return in GetWebhook
+	caPool       *x509.CertPool
 	mtime        time.Time
 	pollInterval time.Duration
 	stop         chan struct{}
@@ -71,6 +73,7 @@ func (w *CertReloader) GetWebhook() func() (*tls.Config, error) {
 		}
 		return &tls.Config{
 			Certificates: []tls.Certificate{*cert},
+			RootCAs:      w.caPool,
 		}, nil
 	}
 }
@@ -79,6 +82,19 @@ func (w *CertReloader) GetWebhook() func() (*tls.Config, error) {
 func (w *CertReloader) Close() error {
 	w.stop <- struct{}{}
 	return nil
+}
+
+// checkPrefixAndSuffix checks if the given string has given prefix and suffix.
+func checkPrefixAndSuffix(str, pref, suf string) bool {
+	return strings.HasPrefix(str, pref) && strings.HasSuffix(str, suf)
+}
+
+// GetActualValue returns the environment variable value if the given val has "_" prefix and suffix, otherwise returns val directly.
+func GetActualValue(val string) string {
+	if checkPrefixAndSuffix(val, "_", "_") {
+		return os.Getenv(strings.TrimPrefix(strings.TrimSuffix(val, "_"), "_"))
+	}
+	return val
 }
 
 // loadLocalCertAndKey loads cert & its key from local filesystem and update its own cache if the file has changed.
@@ -103,10 +119,17 @@ func (w *CertReloader) loadLocalCertAndKey() error {
 	if err != nil {
 		return errors.Wrap(err, fmt.Sprintf("unable to load key from %s", w.keyPath))
 	}
+	// TODO: Maybe use the logic above!
+	caPool, err := NewX509CertPool(GetActualValue(w.caPath))
+	if err != nil {
+		return errors.Wrap(err, "authorization x509 certpool error")
+	}
+
 	w.l.Lock()
 	w.cert = &cert
 	w.certPEM = certPEM
 	w.keyPEM = keyPEM
+	w.caPool = caPool
 	w.mtime = st.ModTime()
 	w.l.Unlock()
 
