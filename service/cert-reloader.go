@@ -135,10 +135,6 @@ func (w *CertReloader) loadLocalCertAndKey() error {
 		return errors.Wrap(err, fmt.Sprintf("unable to load key from %s", w.keyPath))
 	}
 
-	if err != nil {
-		return err
-	}
-
 	w.l.Lock()
 	w.cert = &cert
 	w.certPEM = certPEM
