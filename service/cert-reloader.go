@@ -107,16 +107,16 @@ func (w *CertReloader) loadLocalCAPool() (*x509.CertPool, error) {
 }
 
 // loadLocalCertAndKey loads cert & its key from local filesystem and update its own cache if the file has changed.
-// Used to be called as "maybeReload"
+
 func (w *CertReloader) loadLocalCertAndKey() error {
-	glg.Debugf("Attempting to load .athenz.cert[%s] .athenz.key[%s] .athenz.root_ca[%s] from local file ...", w.certPath, w.keyPath, w.caPath)
+	// glg.Debugf("Attempting to load .athenz.cert[%s] .athenz.key[%s] .athenz.root_ca[%s] from local file ...", w.certPath, w.keyPath, w.caPath)
 	st, err := os.Stat(w.certPath)
 	if err != nil {
 		return errors.Wrap(err, fmt.Sprintf("unable to stat %s", w.certPath))
 	}
-	// This logic will only reload the cert if the file has changed; greatly improve the performance.
+
 	if !st.ModTime().After(w.mtime) {
-		glg.Debugf("Skipping to load .athenz.cert[%s] .athenz.key[%s] .athenz.root_ca[%s] from local file as it has not changed ...", w.certPath, w.keyPath, w.caPath)
+		// glg.Debugf("Skipping to load .athenz.cert[%s] .athenz.key[%s] .athenz.root_ca[%s] from local file as it has not changed ...", w.certPath, w.keyPath, w.caPath)
 		return nil
 	}
 	cert, err := tls.LoadX509KeyPair(w.certPath, w.keyPath)
@@ -149,7 +149,7 @@ func (w *CertReloader) loadLocalCertAndKey() error {
 }
 
 func (w *CertReloader) pollRefresh() error {
-	glg.Debugf("Starting periodic poll refresh for .athenz.cert[%s] .athenz.key[%s] .athenz.root_ca[%s] every[%s] ...", w.certPath, w.keyPath, w.caPath, w.pollInterval)
+	// glg.Debugf("Starting periodic poll refresh for .athenz.cert[%s] .athenz.key[%s] .athenz.root_ca[%s] every[%s] ...", w.certPath, w.keyPath, w.caPath, w.pollInterval)
 	poll := time.NewTicker(w.pollInterval)
 	defer poll.Stop()
 	for {
