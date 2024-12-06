@@ -22,7 +22,7 @@ data:
       url: https://www.athenz.io:4443/zts/v1
       timeout: 30s
       cert: ""
-      key: "":
+      key: ""
       root_ca: _root_ca_
       poll_interval: ""
     token:
