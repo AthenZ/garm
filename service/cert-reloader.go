@@ -131,10 +131,12 @@ func (w *CertReloader) pollRefresh() error {
 
 // CertReloaderCfg contains the config for cert reload.
 type CertReloaderCfg struct {
-	CertPath     string        // path to the X.509 certificate file i.e) /var/run/athenz/tls.crt
-	KeyPath      string        // path to the X.509 certificate key i.e) /var/run/athenz/tls.key
-	CaPath       string        // path to the X.509 CA file i.e) /var/run/athenz/ca.crt
-	PollInterval time.Duration // duration between consecutive reads of the certificate and key file i.e) 10s, 30m, 24h
+	CertPath string // path to the X.509 certificate file i.e) /var/run/athenz/tls.crt
+	KeyPath  string // path to the X.509 certificate key i.e) /var/run/athenz/tls.key
+	CaPath   string // path to the X.509 CA file i.e) /var/run/athenz/ca.crt (This is optional)
+	// duration between consecutive reads of the certificate and key file i.e) 10s, 30m, 24h
+	// This is not optional as Garm is not aware how long the cert is valid for.
+	PollInterval time.Duration
 }
 
 // NewCertReloader returns a CertReloader that reloads the (key, cert) pair whenever
