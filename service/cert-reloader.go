@@ -109,17 +109,17 @@ func (w *CertReloader) loadCAPool() error {
 	return nil
 }
 
-// loadLocalCertAndKey loads cert & its key from local filesystem and update its own cache if the file has changed.
+// loadLocalCertAndKey loads cert & its key from local filesystem and update only if the file has changed or it is the first time.
 
 func (w *CertReloader) loadLocalCertAndKey() error {
-	// glg.Debugf("Attempting to load .athenz.cert[%s] .athenz.key[%s] .athenz.root_ca[%s] from local file ...", w.certPath, w.keyPath, w.caPath)
+	// glg.Debugf("Attempting to load .athenz.cert[%s] .athenz.key[%s] from local file ...", w.certPath, w.keyPath)
 	st, err := os.Stat(w.certPath)
 	if err != nil {
 		return errors.Wrap(err, fmt.Sprintf("unable to stat %s", w.certPath))
 	}
 
 	if !st.ModTime().After(w.mtime) {
-		// glg.Debugf("Skipping to load .athenz.cert[%s] .athenz.key[%s] .athenz.root_ca[%s] from local file as it has not changed ...", w.certPath, w.keyPath, w.caPath)
+		// glg.Debugf("Skipping to load .athenz.cert[%s] .athenz.key[%s] from local file as it has not changed ...", w.certPath, w.keyPath)
 		return nil
 	}
 	cert, err := tls.LoadX509KeyPair(w.certPath, w.keyPath)
@@ -146,19 +146,19 @@ func (w *CertReloader) loadLocalCertAndKey() error {
 	w.mtime = st.ModTime()
 	w.l.Unlock()
 
-	glg.Infof("Successfully loaded .athenz.cert[%s] .athenz.key[%s] .athenz.root_ca[%s] from local file", w.certPath, w.keyPath, w.caPath)
+	glg.Infof("Successfully loaded .athenz.cert[%s] .athenz.key[%s] from local file", w.certPath, w.keyPath)
 	return nil
 }
 
 func (w *CertReloader) pollRefresh() error {
-	// glg.Debugf("Starting periodic poll refresh for .athenz.cert[%s] .athenz.key[%s] .athenz.root_ca[%s] every[%s] ...", w.certPath, w.keyPath, w.caPath, w.pollInterval)
+	// glg.Debugf("Starting periodic poll refresh for .athenz.cert[%s] .athenz.key[%s] every[%s] ...", w.certPath, w.keyPath, w.pollInterval)
 	poll := time.NewTicker(w.pollInterval)
 	defer poll.Stop()
 	for {
 		select {
 		case <-poll.C:
 			if err := w.loadLocalCertAndKey(); err != nil {
-				glg.Warnf("Failed to load .athenz.cert[%s] .athenz.key[%s] .athenz.root_ca[%s] from local file: %v", w.certPath, w.keyPath, w.caPath, err)
+				glg.Warnf("Failed to load .athenz.cert[%s] .athenz.key[%s] from local file: %v", w.certPath, w.keyPath, err)
 			}
 		case <-w.stop:
 			return nil
