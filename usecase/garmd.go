@@ -70,7 +70,7 @@ func New(cfg config.Config) (GarmDaemon, error) {
 func NewX509(cfg config.Config) (GarmDaemon, error) {
 	pollInterval, err := time.ParseDuration(cfg.Athenz.PollInterval)
 	if err != nil {
-		return nil, errors.Wrap(err, "invalid 	config .athenz.poll_interval ["+cfg.Athenz.PollInterval+"]")
+		return nil, errors.Wrap(err, "invalid config .athenz.poll_interval ["+cfg.Athenz.PollInterval+"]")
 	}
 
 	certReloader, err := service.NewCertReloader(service.CertReloaderCfg{
