@@ -141,7 +141,7 @@ func (w *CertReloader) loadLocalCertAndKey() error {
 	w.mtime = st.ModTime()
 	w.l.Unlock()
 
-	glg.Infof("Successfully loaded X.509 certificate [%s] and its key [%s] from local file", w.certPath, w.keyPath)
+	glg.Infof("Successfully loaded .athenz.cert[%s] .athenz.key[%s] .athenz.root_ca[%s] from local file", w.certPath, w.keyPath, w.caPath)
 	return nil
 }
 
@@ -152,7 +152,7 @@ func (w *CertReloader) pollRefresh() error {
 		select {
 		case <-poll.C:
 			if err := w.loadLocalCertAndKey(); err != nil {
-				glg.Warnf("Failed to load X.509 certificate [%s] and its key [%s] from local file", w.certPath, w.keyPath)
+				glg.Warnf("Failed to load .athenz.cert[%s] .athenz.key[%s] .athenz.root_ca[%s] from local file: %v", w.certPath, w.keyPath, w.caPath, err)
 			}
 		case <-w.stop:
 			return nil
@@ -176,7 +176,7 @@ type CertReloaderCfg struct {
 // NewCertReloader returns a CertReloader that reloads the (key, cert) pair whenever
 // the cert file changes on the filesystem.
 func NewCertReloader(config CertReloaderCfg) (*CertReloader, error) {
-	glg.Infof("Booting X.509 certificate reloader with arg .athenz.cert[%s] .athenz.key[%s] .athenz.poll_interval[%s]", config.CertPath, config.KeyPath, config.PollInterval)
+	glg.Infof("Booting X.509 certificate reloader with arg .athenz.cert[%s] .athenz.key[%s] .athenz.root_ca[%s] .athenz.poll_interval[%s]", config.CertPath, config.KeyPath, config.CaPath, config.PollInterval)
 
 	if config.CertPath == "" || config.KeyPath == "" {
 		return nil, fmt.Errorf("both cert [%s] and key file [%s] paths are required for CertReloader", config.CertPath, config.KeyPath)
