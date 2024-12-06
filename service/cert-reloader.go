@@ -146,6 +146,7 @@ func (w *CertReloader) loadLocalCertAndKey() error {
 }
 
 func (w *CertReloader) pollRefresh() error {
+	glg.Debugf("Starting to poll .athenz.cert[%s] .athenz.key[%s] .athenz.root_ca[%s] every[%s] ...", w.certPath, w.keyPath, w.caPath, w.pollInterval)
 	poll := time.NewTicker(w.pollInterval)
 	defer poll.Stop()
 	for {
