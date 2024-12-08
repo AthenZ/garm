@@ -30,7 +30,7 @@ import (
 
 const (
 	// currentVersion represents the configuration version.
-	currentVersion string = "v2.0.0"
+	currentVersion string = "v2.1.0"
 	// delimiter represents delimiter used to serialize RequestInfo. Must NOT use valid characters allowed in the all the fields of RequestInfo.
 	// Choose the delimiter that RequestInfo's verb, namespace, API Group, Resource and Name CANNOT use.
 	// i.e) If end user can set its resource name with hyphens, we cannot use hyphen as delimiter.
@@ -124,8 +124,17 @@ type Athenz struct {
 	// Timeout represents the request timeout duration to Athenz server.
 	Timeout string `yaml:"timeout"`
 
+	// path to the X.509 certificate file i.e) /var/run/athenz/tls.crt
+	Cert string `yaml:"cert"`
+
+	// path to the X.509 certificate key i.e) /var/run/athenz/tls.key
+	Key string `yaml:"key"`
+
 	// AthenzRootCA is the Athenz root CA certificate file path for connecting to Athenz.
 	AthenzRootCA string `yaml:"root_ca"`
+
+	// duration between consecutive reads of the CA, certificate and key file i.e) 10s, 30m, 24h
+	PollInterval string `yaml:"poll_interval"`
 
 	// AuthN represents the authentication configuration.
 	AuthN webhook.AuthenticationConfig
