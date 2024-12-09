@@ -89,7 +89,7 @@ func NewX509(cfg config.Config) (GarmDaemon, error) {
 	cfg.Athenz.AuthN.Mapper = service.NewUserMapper(resolver)
 
 	// Create Athenz object for X.509:
-	athenz, err := service.NewX509Athenz(cfg.Athenz, certReloader.GetWebhook(), service.NewLogger(cfg.Logger))
+	athenz, err := service.NewX509Athenz(cfg.Athenz, certReloader.GetTLSConfigFunc(), service.NewLogger(cfg.Logger))
 	if err != nil {
 		return nil, errors.Wrap(err, "athenz service instantiate failed")
 	}

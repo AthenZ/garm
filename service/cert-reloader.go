@@ -61,9 +61,9 @@ func (w *CertReloader) GetCertFromCache() (*tls.Certificate, error) {
 	return c, nil
 }
 
-// GetWebhook returns a function that is used to get X.509 Certificate stored in memory to connect to Athenz server
+// GetTLSConfigFunc returns a tls-config-returning-function that is used to get X.509 Certificate stored in memory to connect to Athenz server
 // type IdentityAthenzX509 = func() (*tls.Config, error)
-func (w *CertReloader) GetWebhook() func() (*tls.Config, error) {
+func (w *CertReloader) GetTLSConfigFunc() func() (*tls.Config, error) {
 	return func() (*tls.Config, error) {
 		cert, err := w.GetCertFromCache()
 
