@@ -2,7 +2,7 @@ apiVersion: v1
 data:
   config.yaml: |
     ---
-    version: v1.0.0
+    version: v2.1.0
     logger:
       log_path: /var/log/athenz/webhook.log
       log_trace: athenz,server
@@ -21,7 +21,10 @@ data:
       auth_header: Athenz-Principal-Auth
       url: https://www.athenz.io:4443/zts/v1
       timeout: 30s
+      cert: ""
+      key: ""
       root_ca: _root_ca_
+      poll_interval: ""
     token:
       athenz_domain: _athenz_domain_
       service_name: _service_name_
@@ -37,7 +40,7 @@ data:
         platform:
           name: k8s
           # service_athenz_domains:
-          #  - {{TLD}}.k8s.{{ENV}} # {{ENV}} = [prod, tool, dev]
+          # - {{TLD}}.k8s.{{ENV}} # {{ENV}} = [prod, tool, dev]
           service_athenz_domains:
             - k8s.k8s.dev
           resource_mappings:

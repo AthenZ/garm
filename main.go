@@ -65,9 +65,21 @@ func run(cfg config.Config) []error {
 		glg.Get().DisableColor()
 	}
 
-	daemon, err := usecase.New(cfg)
-	if err != nil {
-		return []error{errors.Wrap(err, "failed to instantiate daemon")}
+	// Check if X.509 cert mode:
+	var daemon usecase.GarmDaemon
+	var daemonErr error
+
+	if cfg.Athenz.Cert != "" && cfg.Athenz.Key != "" { // useX509Mode := cfg.Athenz.Cert != "" && cfg.Athenz.Key != ""
+		glg.Info("Garm will connect to the Athenz server using X.509 Certificate ...")
+		daemon, daemonErr = usecase.NewX509(cfg)
+	} else {
+		glg.Info("Garm will connect to the Athenz server using an N-Token ...")
+		glg.Warn("If you want a more secure connection, you can prepare an X.509 Certificate and configure .athenz.cert and .athenz.key. Garm will then use the X.509 Certificate instead.")
+		daemon, daemonErr = usecase.New(cfg)
+	}
+
+	if daemonErr != nil {
+		return []error{errors.Wrap(daemonErr, "failed to instantiate daemon")}
 	}
 
 	ctx, cancel := context.WithCancel(context.Background())
@@ -87,7 +99,7 @@ func run(cfg config.Config) []error {
 		select {
 		case <-sigCh:
 			cancel()
-			err = glg.Warn("garm server shutdown...")
+			err := glg.Warn("garm server shutdown...")
 			if err != nil {
 				glg.Fatal(err)
 			}
