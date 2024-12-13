@@ -40,13 +40,13 @@ type LogFn func(format string, args ...interface{})
 // CertReloader reloads the (key, cert) pair from the filesystem when
 // the cert file is updated.
 type CertReloader struct {
-	l            sync.RWMutex
-	certPath     string
-	keyPath      string
-	caPath       string
-	cert         *tls.Certificate
-	certPEM      []byte
-	keyPEM       []byte
+	l        sync.RWMutex
+	certPath string
+	keyPath  string
+	caPath   string
+	cert     *tls.Certificate
+	// certPEM      []byte
+	// keyPEM       []byte
 	caPool       *x509.CertPool // This is optional and can be nil
 	mtime        time.Time
 	pollInterval time.Duration
@@ -126,19 +126,20 @@ func (w *CertReloader) loadLocalCertAndKey() error {
 	if err != nil {
 		return errors.Wrap(err, fmt.Sprintf("unable to load cert from %s,%s", w.certPath, w.keyPath))
 	}
-	certPEM, err := os.ReadFile(w.certPath)
-	if err != nil {
-		return errors.Wrap(err, fmt.Sprintf("unable to load cert from %s", w.certPath))
-	}
-	keyPEM, err := os.ReadFile(w.keyPath)
-	if err != nil {
-		return errors.Wrap(err, fmt.Sprintf("unable to load key from %s", w.keyPath))
-	}
+	// TODO: I have this feeling that the following code does not care of reading files properly:
+	// certPEM, err := os.ReadFile(w.certPath)
+	// if err != nil {
+	// 	return errors.Wrap(err, fmt.Sprintf("unable to load cert from %s", w.certPath))
+	// }
+	// keyPEM, err := os.ReadFile(w.keyPath)
+	// if err != nil {
+	// 	return errors.Wrap(err, fmt.Sprintf("unable to load key from %s", w.keyPath))
+	// }
 
 	w.l.Lock()
 	w.cert = &cert
-	w.certPEM = certPEM
-	w.keyPEM = keyPEM
+	// w.certPEM = certPEM
+	// w.keyPEM = keyPEM
 	w.mtime = st.ModTime()
 	w.l.Unlock()
 
