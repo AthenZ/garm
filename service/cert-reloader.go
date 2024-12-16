@@ -126,7 +126,9 @@ func (w *CertReloader) loadLocalCertAndKey() error {
 	if err != nil {
 		return errors.Wrap(err, fmt.Sprintf("unable to load cert from %s,%s", w.certPath, w.keyPath))
 	}
-	// TODO: I have this feeling that the following code does not care of reading files properly:
+
+	// TODO: The following code potentially has the bug as the following issue describes:
+	// TODO: https://github.com/AthenZ/k8s-athenz-sia/issues/177
 	// certPEM, err := os.ReadFile(w.certPath)
 	// if err != nil {
 	// 	return errors.Wrap(err, fmt.Sprintf("unable to load cert from %s", w.certPath))
