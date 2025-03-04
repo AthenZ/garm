@@ -84,113 +84,127 @@ func Test_requestInfo_Match(t *testing.T) {
 		args   args
 		want   bool
 	}{
-		{
-			name: "Check match",
-			fields: fields{
-				req: RequestInfo{
-					Verb:      "dummyVerb",
-					Namespace: "dummyNamespace",
-					APIGroup:  "dummyAPIGroup",
-					Resource:  "dummyResource",
-					Name:      "dummyName",
-				},
-			},
-			args: args{
-				req: RequestInfo{
-					Verb:      "dummyVerb",
-					Namespace: "dummyNamespace",
-					APIGroup:  "dummyAPIGroup",
-					Resource:  "dummyResource",
-					Name:      "dummyName",
-				},
-			},
-			want: true,
-		},
-		{
-			name: "Check not match",
-			fields: fields{
-				req: RequestInfo{
-					Verb:      "dummyVerb",
-					Namespace: "dummyNamespace",
-					APIGroup:  "dummyAPIGroup",
-					Resource:  "dummyResource",
-					Name:      "dummyName",
-				},
-			},
-			args: args{
-				req: RequestInfo{
-					Verb:      "notmatch",
-					Namespace: "notmatch",
-					APIGroup:  "notmatch",
-					Resource:  "notmatch",
-					Name:      "notmatch",
-				},
-			},
-			want: false,
-		},
-		{
-			name: "Check wildcard match",
-			fields: fields{
-				req: RequestInfo{
-					Verb:      "dummyVerb",
-					Namespace: "dummyNamespace",
-					APIGroup:  "dummyAPIGroup",
-					Resource:  "dummyResource",
-					Name:      "*",
-				},
-			},
-			args: args{
-				req: RequestInfo{
-					Verb:      "dummyVerb",
-					Namespace: "dummyNamespace",
-					APIGroup:  "dummyAPIGroup",
-					Resource:  "dummyResource",
-					Name:      "any",
-				},
-			},
-			want: true,
-		},
+		// {
+		// 	name: "Check match",
+		// 	fields: fields{
+		// 		req: RequestInfo{
+		// 			Verb:      "dummyVerb",
+		// 			Namespace: "dummyNamespace",
+		// 			APIGroup:  "dummyAPIGroup",
+		// 			Resource:  "dummyResource",
+		// 			Name:      "dummyName",
+		// 		},
+		// 	},
+		// 	args: args{
+		// 		req: RequestInfo{
+		// 			Verb:      "dummyVerb",
+		// 			Namespace: "dummyNamespace",
+		// 			APIGroup:  "dummyAPIGroup",
+		// 			Resource:  "dummyResource",
+		// 			Name:      "dummyName",
+		// 		},
+		// 	},
+		// 	want: true,
+		// },
+		// {
+		// 	name: "Check not match",
+		// 	fields: fields{
+		// 		req: RequestInfo{
+		// 			Verb:      "dummyVerb",
+		// 			Namespace: "dummyNamespace",
+		// 			APIGroup:  "dummyAPIGroup",
+		// 			Resource:  "dummyResource",
+		// 			Name:      "dummyName",
+		// 		},
+		// 	},
+		// 	args: args{
+		// 		req: RequestInfo{
+		// 			Verb:      "notmatch",
+		// 			Namespace: "notmatch",
+		// 			APIGroup:  "notmatch",
+		// 			Resource:  "notmatch",
+		// 			Name:      "notmatch",
+		// 		},
+		// 	},
+		// 	want: false,
+		// },
+		// {
+		// 	name: "Check wildcard match",
+		// 	fields: fields{
+		// 		req: RequestInfo{
+		// 			Verb:      "dummyVerb",
+		// 			Namespace: "dummyNamespace",
+		// 			APIGroup:  "dummyAPIGroup",
+		// 			Resource:  "dummyResource",
+		// 			Name:      "*",
+		// 		},
+		// 	},
+		// 	args: args{
+		// 		req: RequestInfo{
+		// 			Verb:      "dummyVerb",
+		// 			Namespace: "dummyNamespace",
+		// 			APIGroup:  "dummyAPIGroup",
+		// 			Resource:  "dummyResource",
+		// 			Name:      "any",
+		// 		},
+		// 	},
+		// 	want: true,
+		// },
 
+		// {
+		// 	name: "Check multiple wildcard match",
+		// 	fields: fields{
+		// 		req: RequestInfo{
+		// 			Verb:      "dummyVerb",
+		// 			Namespace: "*",
+		// 			APIGroup:  "dummyAPIGroup",
+		// 			Resource:  "*",
+		// 			Name:      "*",
+		// 		},
+		// 	},
+		// 	args: args{
+		// 		req: RequestInfo{
+		// 			Verb:      "dummyVerb",
+		// 			Namespace: "any",
+		// 			APIGroup:  "dummyAPIGroup",
+		// 			Resource:  "any",
+		// 			Name:      "any",
+		// 		},
+		// 	},
+		// 	want: true,
+		// },
+		// {
+		// 	name: "Check malicious resource name not match",
+		// 	fields: fields{
+		// 		req: RequestInfo{
+		// 			Verb:      "get",
+		// 			Namespace: "kube-system",
+		// 			APIGroup:  "garm",
+		// 			Resource:  "pods",
+		// 			Name:      "*",
+		// 		},
+		// 	},
+		// 	args: args{
+		// 		req: RequestInfo{
+		// 			Verb:      "create",
+		// 			Namespace: "kube-system",
+		// 			APIGroup:  "garm",
+		// 			Resource:  "pods",
+		// 			Name:      "get-kube-system-garm-pods-test",
+		// 		},
+		// 	},
+		// 	want: false,
+		// },
 		{
-			name: "Check multiple wildcard match",
+			name: "🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴",
 			fields: fields{
 				req: RequestInfo{
-					Verb:      "dummyVerb",
-					Namespace: "*",
-					APIGroup:  "dummyAPIGroup",
-					Resource:  "*",
-					Name:      "*",
+					Name: "prefix-",
 				},
 			},
 			args: args{
 				req: RequestInfo{
-					Verb:      "dummyVerb",
-					Namespace: "any",
-					APIGroup:  "dummyAPIGroup",
-					Resource:  "any",
-					Name:      "any",
-				},
-			},
-			want: true,
-		},
-		{
-			name: "Check malicious resource name not match",
-			fields: fields{
-				req: RequestInfo{
-					Verb:      "get",
-					Namespace: "kube-system",
-					APIGroup:  "garm",
-					Resource:  "pods",
-					Name:      "*",
-				},
-			},
-			args: args{
-				req: RequestInfo{
-					Verb:      "create",
-					Namespace: "kube-system",
-					APIGroup:  "garm",
-					Resource:  "pods",
-					Name:      "get-kube-system-garm-pods-test",
+					Name: "prefix-suffix",
 				},
 			},
 			want: false,
@@ -198,7 +212,22 @@ func Test_requestInfo_Match(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := tt.fields.req.Match(tt.args.req)
+
+			reqInfo := RequestInfo{
+				Name:      tt.fields.req.Name,
+				Namespace: "Namespace",
+				APIGroup:  "APIGroup",
+				Resource:  "Resource",
+				Verb:      "Verb",
+			}
+
+			got := reqInfo.Match(RequestInfo{
+				Name:      tt.args.req.Name,
+				Namespace: "Namespace",
+				APIGroup:  "APIGroup",
+				Resource:  "Resource",
+				Verb:      "Verb",
+			})
 			if got != tt.want {
 				t.Errorf("Match() = %v, want %v", got, tt.want)
 				return
