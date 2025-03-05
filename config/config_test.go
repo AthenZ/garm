@@ -209,6 +209,48 @@ func Test_requestInfo_Match(t *testing.T) {
 			},
 			want: false,
 		},
+		{
+			name: "🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦",
+			fields: fields{
+				req: RequestInfo{
+					Name: "prefix-*",
+				},
+			},
+			args: args{
+				req: RequestInfo{
+					Name: "prefix-suffix",
+				},
+			},
+			want: true,
+		},
+		{
+			name: "🐤🐤🐤🐤🐤🐤🐤🐤🐤🐤🐤🐤🐤🐤🐤🐤🐤🐤",
+			fields: fields{
+				req: RequestInfo{
+					Name: "prefix.*",
+				},
+			},
+			args: args{
+				req: RequestInfo{
+					Name: "prefix-suffix",
+				},
+			},
+			want: false,
+		},
+		{
+			name: "⭐️⭐️⭐️⭐️⭐️⭐️⭐️⭐️⭐️⭐️⭐️⭐️⭐️⭐️⭐️⭐️⭐️⭐️",
+			fields: fields{
+				req: RequestInfo{
+					Name: "prefix.*suffix",
+				},
+			},
+			args: args{
+				req: RequestInfo{
+					Name: "prefix-suffix-incorrect",
+				},
+			},
+			want: false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

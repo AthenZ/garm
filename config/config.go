@@ -293,8 +293,11 @@ func (r *RequestInfo) Match(req RequestInfo) bool {
 			r.reg = regexp.MustCompile("")
 		} else {
 			r.reg = ass.ResourceRegexp
+			// print ass.ResourceRegexp:
 		}
 	})
+
+
 
 	return r.reg.Copy().MatchString(strings.ToLower(req.Serialize()))
 }
