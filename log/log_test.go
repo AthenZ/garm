@@ -54,7 +54,7 @@ func TestNew(t *testing.T) {
 			w := bytes.NewBuffer(nil)
 
 			got := New(w, tt.args.requestID)
-			got.Printf(tt.args.printValue)
+			got.Printf("%s", tt.args.printValue)
 
 			if gotW := w.String(); !strings.HasSuffix(gotW, tt.wantW) {
 				t.Errorf("New() = [%v], want [%v]", gotW, tt.wantW)
