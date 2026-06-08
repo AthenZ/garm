@@ -154,7 +154,7 @@ func (a *authorizer) useCacheEval(log Logger, principal string, checks []AthenzA
 	}
 	log.Println("Authorization decision using cache (true=authorized, false=not authorized): ", decision)
 	if len(errstrings) > 0 {
-		aggrError = fmt.Errorf(strings.Join(errstrings, "\n"))
+		aggrError = fmt.Errorf("%s", strings.Join(errstrings, "\n"))
 	}
 	if decision {
 		return &grantStatus{
