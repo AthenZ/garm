@@ -777,7 +777,7 @@ func TestRoutingUnsupportedMethodBodyLimit(t *testing.T) {
 							return nil
 						},
 					}
-					req := httptest.NewRequest(http.MethodPut, path, body)
+					req := httptest.NewRequestWithContext(context.Background(), http.MethodPut, path, body)
 					req.ContentLength = length
 					w := httptest.NewRecorder()
 					mux.ServeHTTP(w, req)
