@@ -149,7 +149,7 @@ func (w *CertReloader) loadLocalCertAndKey() error {
 	return nil
 }
 
-func (w *CertReloader) pollRefresh() error {
+func (w *CertReloader) pollRefresh() {
 	// glg.Debugf("Starting periodic poll refresh for .athenz.cert[%s] .athenz.key[%s] every[%s] ...", w.certPath, w.keyPath, w.pollInterval)
 	poll := time.NewTicker(w.pollInterval)
 	defer poll.Stop()
@@ -160,7 +160,7 @@ func (w *CertReloader) pollRefresh() error {
 				glg.Warnf("Failed to load .athenz.cert[%s] .athenz.key[%s] from local file: %v", w.certPath, w.keyPath, err)
 			}
 		case <-w.stop:
-			return nil
+			return
 		}
 	}
 }

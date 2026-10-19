@@ -19,7 +19,6 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"reflect"
@@ -33,19 +32,19 @@ import (
 	authz "k8s.io/api/authorization/v1"
 )
 
-// dummyLogger is a mock implementation for webhook.Logger
+// dummyLogger is a mock implementation for webhook.Logger.
 type dummyLogger string
 
-// Println is mock method for webhook.Logger interface
+// Println is mock method for webhook.Logger interface.
 func (dummyLogger) Println(args ...interface{}) {}
 
-// Printf is mock method for webhook.Logger interface
+// Printf is mock method for webhook.Logger interface.
 func (dummyLogger) Printf(format string, args ...interface{}) {}
 
-// dummyLogger is a mock implementation for webhook.ResourceMapper and webhook.UserMapper
+// dummyLogger is a mock implementation for webhook.ResourceMapper and webhook.UserMapper.
 type dummyMapper string
 
-// MapResource is mock method for webhook.ResourceMapper interface
+// MapResource is mock method for webhook.ResourceMapper interface.
 func (dummyMapper) MapResource(ctx context.Context, spec authz.SubjectAccessReviewSpec) (principal string, checks []webhook.AthenzAccessCheck, err error) {
 	principal = "principal"
 	checks = []webhook.AthenzAccessCheck{
@@ -62,7 +61,7 @@ func (dummyMapper) MapResource(ctx context.Context, spec authz.SubjectAccessRevi
 	return
 }
 
-// MapUser is mock method for webhook.UserMapper interface
+// MapUser is mock method for webhook.UserMapper interface.
 func (dummyMapper) MapUser(ctx context.Context, domain, service string) (authn.UserInfo, error) {
 	return authn.UserInfo{
 		Username: "username",
@@ -289,7 +288,7 @@ func Test_athenz_AthenzAuthenticator(t *testing.T) {
 			name: "Check AthenzAuthenticator success",
 			fields: fields{
 				authn: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-					body, err := ioutil.ReadAll(r.Body)
+					body, err := io.ReadAll(r.Body)
 					if err != nil {
 						http.Error(w, err.Error(), http.StatusInternalServerError)
 						return
@@ -305,7 +304,7 @@ func Test_athenz_AthenzAuthenticator(t *testing.T) {
 			},
 			args: args{
 				w: httptest.NewRecorder(),
-				r: httptest.NewRequest("POST", "http://dummy.url", bytes.NewBufferString("dummy athenz authenticator request body")),
+				r: httptest.NewRequestWithContext(context.Background(), "POST", "http://dummy.url", bytes.NewBufferString("dummy athenz authenticator request body")),
 			},
 			wantError: nil,
 			want: &httptest.ResponseRecorder{
@@ -323,7 +322,7 @@ func Test_athenz_AthenzAuthenticator(t *testing.T) {
 			},
 			args: args{
 				w: httptest.NewRecorder(),
-				r: httptest.NewRequest("GET", "http://dummy.url", nil),
+				r: httptest.NewRequestWithContext(context.Background(), "GET", "http://dummy.url", nil),
 			},
 			wantError: nil,
 			want: &httptest.ResponseRecorder{
@@ -384,7 +383,7 @@ func Test_athenz_AthenzAuthorizer(t *testing.T) {
 			name: "Check AthenzAuthorizer success",
 			fields: fields{
 				authz: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-					body, err := ioutil.ReadAll(r.Body)
+					body, err := io.ReadAll(r.Body)
 					if err != nil {
 						http.Error(w, err.Error(), http.StatusInternalServerError)
 						return
@@ -400,7 +399,7 @@ func Test_athenz_AthenzAuthorizer(t *testing.T) {
 			},
 			args: args{
 				w: httptest.NewRecorder(),
-				r: httptest.NewRequest("POST", "http://dummy.url", bytes.NewBufferString("dummy athenz authorizer request body")),
+				r: httptest.NewRequestWithContext(context.Background(), "POST", "http://dummy.url", bytes.NewBufferString("dummy athenz authorizer request body")),
 			},
 			wantError: nil,
 			want: &httptest.ResponseRecorder{
@@ -418,7 +417,7 @@ func Test_athenz_AthenzAuthorizer(t *testing.T) {
 			},
 			args: args{
 				w: httptest.NewRecorder(),
-				r: httptest.NewRequest("GET", "http://dummy.url", nil),
+				r: httptest.NewRequestWithContext(context.Background(), "GET", "http://dummy.url", nil),
 			},
 			wantError: nil,
 			want: &httptest.ResponseRecorder{

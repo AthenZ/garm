@@ -18,7 +18,6 @@ import (
 	"bytes"
 	"errors"
 	"io"
-	"io/ioutil"
 	"os"
 	"reflect"
 	"strings"
@@ -108,7 +107,7 @@ func TestNewLogger(t *testing.T) {
 				expectedLogMsg := "[dummy ID]:\tdummy msg\n"
 				got.GetProvider()(dummyID).Println(dummyMsg)
 
-				body, err := ioutil.ReadAll(f)
+				body, err := io.ReadAll(f)
 				if err != nil {
 					return err
 				}

@@ -29,7 +29,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-// Version is set by the build command via LDFLAGS
+// Version is set by the build command via LDFLAGS.
 var Version string
 
 // params is the data model for Garm command line arguments.

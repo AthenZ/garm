@@ -1,0 +1,69 @@
+name: lint
+
+on:
+  push:
+    branches: [ master ]
+    tags: [ 'v[0-9]+.[0-9]+.[0-9]+' ]
+  pull_request:
+    branches: [ master ]
+
+permissions:
+  contents: read
+
+jobs:
+  golangci-lint:
+    name: golangci-lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+      - name: Setup Golang
+        uses: actions/setup-go@v7
+        with:
+          go-version-file: go.mod
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v9
+        with:
+          version: v2.15.0
+          args: --config .golangci.yml
+
+  markdownlint:
+    name: markdownlint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+      - name: markdownlint
+        uses: DavidAnson/markdownlint-cli2-action@v24.2.0
+        with:
+          globs: |
+            README.md
+            docs/**/*.md
+
+  CodeQL:
+    name: CodeQL
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+      actions: read
+    strategy:
+      fail-fast: false
+      matrix:
+        language: ['go']
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+      - name: Setup Golang
+        uses: actions/setup-go@v7
+        with:
+          go-version-file: go.mod
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v4
+        with:
+          languages: ${{ matrix.language }}
+          build-mode: manual
+      - name: Build
+        run: go build ./...
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v4

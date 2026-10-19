@@ -19,7 +19,6 @@ import (
 	"crypto/x509"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"strings"
 	"testing"
@@ -418,8 +417,11 @@ func TestNewX509CertPool(t *testing.T) {
 				path: "./testdata/dummyCa.pem",
 			},
 			want: func() *x509.CertPool {
-				wantPool := x509.NewCertPool()
-				c, err := ioutil.ReadFile("./testdata/dummyCa.pem")
+				wantPool, err := x509.SystemCertPool()
+				if err != nil || wantPool == nil {
+					wantPool = x509.NewCertPool()
+				}
+				c, err := os.ReadFile("./testdata/dummyCa.pem")
 				if err != nil {
 					panic(err)
 				}
@@ -429,16 +431,8 @@ func TestNewX509CertPool(t *testing.T) {
 				return wantPool
 			}(),
 			checkFunc: func(want *x509.CertPool, got *x509.CertPool) error {
-				for _, wantCert := range want.Subjects() {
-					exists := false
-					for _, gotCert := range got.Subjects() {
-						if strings.EqualFold(string(wantCert), string(gotCert)) {
-							exists = true
-						}
-					}
-					if !exists {
-						return fmt.Errorf("Error\twant\t%s\t not found", string(wantCert))
-					}
+				if !got.Equal(want) {
+					return errors.New("certificate pool does not match the system roots plus configured CA")
 				}
 				return nil
 			},

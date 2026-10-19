@@ -17,7 +17,6 @@ package service
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"reflect"
 	"strings"
@@ -125,7 +124,7 @@ func TestNewTokenService(t *testing.T) {
 				KeyVersion:      "1",
 				Expiration:      "1s",
 			}
-			keyData, _ := ioutil.ReadFile(key)
+			keyData, _ := os.ReadFile(key)
 			athenzDomain := config.GetActualValue(cfg.AthenzDomain)
 			serviceName := config.GetActualValue(cfg.ServiceName)
 
@@ -547,7 +546,7 @@ func Test_token_createTokenBuilder(t *testing.T) {
 	}
 	tests := []test{
 		func() test {
-			keyData, err := ioutil.ReadFile("./testdata/dummyServer.key")
+			keyData, err := os.ReadFile("./testdata/dummyServer.key")
 			if err != nil {
 				panic(err)
 			}
@@ -576,7 +575,7 @@ func Test_token_createTokenBuilder(t *testing.T) {
 			}
 		}(),
 		func() test {
-			keyData, _ := ioutil.ReadFile("./testdata/emptyfile")
+			keyData, _ := os.ReadFile("./testdata/emptyfile")
 
 			return test{
 				name: "Check error create token builder",

@@ -17,7 +17,7 @@ package service
 import (
 	"crypto/tls"
 	"crypto/x509"
-	"io/ioutil"
+	"os"
 
 	"github.com/AthenZ/garm/v3/config"
 	"github.com/kpango/glg"
@@ -89,7 +89,6 @@ func NewTLSConfig(cfg config.TLS) (*tls.Config, error) {
 		t.ClientAuth = tls.RequireAndVerifyClientCert
 	}
 
-	t.BuildNameToCertificate()
 	return t, nil
 }
 
@@ -97,7 +96,7 @@ func NewTLSConfig(cfg config.TLS) (*tls.Config, error) {
 // The CertPool will read the certificate from the path, and append the content to the system certificate pool.
 func NewX509CertPool(path string) (*x509.CertPool, error) {
 	var pool *x509.CertPool
-	c, err := ioutil.ReadFile(path)
+	c, err := os.ReadFile(path)
 	if err == nil && c != nil {
 		pool, err = x509.SystemCertPool()
 		if err != nil || pool == nil {

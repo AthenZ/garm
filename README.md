@@ -9,16 +9,18 @@
 
 ![logo](./images/logo.png)
 
-<!-- TOC insertAnchor:false -->
+<!-- TOC -->
 
 - [What is Garm](#what-is-garm)
 - [Use Case](#use-case)
   - [Authorization](#authorization)
   - [Docker](#docker)
   - [Usage](#usage)
+- [Development](#development)
 - [About releases](#about-releases)
 
 <!-- /TOC -->
+<!--markdownlint-disable MD013-->
 
 ## What is Garm
 
@@ -50,8 +52,9 @@ Garm convert the K8s request to Athenz request based on the mapping rules in `co
 P.S. It is just a sample deployment solution above. Garm can work on any environment as long as it can access both the API server and the Athenz server.
 
 ### Docker
-```shell
-$ docker pull docker.io/athenz/garm
+
+```bash
+docker pull docker.io/athenz/garm
 ```
 
 ### Usage
@@ -59,6 +62,26 @@ $ docker pull docker.io/athenz/garm
 - [install Garm](https://github.com/AthenZ/garm/blob/master/docs/installation/02.%20install-garm.md)
 - [configure k8s webhook](https://github.com/AthenZ/garm/blob/master/docs/installation/03.%20config-k8s-in-webhook-mode.md)
 - [configure Athenz & Garm yaml](./docs/config-detail.md)
+
+## Development
+
+Use the Go version declared in [go.mod](./go.mod) and
+[golangci-lint v2.15.0](https://github.com/golangci/golangci-lint/releases/tag/v2.15.0).
+Run the Go checks from the repository root:
+
+```sh
+make lint
+make test
+```
+
+`make coverage` runs the race-enabled tests and writes `coverage.out` and
+`coverage.html` without changing the module files.
+
+With Node.js and npm installed, run the same Markdown checks as CI:
+
+```sh
+npm exec --yes --package=markdownlint-cli2@0.23.2 -- markdownlint-cli2 README.md 'docs/**/*.md'
+```
 
 ## About releases
 
