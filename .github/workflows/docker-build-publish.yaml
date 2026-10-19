@@ -84,7 +84,6 @@ jobs:
         # uses: https://github.com/actions/setup-go/tags
         uses: actions/setup-go@v4
         with:
-          go-version: "stable"
           go-version-file: './go.mod'
           cache: true
 
