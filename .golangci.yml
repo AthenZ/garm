@@ -1,31 +1,45 @@
-linters-settings:
-  errcheck:
-    ignore: "fmt:.*,github.com/kpango/glg:.*"
-issues:
-  max-same-issues: 0
-  # exclude:
-  #   - Error return value of .(glg.(Info|Log|Debug|Warn|Error|Success|Fail|Print|Println|CustomLog)f?). is not checked
+version: "2"
+
+run:
+  timeout: 5m
+
 linters:
-  presets:
-    # - bugs
-    - comment
-    # - complexity
-    # - error
-    # - format
-    # - import
-    # - metalinter
-    - module
-    - performance
-    # - sql
-    # - style
-    # - test
-    - unused
-  disable:
-    - varcheck
-    - deadcode
-    - structcheck
-    - maligned
-    - dupword
-    - godox
-    - gomoddirectives
-    - godot
+  default: standard
+  enable:
+    - bodyclose
+    - fatcontext
+    - misspell
+    - noctx
+    - prealloc
+    - unparam
+  settings:
+    errcheck:
+      # Preserve the logging exclusions from the v1 configuration.
+      exclude-functions:
+        - github.com/kpango/glg.Debugf
+        - github.com/kpango/glg.Error
+        - github.com/kpango/glg.Errorf
+        - github.com/kpango/glg.Fatal
+        - github.com/kpango/glg.Fatalln
+        - github.com/kpango/glg.Info
+        - github.com/kpango/glg.Infof
+        - github.com/kpango/glg.Warn
+        - github.com/kpango/glg.Warnf
+    staticcheck:
+      # These match the staticcheck and gosimple checks enabled in v1.
+      checks:
+        - SA*
+        - S1*
+  exclusions:
+    presets:
+      - comments
+      - common-false-positives
+      - legacy
+      - std-error-handling
+    # Preserve v1's exclusion for vendored code.
+    paths:
+      - ^third_party/
+
+issues:
+  max-issues-per-linter: 0
+  max-same-issues: 0

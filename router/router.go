@@ -18,7 +18,6 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"strings"
 	"time"
@@ -170,7 +169,7 @@ func recoverWrap(h http.Handler) http.Handler {
 func flushAndClose(rc io.ReadCloser) error {
 	if rc != nil {
 		// flush
-		_, err := io.Copy(ioutil.Discard, rc)
+		_, err := io.Copy(io.Discard, rc)
 		if err != nil {
 			return errors.Wrap(err, "request body flush failed")
 		}

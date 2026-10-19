@@ -36,6 +36,7 @@ jobs:
       actions: none
       checks: none
       contents: read
+      id-token: write
       deployments: none
       issues: none
       discussions: none
@@ -71,7 +72,7 @@ jobs:
         id: checkout
         # You may pin to the exact commit or the version.
         # uses: https://github.com/actions/checkout/tags
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       # This action sets up a go environment for use in actions by:
       # - Optionally downloading and caching a version of Go by version and adding to PATH.
@@ -82,7 +83,7 @@ jobs:
         id: setup-go
         # You may pin to the exact commit or the version.
         # uses: https://github.com/actions/setup-go/tags
-        uses: actions/setup-go@v4
+        uses: actions/setup-go@v7
         with:
           go-version-file: './go.mod'
           cache: true
@@ -93,21 +94,32 @@ jobs:
         id: go-tests
         run: |
           go version
-          rm -rf example
           go test -v -race -covermode=atomic -coverprofile=coverage.out ./...
+          go tool cover -html=coverage.out -o coverage.html
+
+      - name: Save coverage report
+        uses: actions/upload-artifact@v7
+        with:
+          name: coverage
+          path: |
+            coverage.out
+            coverage.html
+          if-no-files-found: error
 
       # This action uploads coverage to Codecov.
       # https://github.com/codecov/codecov-action
       -
         name: Upload coverage to Codecov
         id: go-coverage
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v7
         with:
+          # Fork pull requests use Codecov's public-repository tokenless uploads.
+          use_oidc: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository }}
           files: ./coverage.out
+          disable_search: true
           flags: unittests
           fail_ci_if_error: true
           verbose: true
-          version: "latest"
 
       # https://github.com/apache/skywalking-eyes
       # issue: go version hard-coded: https://github.com/apache/skywalking-eyes/blob/5dfa68f93380a5e57259faaf95088b7f133b5778/header/action.yml#L47-L51
@@ -179,6 +191,7 @@ jobs:
       -
         name: Docker Login to registry ${{ env.DOCKER_REGISTRY_URL }}
         id: login
+        if: github.event_name != 'pull_request'
         # You may pin to the exact commit or the version.
         # uses: https://github.com/docker/login-action/tags
         uses: docker/login-action@v3
@@ -217,7 +230,7 @@ jobs:
         id: build_and_push
         # You may pin to the exact commit or the version.
         # uses: https://github.com/docker/build-push-action/tags
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v7
         with:
           context: .
           push: ${{ github.event_name != 'pull_request' }}

@@ -1,6 +1,6 @@
 GO_VERSION:=$(shell go version)
 
-.PHONY: all clean bench bench-all profile lint test contributors update install
+.PHONY: all build clean bench bench-all profile lint test contributors update install coverage check-license-header
 
 all: build
 
@@ -41,8 +41,8 @@ deps: clean
 lint:
 	golangci-lint run -c ./.golangci.yml
 
-test: clean init
-	GO111MODULE=on go test --race -v ./...
+test:
+	go test -race -v ./...
 
 contributors:
 	git log --format='%aN <%aE>' | sort -fu > CONTRIBUTORS
@@ -54,7 +54,6 @@ docker-push:
 coverage:
 	go test -v -race -covermode=atomic -coverprofile=coverage.out ./...
 	go tool cover -html=coverage.out -o coverage.html
-	rm -f coverage.out
 
 check-license-header:
 	# go install github.com/apache/skywalking-eyes/cmd/license-eye@latest

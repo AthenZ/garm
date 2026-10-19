@@ -19,7 +19,6 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"reflect"
@@ -289,7 +288,7 @@ func Test_athenz_AthenzAuthenticator(t *testing.T) {
 			name: "Check AthenzAuthenticator success",
 			fields: fields{
 				authn: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-					body, err := ioutil.ReadAll(r.Body)
+					body, err := io.ReadAll(r.Body)
 					if err != nil {
 						http.Error(w, err.Error(), http.StatusInternalServerError)
 						return
@@ -305,7 +304,7 @@ func Test_athenz_AthenzAuthenticator(t *testing.T) {
 			},
 			args: args{
 				w: httptest.NewRecorder(),
-				r: httptest.NewRequest("POST", "http://dummy.url", bytes.NewBufferString("dummy athenz authenticator request body")),
+				r: httptest.NewRequestWithContext(context.Background(), "POST", "http://dummy.url", bytes.NewBufferString("dummy athenz authenticator request body")),
 			},
 			wantError: nil,
 			want: &httptest.ResponseRecorder{
@@ -323,7 +322,7 @@ func Test_athenz_AthenzAuthenticator(t *testing.T) {
 			},
 			args: args{
 				w: httptest.NewRecorder(),
-				r: httptest.NewRequest("GET", "http://dummy.url", nil),
+				r: httptest.NewRequestWithContext(context.Background(), "GET", "http://dummy.url", nil),
 			},
 			wantError: nil,
 			want: &httptest.ResponseRecorder{
@@ -384,7 +383,7 @@ func Test_athenz_AthenzAuthorizer(t *testing.T) {
 			name: "Check AthenzAuthorizer success",
 			fields: fields{
 				authz: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-					body, err := ioutil.ReadAll(r.Body)
+					body, err := io.ReadAll(r.Body)
 					if err != nil {
 						http.Error(w, err.Error(), http.StatusInternalServerError)
 						return
@@ -400,7 +399,7 @@ func Test_athenz_AthenzAuthorizer(t *testing.T) {
 			},
 			args: args{
 				w: httptest.NewRecorder(),
-				r: httptest.NewRequest("POST", "http://dummy.url", bytes.NewBufferString("dummy athenz authorizer request body")),
+				r: httptest.NewRequestWithContext(context.Background(), "POST", "http://dummy.url", bytes.NewBufferString("dummy athenz authorizer request body")),
 			},
 			wantError: nil,
 			want: &httptest.ResponseRecorder{
@@ -418,7 +417,7 @@ func Test_athenz_AthenzAuthorizer(t *testing.T) {
 			},
 			args: args{
 				w: httptest.NewRecorder(),
-				r: httptest.NewRequest("GET", "http://dummy.url", nil),
+				r: httptest.NewRequestWithContext(context.Background(), "GET", "http://dummy.url", nil),
 			},
 			wantError: nil,
 			want: &httptest.ResponseRecorder{

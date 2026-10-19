@@ -16,7 +16,7 @@ package service
 
 import (
 	"context"
-	"io/ioutil"
+	"os"
 	"strings"
 	"sync/atomic"
 	"time"
@@ -63,7 +63,7 @@ func NewTokenService(cfg config.Token) (TokenService, error) {
 		return nil, errors.Wrapf(err, "invalid token expiration %s", cfg.Expiration)
 	}
 
-	keyData, err := ioutil.ReadFile(config.GetActualValue(cfg.PrivateKey))
+	keyData, err := os.ReadFile(config.GetActualValue(cfg.PrivateKey))
 	if err != nil && keyData == nil {
 		if cfg.NTokenPath == "" {
 			return nil, errors.Wrap(err, "invalid token private key")
@@ -163,7 +163,7 @@ func (t *token) loadToken() (ntoken string, err error) {
 
 	} else {
 		// Copper Argos
-		tok, err := ioutil.ReadFile(t.tokenFilePath)
+		tok, err := os.ReadFile(t.tokenFilePath)
 		if err != nil {
 			return "", errors.Wrap(err, "load token from filepath failed")
 		}

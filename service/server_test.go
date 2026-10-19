@@ -710,7 +710,7 @@ func Test_server_handleHealthCheckRequest(t *testing.T) {
 				name: "Test handle HTTP GET request health check request",
 				args: args{
 					rw: rw,
-					r:  httptest.NewRequest(http.MethodGet, "/", nil),
+					r:  httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil),
 				},
 				checkFunc: func() error {
 					result := rw.Result()

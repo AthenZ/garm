@@ -296,7 +296,7 @@ func (r *RequestInfo) Match(req RequestInfo) bool {
 		}
 	})
 
-	return r.reg.Copy().MatchString(strings.ToLower(req.Serialize()))
+	return r.reg.MatchString(strings.ToLower(req.Serialize()))
 }
 
 // New returns the decoded configuration YAML file as *Config struct. Returns non-nil error if any.
