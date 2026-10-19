@@ -1,10 +1,9 @@
 module github.com/AthenZ/garm/v3
 
-go 1.26.0
+go 1.26.9
 
 replace (
 	github.com/AthenZ/athenz => github.com/AthenZ/athenz v1.11.26
-	golang.org/x/net => golang.org/x/net v0.55.0
 	k8s.io/client-go => k8s.io/client-go v0.31.3
 )
 
@@ -52,12 +51,12 @@ require (
 	github.com/rogpeppe/go-internal v1.13.1 // indirect
 	github.com/x448/float16 v0.8.4 // indirect
 	github.com/zeebo/xxh3 v1.0.2 // indirect
-	golang.org/x/net v0.53.0 // indirect
+	golang.org/x/net v0.60.0 // indirect
 	golang.org/x/oauth2 v0.27.0 // indirect
-	golang.org/x/sync v0.20.0 // indirect
-	golang.org/x/sys v0.45.0 // indirect
-	golang.org/x/term v0.43.0 // indirect
-	golang.org/x/text v0.37.0 // indirect
+	golang.org/x/sync v0.23.0 // indirect
+	golang.org/x/sys v0.48.0 // indirect
+	golang.org/x/term v0.46.0 // indirect
+	golang.org/x/text v0.42.0 // indirect
 	golang.org/x/time v0.3.0 // indirect
 	google.golang.org/protobuf v1.34.2 // indirect
 	gopkg.in/evanphx/json-patch.v4 v4.12.0 // indirect
