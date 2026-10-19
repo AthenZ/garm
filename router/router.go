@@ -28,6 +28,8 @@ import (
 	"github.com/pkg/errors"
 )
 
+const maxBodyDrainBytes = 256 * 1024
+
 // New returns ServeMux with routes using given handler.
 func New(cfg config.Server, h handler.Handler) *http.ServeMux {
 
@@ -164,12 +166,12 @@ func recoverWrap(h http.Handler) http.Handler {
 	})
 }
 
-// flushAndClose helps to flush and close a ReadCloser. Used for request body internal.
+// flushAndClose drains at most maxBodyDrainBytes before closing a request body.
 // Returns if there is any errors.
 func flushAndClose(rc io.ReadCloser) error {
 	if rc != nil {
 		// flush
-		_, err := io.Copy(io.Discard, rc)
+		_, err := io.Copy(io.Discard, io.LimitReader(rc, maxBodyDrainBytes))
 		if err != nil {
 			return errors.Wrap(err, "request body flush failed")
 		}

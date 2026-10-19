@@ -5,6 +5,7 @@ import (
 	"crypto/rand"
 	"encoding/base32"
 	"encoding/json"
+	"errors"
 	"log"
 	"net/http"
 	"os"
@@ -13,7 +14,19 @@ import (
 
 // this file contains http and context helpers
 
+// Match the default Kubernetes API server request-body limit.
+const maxRequestBodyBytes = 3 * 1024 * 1024
+
 var logKey = struct{}{}
+
+func writeRequestError(w http.ResponseWriter, err error) {
+	status := http.StatusBadRequest
+	var maxBytesErr *http.MaxBytesError
+	if errors.As(err, &maxBytesErr) {
+		status = http.StatusRequestEntityTooLarge
+	}
+	http.Error(w, err.Error(), status)
+}
 
 // writeJSON writes the supplied data as JSON to the response writer.
 func writeJSON(ctx context.Context, w http.ResponseWriter, data interface{}) {
@@ -81,6 +94,7 @@ func wrapHandler(delegate http.Handler, config Config) http.Handler {
 	}
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		req := requestWithContext(r, config)
+		req.Body = http.MaxBytesReader(w, req.Body, maxRequestBodyBytes)
 		ctx := req.Context()
 		if isLogEnabled(ctx, LogTraceServer) {
 			dumpRequest(getLogger(ctx), req)

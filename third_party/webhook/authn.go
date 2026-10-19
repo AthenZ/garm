@@ -30,7 +30,7 @@ func newAuthn(c AuthenticationConfig) *authenticator {
 func (a *authenticator) getTokenReview(ctx context.Context, req *http.Request) (*authn.TokenReview, error) {
 	b, err := ioutil.ReadAll(req.Body)
 	if err != nil {
-		return nil, fmt.Errorf("body read error for authentication request, %v", err)
+		return nil, fmt.Errorf("body read error for authentication request, %w", err)
 	}
 	if len(b) == 0 {
 		return nil, fmt.Errorf("empty body for authentication request")
@@ -130,7 +130,7 @@ func (a *authenticator) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	tr, err := a.getTokenReview(ctx, r)
 	if err != nil {
 		l.Printf("authn request error from %s: %v\n", r.RemoteAddr, err)
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		writeRequestError(w, err)
 		return
 	}
 
