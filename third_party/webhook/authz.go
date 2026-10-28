@@ -94,7 +94,7 @@ func (a *authorizer) getSubjectAccessReview(ctx context.Context, req *http.Reque
 	isV1Beta := false // TODO: Remove me! Temporary fix to support both v1 and v1beta1 versions of SubjectAccessReview.
 	b, err := ioutil.ReadAll(req.Body)
 	if err != nil {
-		return isV1Beta, nil, fmt.Errorf("body read error for authorization request, %v", err)
+		return isV1Beta, nil, fmt.Errorf("body read error for authorization request, %w", err)
 	}
 	if len(b) == 0 {
 		return isV1Beta, nil, fmt.Errorf("empty body for authorization request")
@@ -325,7 +325,7 @@ func (a *authorizer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	isV1Beta, sr, err := a.getSubjectAccessReview(ctx, r)
 	if err != nil {
 		getLogger(ctx).Printf("authz request error from %s: %v\n", r.RemoteAddr, err)
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		writeRequestError(w, err)
 		return
 	}
 

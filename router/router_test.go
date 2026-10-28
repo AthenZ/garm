@@ -752,6 +752,50 @@ func Test_flushAndClose(t *testing.T) {
 	}
 }
 
+func TestRoutingUnsupportedMethodBodyLimit(t *testing.T) {
+	const drainLimit = 256 * 1024
+	mux := New(config.Server{Timeout: "1s"}, &dummyHandler{})
+	for _, path := range []string{"/authn", "/authz"} {
+		t.Run(path, func(t *testing.T) {
+			for _, length := range []int64{drainLimit * 4, -1} {
+				t.Run(fmt.Sprint(length), func(t *testing.T) {
+					remaining := drainLimit * 4
+					bytesRead := 0
+					closed := false
+					body := &readCloserMock{
+						readMock: func(p []byte) (int, error) {
+							if remaining == 0 {
+								return 0, io.EOF
+							}
+							n := min(len(p), remaining)
+							remaining -= n
+							bytesRead += n
+							return n, nil
+						},
+						closeMock: func() error {
+							closed = true
+							return nil
+						},
+					}
+					req := httptest.NewRequestWithContext(context.Background(), http.MethodPut, path, body)
+					req.ContentLength = length
+					w := httptest.NewRecorder()
+					mux.ServeHTTP(w, req)
+					if w.Code != http.StatusMethodNotAllowed {
+						t.Errorf("status = %d, want %d", w.Code, http.StatusMethodNotAllowed)
+					}
+					if bytesRead > drainLimit {
+						t.Errorf("cleanup read %d bytes, want at most %d", bytesRead, drainLimit)
+					}
+					if !closed {
+						t.Error("request body was not closed")
+					}
+				})
+			}
+		})
+	}
+}
+
 func Test_recoverWrap(t *testing.T) {
 	type args struct {
 		h http.Handler
