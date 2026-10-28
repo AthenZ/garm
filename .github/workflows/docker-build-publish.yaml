@@ -73,6 +73,25 @@ jobs:
         # You may pin to the exact commit or the version.
         # uses: https://github.com/actions/checkout/tags
         uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Check coverage scope
+        id: coverage-scope
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          if [[ "$EVENT_NAME" == "pull_request" ]]; then
+            changed_files=$(git diff --name-only --no-renames "$PR_BASE_SHA...$PR_HEAD_SHA")
+            if [[ "$changed_files" == "Makefile" ]]; then
+              echo "run=false" >> "$GITHUB_OUTPUT"
+              echo "Coverage skipped: only the root Makefile changed." >> "$GITHUB_STEP_SUMMARY"
+              exit 0
+            fi
+          fi
+          echo "run=true" >> "$GITHUB_OUTPUT"
 
       # This action sets up a go environment for use in actions by:
       # - Optionally downloading and caching a version of Go by version and adding to PATH.
@@ -92,12 +111,14 @@ jobs:
       -
         name: Golang Tests
         id: go-tests
+        if: steps.coverage-scope.outputs.run == 'true'
         run: |
           go version
           go test -v -race -covermode=atomic -coverprofile=coverage.out ./...
           go tool cover -html=coverage.out -o coverage.html
 
       - name: Save coverage report
+        if: steps.coverage-scope.outputs.run == 'true'
         uses: actions/upload-artifact@v7
         with:
           name: coverage
@@ -111,6 +132,7 @@ jobs:
       -
         name: Upload coverage to Codecov
         id: go-coverage
+        if: steps.coverage-scope.outputs.run == 'true'
         uses: codecov/codecov-action@v7
         with:
           # Fork pull requests use Codecov's public-repository tokenless uploads.
